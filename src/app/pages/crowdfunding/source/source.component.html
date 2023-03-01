@@ -1,0 +1,139 @@
+<div class="souce_container">
+  <div class="overview bg-primary py-8 d-flex pb-20" *ngIf="source">
+    <div class="container">
+      <h1 class="d-flex position-relative mb-0">
+        <span class="text-white">{{'OTHERS.Aggregatore_Crowdfunding' | translate}}</span>
+        <span class="position-relative ms-2 cursor-pointer" [ngbTooltip]="titleTooltipTemplate" triggers="click hover" placement="bottom-center" [closeDelay]="1000">
+          <i class="fa fa-question-circle fs-2"></i>
+        </span>
+        <a routerLink="/crowdfunding" class="position-relative ms-5">
+          <i class="fa fa-link f-16px"></i>
+        </a>
+      </h1>
+    </div>
+  </div>
+
+  <div class="bg-white mt-n10" style="border-top-left-radius: 2.5rem;">
+    <div class="container">
+      <div class="pt-10 pb-10">
+        <div>
+          <div class="row" *ngIf="source">
+            <div class="col-xl-2 col-md-4 mb-12">
+              <div class="logo me-7">
+                <img [src]="source.smallLogo" alt="" class="img">
+              </div>
+            </div>
+  
+            <div class="col-xl-7 col-md-8 mb-12">
+              <div class="pt-2">
+                <div class="text-primary fw-boldest fs-1">{{source.name}}</div>
+                <a class="pt-4 cursor-pointer" (click)="common.openLinkWithNewTab(source.link)">{{source.link}}</a>
+                <div class="pt-4">
+                  <span class="fs-5" [innerHtml]="source.description"></span>
+                </div>
+                <div class="d-flex flex-wrap justify-between mt-7">
+                  <span>
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M0.292786 19.7071C0.480314 19.8946 0.734622 19.9999 0.999786 19.9999C1.26495 19.9999 1.51926 19.8946 1.70679 19.7071L12.2428 9.17113C13.2765 9.85439 14.527 10.1295 15.752 9.94311C16.977 9.75673 18.0892 9.12213 18.8728 8.16234C19.6565 7.20256 20.0559 5.98597 19.9936 4.74845C19.9312 3.51093 19.4116 2.34064 18.5354 1.46447C17.6593 0.588302 16.489 0.0686758 15.2515 0.00633649C14.0139 -0.0560028 12.7974 0.343386 11.8376 1.12707C10.8778 1.91075 10.2432 3.0229 10.0568 4.24789C9.87041 5.47289 10.1455 6.72345 10.8288 7.75713L0.292786 18.2931C0.105315 18.4807 0 18.735 0 19.0001C0 19.2653 0.105315 19.5196 0.292786 19.7071ZM12.8788 2.87913C13.1555 2.5926 13.4866 2.36405 13.8526 2.20682C14.2186 2.0496 14.6122 1.96684 15.0106 1.96338C15.4089 1.95992 15.804 2.03582 16.1726 2.18666C16.5413 2.33751 16.8763 2.56026 17.158 2.84194C17.4396 3.12362 17.6624 3.45858 17.8133 3.82727C17.9641 4.19595 18.04 4.59099 18.0365 4.98933C18.0331 5.38767 17.9503 5.78133 17.7931 6.14734C17.6359 6.51335 17.4073 6.84439 17.1208 7.12113C16.5493 7.66654 15.7897 7.97084 14.9998 7.97084C14.2098 7.97084 13.4502 7.66654 12.8788 7.12113C12.3164 6.55855 12.0004 5.79562 12.0004 5.00013C12.0004 4.20464 12.3164 3.44171 12.8788 2.87913Z" fill="#003F87"/>
+                      </svg>
+                    <span class="spec_name fs-6">{{source.address}}</span>
+                  </span>
+                  <span style="text-transform: capitalize;">
+                    <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M11 0C8.82441 0 6.69767 0.645139 4.88873 1.85383C3.07979 3.06253 1.66989 4.78049 0.83733 6.79048C0.00476617 8.80047 -0.213071 11.0122 0.211367 13.146C0.635804 15.2798 1.68345 17.2398 3.22183 18.7782C4.76021 20.3166 6.72022 21.3642 8.85401 21.7886C10.9878 22.2131 13.1995 21.9952 15.2095 21.1627C17.2195 20.3301 18.9375 18.9202 20.1462 17.1113C21.3549 15.3023 22 13.1756 22 11C21.9966 8.08367 20.8365 5.28778 18.7744 3.22563C16.7122 1.16347 13.9163 0.00344047 11 0ZM7.149 2.878C7.11029 3.66835 6.84163 4.4302 6.376 5.07C5.982 4.87 5.51601 4.613 4.998 4.313C5.64241 3.7339 6.36684 3.25061 7.149 2.878ZM5.183 17.855C3.65655 16.5631 2.60382 14.7997 2.191 12.843C5.8 11.618 7.34 11.433 7.94 11.433C7.83188 11.719 7.65172 11.9721 7.417 12.168C7.11767 12.4227 6.89361 12.7543 6.769 13.127C6.69791 13.4021 6.70723 13.6918 6.79586 13.9618C6.88449 14.2317 7.0487 14.4706 7.269 14.65C7.315 15.077 6.28601 16.412 5.605 17.296C5.465 17.476 5.324 17.67 5.183 17.855ZM11 20C9.55209 20 8.12585 19.6483 6.844 18.975C6.959 18.823 7.075 18.664 7.188 18.517C8.541 16.762 9.936 14.951 8.89701 13.517C9.24677 13.198 9.52568 12.8092 9.71568 12.3756C9.90568 11.942 10.0025 11.4734 10 11C10.0017 10.7648 9.9463 10.5327 9.83848 10.3237C9.73065 10.1146 9.57366 9.93493 9.381 9.8C8.918 9.473 7.986 8.811 2.01 10.792C2.04876 9.01503 2.61624 7.28994 3.64 5.837C4.37801 6.273 5.019 6.628 5.553 6.895C5.85578 7.04974 6.19554 7.11746 6.53451 7.09063C6.87347 7.06379 7.19835 6.94345 7.473 6.743C8.593 5.959 9.17301 3.943 9.186 2.184C10.7819 1.85456 12.4376 1.96904 13.973 2.515C10.758 3.888 10 5.653 10 7C10 10.034 12.017 10.268 13.1 10.394C14 10.499 14 10.499 14 11C13.984 11.8445 13.8054 12.6781 13.474 13.455C13.111 14.428 12.563 15.9 14.553 16.895C14.8826 17.0583 15.2462 17.1416 15.614 17.138C16.5456 17.0555 17.4477 16.7698 18.257 16.301C17.4241 17.4455 16.3327 18.3771 15.0716 19.0199C13.8105 19.6627 12.4155 19.9985 11 20ZM19.635 13.515C18.9585 13.7495 18.3003 14.0339 17.666 14.366C16.88 14.753 15.804 15.283 15.447 15.105C15.3307 15.0484 15.2185 14.9839 15.111 14.912C15.1652 14.6516 15.2445 14.397 15.348 14.152C15.7647 13.1526 15.986 12.0827 16 11C16 8.717 14.2 8.508 13.33 8.407C12.282 8.286 12 8.253 12 7C12 5.372 14.545 4.323 16.354 3.783C17.835 4.87116 18.9445 6.38933 19.5316 8.13078C20.1187 9.87222 20.1548 11.7523 19.635 13.515Z" fill="#003F87"/>
+                      </svg>
+                    <span class="spec_name fs-6">{{source.country}}</span>
+                  </span>
+                  <span>
+                    <svg width="20" height="21" viewBox="0 0 20 21" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M19.707 2.97479L17.525 0.792786C17.3375 0.605315 17.0832 0.5 16.818 0.5C16.5528 0.5 16.2985 0.605315 16.111 0.792786L7.384 9.52079C7.27387 9.62983 7.19126 9.76351 7.143 9.91079L6.052 13.1838C6.00196 13.334 5.98831 13.494 6.01219 13.6506C6.03608 13.8071 6.0968 13.9558 6.18937 14.0843C6.28193 14.2128 6.40369 14.3175 6.54463 14.3897C6.68556 14.4619 6.84163 14.4997 7 14.4998C7.10746 14.4998 7.2142 14.4822 7.316 14.4478L10.589 13.3568C10.7363 13.3085 10.87 13.2259 10.979 13.1158L19.707 4.38879C19.8945 4.20126 19.9998 3.94695 19.9998 3.68179C19.9998 3.41662 19.8945 3.16231 19.707 2.97479ZM9.732 11.5348L8.581 11.9188L8.965 10.7678L16.818 2.91379L17.586 3.68179L9.732 11.5348ZM0 4.49979C0 4.23457 0.105357 3.98022 0.292893 3.79268C0.48043 3.60514 0.734784 3.49979 1 3.49979H9C9.26522 3.49979 9.51957 3.60514 9.70711 3.79268C9.89464 3.98022 10 4.23457 10 4.49979C10 4.765 9.89464 5.01936 9.70711 5.20689C9.51957 5.39443 9.26522 5.49979 9 5.49979H2V18.4998H15V11.4998C15 11.2346 15.1054 10.9802 15.2929 10.7927C15.4804 10.6051 15.7348 10.4998 16 10.4998C16.2652 10.4998 16.5196 10.6051 16.7071 10.7927C16.8946 10.9802 17 11.2346 17 11.4998V19.4998C17 19.765 16.8946 20.0194 16.7071 20.2069C16.5196 20.3944 16.2652 20.4998 16 20.4998H1C0.734784 20.4998 0.48043 20.3944 0.292893 20.2069C0.105357 20.0194 0 19.765 0 19.4998V4.49979Z" fill="#003F87"/>
+                      </svg>
+                    <span class="spec_name fs-6">{{'OTHERS.VAT_NUMBER' | translate}}: {{source.fiscalCode}}</span>
+                  </span>
+                </div>
+              </div>
+            </div>
+  
+            <div class="col-xl-3 col-md-6 mb-12">
+              <div class="d-flex flex-wrap {{source.socials?.length > 3 ? 'justify-content-start' : 'justify-content-end'}} mt-3" *ngIf="source.socials?.length || source.link">
+                <span *ngIf="source.link" class="hvr-grow-shadow btn rounded-pill btn-icon btn-dark w-44px h-44px me-4 mb-4">
+                  <a (click)="common.openLinkWithNewTab(source.link)">
+                    <i class="fa fa-link f-16px"></i>
+                  </a>
+                </span>
+                <span *ngFor="let social of source.socials"
+                  class="hvr-grow-shadow btn rounded-pill btn-icon btn-dark w-44px h-44px me-4 mb-4">
+                  <a (click)="common.openLinkWithNewTab(social.link)">
+                    <i class="{{social.icon}} text-white f-16px"></i>
+                  </a>
+                </span>
+              </div>
+            </div>
+  
+            <div class="fs-5" *ngIf="source.blogSection" >
+              {{'OTHERS.discover_blog' | translate}} {{source.name}}: <a class="cursor-pointer" (click)="common.openLinkWithNewTab(source.blogSection)">{{source.blogSection}}</a>
+            </div>
+          </div>
+  
+          <br>
+  
+          <div class="row pt-10 d-flex flex-wrap">
+            <ng-container *ngIf="campaigns.length">
+              <div class="col-xl-4 col-md-6 mb-12" *ngFor="let campaign of campaigns">
+                <app-campaign-card
+                  [data]="campaign"
+                  [type]="'md'"
+                  (videoClick)="onClickVideo($event)"
+                  (followClick)="onClickFollowCampaign($event)"
+                  (walletClick)="onClickWalletCampaign($event)"
+                  (detailClick)="onClickDetailCampaign($event)"
+                  (externalClick)="onClickExternalCampaign($event)"
+                  (expandClick)="onExpandCard($event)"
+                  [expanded]="expanded">
+                </app-campaign-card>
+              </div>
+  
+              <div class="py-4 d-flex justify-content-center" *ngIf="campaigns.length && totalCampaigns > 9 && loadMore">
+                <div (click)="onClickLoadMore()" class="btn btn-warning hvr-grow-shadow"><span>{{ 'GENERAL.SHOW_MORE_RESULT' | translate}}</span></div>
+              </div>
+            </ng-container>
+  
+            <div class="modal" id="video_view">
+              <app-video-component
+                (close)="onCloseVideo()"
+                [campaigns]="campaigns"
+                [totalCount]="totalCampaigns"
+                (followClick)="onClickFollowCampaign($event)"
+                (walletClick)="onClickWalletCampaign($event)"
+                (detailClick)="onClickDetailCampaign($event)"
+                (externalClick)="onClickExternalCampaign($event)"
+                #video>
+              </app-video-component>
+            </div>
+          </div>
+        </div>
+      </div>
+  
+      <div class="d-flex justify-content-center pt-10">
+        <a routerLink="/crowdfunding" class="hvr-grow py-2 px-6 btn rounded-pill btn-warning text-capitalize h-40px">
+          <span class="fs-4 fw-bolder">{{ 'GENERAL.ALL_STARTUPS' | translate}}</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #titleTooltipTemplate>
+	<h2 class="fs-7 fw-normal">
+		{{'OTHERS.homepage_tooltip1' | translate}}
+		<a (click)="common.openLinkWithNewTab('https://www.startupswallet.com/news/it/crowdfunding/equity-crowdfunding/crowdfunding-immobiliare-un-fenomeno-in-crescita-con-grandi-potenzialita-di-ritorno/')">{{'OTHERS.immobiliari' | translate}}</a>
+		{{'OTHERS.homepage_tooltip2' | translate}}
+		<a (click)="common.openLinkWithNewTab('https://www.startupswallet.com/news/it/crowdfunding/lending-crowdfunding-guadagnare-aiutando-le-aziende/')">lending</a>
+		,
+		<a (click)="common.openLinkWithNewTab('https://www.startupswallet.com/news/it/crowdfunding/minibond/')">minibond</a>
+			{{'OTHERS.AND' | translate}}
+		<a (click)="common.openLinkWithNewTab('https://www.startupswallet.com/news/it/crowdfunding/equity-crowdfunding/')">equity</a>
+		{{'OTHERS.homepage_tooltip3' | translate}}
+		<a (click)="common.openLinkWithNewTab('https://www.startupswallet.com/news/it/crowdfunding/piattaforme-equity-crowdfunding/')">{{'OTHERS.homepage_tooltip4' | translate}}</a>
+	</h2>
+</ng-template>

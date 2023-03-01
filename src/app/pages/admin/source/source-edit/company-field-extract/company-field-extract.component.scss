@@ -1,0 +1,33 @@
+:host{
+    .company-field-extract-component{
+        &.border{
+            padding: 1.4em;
+            border: 1px solid #EBEDF3;
+            border-radius: 0.42rem;
+        }
+        position: relative;
+        
+        .form-group{
+            margin-bottom: 1rem;
+        }
+        .title {
+            position: absolute;
+            top: -0.8rem;
+            left: 0.8rem;
+            background: white;
+            padding: 0 3px;
+            font-size: 1rem;
+            font-weight: 400;
+        }
+        .kt-section{
+            margin-bottom: 0;
+        }
+        .kt-nav .kt-nav__section{
+            padding-left: 10px;
+            margin-bottom: 0.5rem;
+            .kt-nav__section-text {
+                color: #9292bb;
+            }
+        }
+    }
+}

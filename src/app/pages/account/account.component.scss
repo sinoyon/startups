@@ -1,0 +1,11 @@
+:host{
+    .nav-link{
+        &.active, &:hover{
+            background: #0275f914;
+            color: #0275f9;
+        }
+        &.active {
+            border-left: solid 5px #0275f9;
+        }
+    }
+}

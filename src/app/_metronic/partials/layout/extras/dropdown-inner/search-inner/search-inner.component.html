@@ -1,0 +1,89 @@
+<div>
+	<div class="w-100 px-4">
+		<div class="position-relative">
+			<span class="position-absolute top-50 translate-middle-y ms-0">
+				<span
+				[inlineSVG]="'./assets/media/svg/search.svg'"
+			></span>
+			</span>
+			<input #searchInput type="text"
+			class="form-control form-control-flush ps-7" spellcheck="false" autofocus/>
+			<span class="position-absolute top-50 end-0 translate-middle-y lh-0 me-1" *ngIf="(loading$ | async)">
+				<span class="spinner-border h-15px w-15px align-middle text-gray-400"></span>
+			</span>
+			<span [hidden]="(loading$ | async) || !searchInput.value"
+			class="btn btn-flush btn-active-color-primary position-absolute top-50 end-0 translate-middle-y lh-0" (click)="clear()">
+				<span class="svg-icon-2 svg-icon-lg-1 me-0">
+					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+						<rect opacity="0.5" x="6" y="17.3137" width="16" height="2" rx="1" transform="rotate(-45 6 17.3137)" fill="black"></rect>
+						<rect x="7.41422" y="6" width="16" height="2" rx="1" transform="rotate(45 7.41422 6)" fill="black"></rect>
+					</svg>
+				</span>
+			</span>
+		</div>
+	</div>
+	<div [hidden]="!searchInput.value">
+		<div *ngIf="campaignQuery?.result.length">
+			<div class="text-primary fs-5 fw-bold py-2 px-4">
+				{{'GENERAL.CAMPAIGNS'| translate}}
+			</div>
+			<div [perfectScrollbar]="{wheelPropagation: false, useBothWheelAxes: false, suppressScrollX: true}" [ngStyle]="{'max-height': '200px', 'position': 'relative'}">
+				<ng-container *ngFor="let item of campaignQuery.result; index as i">
+					<ng-container [ngTemplateOutlet]="campaignTemplate" [ngTemplateOutletContext]="{item: item}"></ng-container>
+				</ng-container>
+			</div>
+		</div>
+		<div *ngIf="categoryQuery?.result.length">
+			<div class="text-primary fs-5 fw-bold py-2 px-4">
+				{{'GENERAL.CATEGORIES'| translate}}
+			</div>
+			<div [perfectScrollbar]="{wheelPropagation: false, useBothWheelAxes: false, suppressScrollX: true}" [ngStyle]="{'max-height': '200px', 'position': 'relative'}">
+				<ng-container *ngFor="let item of categoryQuery.result; index as i">
+					<ng-container [ngTemplateOutlet]="categoryTemplate" [ngTemplateOutletContext]="{item: item}"></ng-container>
+				</ng-container>
+			</div>
+		</div>
+		<div *ngIf="campaignQuery?.result.length == 0 && categoryQuery?.result.length == 0">
+			<ng-container [ngTemplateOutlet]="emptyResultTemplate"></ng-container>
+		</div>
+	</div>
+</div>
+<ng-template #campaignTemplate let-item="item">
+	<div class="py-2 border-bottom px-4 bg-hover-secondary"
+		(click)="((!_user || _user.isGuest) && item.status == 'closed') ? checkUser() : optionSelect(item, $event, 'campaign')">
+		<div class="fs-7">
+			<span class="text-capitalize terminata" *ngIf="(_user && !_user.isGuest) && item.status == 'closed'">terminata</span>
+
+			<span class="fw-bold {{(!_user || _user.isGuest) && item.status == 'closed' ? 'text-danger' : ''}}" [innerHTML]="item.name | highlight: searchInput.value"></span>&nbsp;|&nbsp;
+
+			<span *ngIf="(!_user || _user.isGuest) && item.status == 'closed'">Fai la login per vedere questa campagna</span>
+
+			<span class="text-capitalize" *ngIf="(_user && !_user.isGuest) || ((!_user || _user.isGuest) && item.status != 'closed')" [innerHTML]="item.typology | highlight: searchInput.value"></span>
+			
+			<span *ngIf="(_user && !_user.isGuest) || ((!_user || _user.isGuest) && item.status != 'closed')">&nbsp;|&nbsp;</span>
+
+			<span class="text-info" *ngIf="(_user && !_user.isGuest) || ((!_user || _user.isGuest) && item.status != 'closed')" [innerHTML]="item.source | highlight: searchInput.value"></span>
+		</div>
+		<div class="fs-8" *ngIf="((_user && !_user.isGuest) || ((!_user || _user.isGuest) && item.status != 'closed')) && item.description">
+			<span [innerHTML]="item.description | highlight: searchInput.value"></span>
+		</div>
+	</div>
+</ng-template>
+<ng-template #categoryTemplate let-item="item">
+	<div class="py-2 border-bottom px-4 bg-hover-secondary"
+		(click)="optionSelect(item, $event, 'category')">
+		<div class="fs-7">
+			<span class="fw-bold" [innerHTML]="item.label | highlight: searchInput.value"></span>
+		</div>
+		<div class="fs-8" *ngIf="item.synonyms">
+			(<span [innerHTML]="item.synonyms | highlight: searchInput.value"></span>)
+		</div>
+	</div>
+</ng-template>
+<ng-template #emptyResultTemplate>
+	<div class="text-center fs-6 fw-bold py-6">
+		{{ ((loading$ | async) ? 'OTHERS.Loading': 'GENERAL.NO_RECORD_FOUND') | translate}}
+	</div>
+</ng-template>
+
+

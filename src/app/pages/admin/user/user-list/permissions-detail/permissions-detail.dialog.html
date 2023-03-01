@@ -1,0 +1,59 @@
+<div class="overlay" [ngClass]="{'overlay-block': loading$ | async}">
+	<ng-container *ngIf="loading$ | async">
+		<div class="overlay-layer bg-transparent" style="z-index: 1;">
+		  <div class="spinner spinner-center spinner-primary"></div>
+		</div>
+	</ng-container>
+  
+	<div class="modal-body">
+		<div class="table-responsive" style="overflow: visible;" *ngIf="role">
+			<table class="table table-head-custom table-vertical-center" >
+				<thead>
+					<tr class="text-left">
+						<th>{{'Permission name' | translate}}</th>
+						<th>Country</th>
+						<th>Typology</th>
+						<th>Allowed</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr *ngFor="let item of role.permissions">
+						<td class="pr-0 cursor-pointer">
+						  <div class="text-uppercase">
+							{{item.permission}}
+						  </div>
+						</td>
+						<td>
+						  <div class="ml-2 mb-2 d-flex align-items-center" *ngFor="let country of item.country ; index as i">
+							{{country}}&nbsp;
+						  </div>
+						</td>
+						<td>
+						  <div class="ml-2 mb-2 d-flex align-items-center" *ngFor="let typology of item.typology ; index as i">
+							{{typology}}&nbsp;
+						  </div>
+						</td>
+						<td>
+						  <div *ngIf="item.readable">
+							<label>READ</label>
+						  </div>
+						  <div *ngIf="item.writable">
+							<label>WRITE</label>
+						  </div>
+						  <div *ngIf="item.downloadable">
+							<label>DOWNLOAD</label>
+						  </div>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+	<div class="modal-footer">
+        <div>
+            <button type="button" class="btn btn-light btn-elevate me-1" (click)="modal.dismiss()">
+            {{ 'GENERAL.CLOSE' | translate}}
+            </button>
+        </div>
+    </div>
+</div>

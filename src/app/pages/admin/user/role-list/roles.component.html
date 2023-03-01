@@ -1,0 +1,23 @@
+<div class="card card-custom overlay" [ngClass]="{'overlay-block': loading$ | async}">
+	<ng-container *ngIf="loading$ | async">
+		<div class="overlay-layer bg-transparent" style="z-index: 1;">
+		  <div class="spinner spinner-center spinner-primary"></div>
+		</div>
+	</ng-container>
+	<div class="card-body">
+		<div>
+			<lp-table
+				[hidden]="isEmptyTable"
+				[hasPadding]="false"
+				[showSelectAllCheckbox]="true"
+				[suppressRowClickSelection]="true"
+				[showDeleteColumn]="true"
+				(action)="onAction($event)"
+				(paginationChanged)="onPaginationChanged($event)"
+				[columnDefs]="columnDefs"
+				#tableCtrl
+			></lp-table>
+		</div>
+		<div class="d-flex justify-content-center align-items-center h-200px" *ngIf="isEmptyTable">{{'GENERAL.NO_RECORD_FOUND' | translate}}</div>
+	</div>
+</div>

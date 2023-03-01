@@ -1,0 +1,81 @@
+<ng-container *ngFor="let menu of menuList">
+  <div
+  data-kt-menu-trigger="click"
+  data-kt-menu-placement="bottom-start"
+  class="menu-item px-2 bg-hover-light-primary"
+  [ngClass]="{'menu-lg-down-accordion menu-dropdown': menu.submenu}"
+  >
+    <a class="menu-link py-3 px-4 px-lg-0 bg-white" routerLinkActive="active" [routerLink]="menu.link"
+    *ngIf="!(menu.submenu && menu.submenu.length)"
+      ><span class="menu-title text-primary fs-4 text-uppercase fw-boldest">{{ menu.label | translate }}</span></a
+    >
+    <ng-container *ngIf="menu.submenu && menu.submenu.length">
+      <span class="menu-link py-3 px-4 px-lg-0 bg-transparent" [ngClass]="calculateMenuItemCssClass(menu.link)"
+        ><span class="menu-title  text-primary fs-4 text-uppercase fw-boldest">{{ menu.label | translate}}</span></span
+      >
+      <div
+        class="
+          menu-sub menu-sub-lg-down-accordion menu-sub-lg-dropdown menu-rounded-0
+          py-lg-4
+          w-lg-225px
+        "
+        data-kt-menu-dismiss="true"
+        data-popper-placement="bottom-start"
+      >
+        <div *ngFor="let smenu of menu.submenu"
+          class="menu-item menu-lg-down-accordion me-lg-1"
+          data-kt-menu-trigger="{default:'click', lg: 'hover'}"
+          data-kt-menu-placement="right-start"
+        >
+        <a
+        *ngIf="!(smenu.submenu && smenu.submenu.length)"
+          class="menu-link py-3 bg-white bg-hover-light-primary"
+          [routerLink]="smenu.link"
+          ><!--routerLinkActive="active"-->
+            <!-- <span class="menu-bullet">
+              <span class="bullet bullet-dot"></span>
+            </span> -->
+            <span class="menu-icon"><i class="bi fs-3 bi-layers"></i></span>
+            <span class="menu-title  text-primary fw-boldest">{{smenu.label | translate}}</span>
+          </a
+        > 
+
+        <ng-container *ngIf="smenu.submenu && smenu.submenu.length">
+          <span
+            class="menu-link py-3 bg-white bg-hover-light-primary"
+            [ngClass]="calculateMenuItemCssClass(smenu.link)"
+            >
+            <span class="menu-icon"><i class="bi fs-3 bi-layers"></i></span>
+            <span class="menu-title  text-primary fw-boldest">{{ smenu.label | translate }}</span><span class="menu-arrow"></span>
+          </span>
+          <div
+            class="
+              menu-sub
+              menu-sub-lg-down-accordion
+              menu-sub-lg-dropdown
+              menu-rounded-0
+              py-lg-4
+              w-lg-225px
+            "
+            data-kt-menu-dismiss="true"
+            *ngIf="smenu.submenu && smenu.submenu.length"
+          >
+            <div class="menu-item me-lg-1" *ngFor="let ssmenu of smenu.submenu">
+              <a
+                class="menu-link py-3 bg-white bg-hover-light-primary"
+                routerLinkActive="active"
+                [routerLink]="ssmenu.link"
+                ><span class="menu-bullet"
+                  ><span class="bullet bullet-dot"></span></span
+                ><span class="menu-title  text-primary fw-boldest">{{ssmenu.label | translate}}</span></a
+              >
+            </div>
+          </div>
+        </ng-container>
+          
+        </div>
+      </div>
+    </ng-container>
+
+  </div>
+</ng-container>

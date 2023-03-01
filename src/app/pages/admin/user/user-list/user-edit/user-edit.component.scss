@@ -1,0 +1,30 @@
+:host {
+    .tags{
+		&.editing{
+			.tag .action{
+				cursor: not-allowed;
+			}
+		}
+		.tag{
+			&.editing{
+				display: none;
+			}
+		}
+    }
+    .input-group-append .btn {
+        z-index: inherit !important;
+    }
+    .date-picker {
+        position: relative;
+        ::ng-deep .mat-icon-button {
+            position: absolute;
+            right: 0;
+            top: 0;
+        }
+    }
+    ::ng-deep{
+		input[type=text] {
+			font-family: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+		}
+	}
+}

@@ -1,0 +1,86 @@
+<div *ngIf="config" class="pattern-extract-component" [ngClass]="{'border': title}">
+    <label class="title" *ngIf="title">{{title}}</label>
+    <div class="mb-1" *ngIf="showAuto">
+        <div class="form-check">
+            <input type="checkbox" class="form-check-input" [(ngModel)]="config.auto">
+            <label class="form-check-label">generate automatically</label>
+        </div>
+    </div>
+    <div class="form-group" *ngIf="type==='number'">
+        <label>Number decimal format</label>
+        <div>
+            <div class="form-check form-check-inline">
+                <input type="radio" class="form-check-input" name="pattern_extract_ndf_{{key}}" [value]="null" [(ngModel)]="config.numberDecimalPoint">
+                <label class="form-check-label">none</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input type="radio" class="form-check-input" name="pattern_extract_ndf_{{key}}" [value]="','" [(ngModel)]="config.numberDecimalPoint">
+                <label class="form-check-label">comma</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input type="radio" class="form-check-input" name="pattern_extract_ndf_{{key}}" [value]="'.'" [(ngModel)]="config.numberDecimalPoint">
+                <label class="form-check-label">point</label>
+            </div>
+        </div>
+    </div>
+    <div class="form-group" *ngIf="config.auto || !hideType">
+        <label>Pattern type</label>
+        <div>
+            <div class="form-check form-check-inline">
+                <input type="radio" class="form-check-input" name="pattern_extract_ptype_{{key}}" [value]="'text'" [(ngModel)]="config.type">
+                <label class="form-check-label">text</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input type="radio" class="form-check-input" name="pattern_extract_ptype_{{key}}" [value]="'textWithChildren'" [(ngModel)]="config.type">
+                <label class="form-check-label">text with children</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input type="radio" class="form-check-input" name="pattern_extract_ptype_{{key}}" [value]="'src'" [(ngModel)]="config.type">
+                <label class="form-check-label">src</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input type="radio" class="form-check-input" name="pattern_extract_ptype_{{key}}" [value]="'title'" [(ngModel)]="config.type">
+                <label class="form-check-label">title</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input type="radio" class="form-check-input" name="pattern_extract_ptype_{{key}}" [value]="'href'" [(ngModel)]="config.type">
+                <label class="form-check-label">href</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input type="radio" class="form-check-input" name="pattern_extract_ptype_{{key}}" [value]="'backgroundImage'" [(ngModel)]="config.type">
+                <label class="form-check-label">background image</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input type="radio" class="form-check-input" name="pattern_extract_ptype_{{key}}" [value]="'backgroundStyle'" [(ngModel)]="config.type">
+                <label class="form-check-label">background style</label>
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label>Pattern selector</label>
+        <div class="input-group">
+            <input type="text" class="form-control form-control-lg form-control-solid" [(ngModel)]="config.pattern"  spellcheck="false">
+        </div>
+    </div>
+    <div class="form-group" *ngIf="type==='url'">
+        <label>Base URL</label>
+        <div class="input-group">
+            <input type="text" class="form-control form-control-lg form-control-solid" [(ngModel)]="config.baseUrl"  spellcheck="false">
+        </div>
+    </div>
+    <button class="btn btn-primary btn-sm mb-4" type="button" (click)="onExtract()" [disabled]="loading$ | async">
+        Extract
+    </button>
+    <div class="form-group">
+        <div class="example">
+            <div *ngIf="config.result && showLength">{{config.result.length}} are extracted</div>
+            <div class="example-code">
+                <div class="example-highlight">
+                    <pre class="language-html">
+                        {{ result || config.result}}
+                    </pre>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

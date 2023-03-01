@@ -1,0 +1,13 @@
+:host ::ng-deep{
+    .ag-root{
+        max-height: 500px;
+    }
+    .date-picker {
+        position: relative;
+        ::ng-deep .mat-icon-button {
+            position: absolute;
+            right: 0;
+            top: 2px;
+        }
+    }
+}

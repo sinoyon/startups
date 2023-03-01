@@ -1,0 +1,57 @@
+<div class="login-form login-signin">
+	<!--begin::Title-->
+	<div class="pt-lg-0 pt-5">
+		<div class="kt-login__title">
+		  <div class="welcome">{{ 'AUTH.GENERAL.WELCOME' | translate }}</div>
+		</div>
+	</div>
+	<!--end::Title-->
+	<!-- begin::Alert error-->
+    <ng-container *ngIf="errorState === errorStates.HasError">
+		<div
+		  class="mb-10 alert alert-custom alert-light-danger alert-dismissible"
+		>
+		  <div class="alert-text">{{'AUTH.VERIFY_EMAIL.ERROR' | translate}}</div>
+		</div>
+	</ng-container>
+	<!-- end::Alert error-->
+
+	<!--begin::Action-->
+    <div class="pb-lg-0 pb-5 d-flex align-items-center" *ngIf="errorState === errorStates.HasError">
+		<button
+		  (click)="resendConfirmEmail()"
+		  class="btn btn-warning fw-bolder fs-5 px-8 py-6 my-3 me-3"
+		>
+		  {{ 'GENERAL.SEND_EMAIL' | translate }}
+		</button>
+	   
+		<ng-container *ngIf="loading$ | async">
+		  <span class="spinner spinner-primary ms-5"></span>
+		</ng-container>
+	  </div>
+	<!--end::Action-->
+
+	<!-- begin::Alert error-->
+    <ng-container *ngIf="errorState === errorStates.HasTokenError">
+		<div
+		  class="mb-10 alert alert-custom alert-light-danger alert-dismissible"
+		>
+		  <div class="alert-text">{{'NOTIFICATION.INVALID_TOKEN' | translate}}</div>
+		</div>
+	</ng-container>
+	<!-- end::Alert error-->
+	<!--begin::Action-->
+    <div class="pb-lg-0 pb-5 d-flex align-items-center" *ngIf="errorState === errorStates.HasTokenError">
+		<button
+		  routerLink="/"
+		  class="btn btn-warning fw-bolder fs-5 px-8 py-6 my-3 me-3"
+		>
+		  {{ 'AUTH.GENERAL.BACK_BUTTON' | translate }}
+		</button>
+	   
+		<ng-container *ngIf="loading$ | async">
+		  <span class="spinner spinner-primary ms-5"></span>
+		</ng-container>
+	  </div>
+	<!--end::Action-->
+</div>

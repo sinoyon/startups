@@ -1,0 +1,79 @@
+<div class="overlay" [ngClass]="{'overlay-block': loading$ | async}">
+    <ng-container *ngIf="loading$ | async">
+		<div class="overlay-layer bg-transparent" style="z-index: 1;">
+		  <div class="spinner spinner-center spinner-primary"></div>
+		</div>
+    </ng-container>
+    <div class="modal-header pb-0">
+        <ul class="nav nav-tabs nav-tabs-line">
+            <li class="nav-item" *ngFor="let tab of tabs"(click)="activeTab = tab;">
+                <a class="nav-link" href="javascript:;" data-toggle="tab"  [ngClass]="{'active': activeTab == tab}" >{{ tab.title | translate}}</a>
+            </li>
+        </ul>
+    </div>
+    <div class="modal-body">
+        <div style="min-height: 300px;">
+            <div [hidden]="!(activeTab?.key==='fromSite')">
+                <div class="form-group">
+                    <label>{{ 'Keyword' }}</label>
+                    <div class="d-flex align-items-stretch">
+                        <input type="text" class="form-control form-control-solid h-auto py-2 px-6 me-3" [(ngModel)]="keyword" spellcheck="false" (keyup.enter)="onSearchCompany(true)">
+                        <button class="btn btn-primary fs-5 px-4 py-2" type="button" (click)="onSearchCompany(true)" 
+                        [disabled]="(loading$ | async) || keyword === ''">
+                            Search
+                        </button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>{{ 'Fiscal Code' }}</label>
+                    <div class="d-flex align-items-stretch">
+                        <input type="text" class="form-control form-control-solid h-auto py-2 px-6 me-3" [(ngModel)]="fiscalCode" spellcheck="false" (keyup.enter)="onSearchCompany(false)">
+                        <button class="btn btn-primary fs-5 px-4 py-2" type="button" (click)="onSearchCompany(false)" 
+                        [disabled]="(loading$ | async) || fiscalCode === ''"
+                        >
+                            Search
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div [hidden]="!(activeTab?.key==='fromExist')">
+                <div class="form-group">
+                    <label>Companies</label>
+                    <div class="input-group">
+                        <ae-select [options]="selectableCompanies" 
+                        maxHeight="200px"
+                        style="flex: 1;" [searchCb]="searchCompaniesCb" [showSearch]="true" #companySelector></ae-select>
+                    </div>
+                </div>
+            </div>
+            <div *ngIf="searchResult.length">
+                <p>
+                    <span *ngIf="from==='exist'" class="text-weight-boldest text-capitalize fs-5">{{ 'Searched in exist companies'}}: </span>
+                    <span *ngIf="from==='keyword'" class="text-weight-boldest text-capitalize fs-5">{{ 'Searched by keyword'}}: </span>
+                    <span *ngIf="from==='fiscal'" class="text-weight-boldest text-capitalize fs-5">{{ 'Searched by fiscalCode'}}: </span>
+                </p>
+                <p *ngFor="let item of searchResult">
+                    <span class="text-weight-boldest text-capitalize">{{ item.key }}: </span>
+                    <span>{{ item.value }}</span>
+                </p>
+                <p>
+                    <span class="text-weight-boldest text-capitalize">Available keywords: </span>
+                    <br>
+                    <span *ngFor="let item of availableKeys">{{ item }} <br></span>
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <div>
+            <button type="button" class="btn btn-light btn-elevate me-1"  (click)="onCreate()">{{ 'Create New Company'}} </button>&nbsp;
+            <button type="button" class="btn btn-light btn-elevate me-1" (click)="modal.dismiss()">
+            {{ 'GENERAL.CANCEL' | translate}}
+            </button>&nbsp;
+            <button type="button" class="btn btn-primary btn-elevate" (click)="onYesClick()"
+            [disabled]="(loading$ | async) || !searchedCompany">
+            {{ 'GENERAL.SAVE' | translate}}
+            </button>
+        </div>
+    </div>
+</div>

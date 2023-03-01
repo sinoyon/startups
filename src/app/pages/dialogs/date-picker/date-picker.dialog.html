@@ -1,0 +1,26 @@
+<div class="modal-body">
+  <div class="mb-0 mb-2">
+    <div class="input-group">
+      <input type="text"
+      class="form-control"
+      [minDate]="minDate"
+      [bsConfig]="{}"
+      #dp="bsDatepicker"
+      (bsValueChange)="onDateChanged($event)"
+      [(bsValue)]="date"
+      bsDatepicker>
+      <button class="btn btn-outline-secondary calendar " (click)="dp.toggle()" type="button"></button>
+    </div>
+  </div>
+</div>
+<div class="modal-footer">
+    <div>
+        <button type="button" class="btn btn-light btn-elevate me-1" (click)="modalActive.dismiss()">
+        {{ 'GENERAL.CLOSE' | translate}}
+        </button>&nbsp;
+        <button type="button" class="btn btn-primary btn-elevate" (click)="onYesClick()"
+        >
+        {{ 'GENERAL.SAVE' | translate}}
+        </button>
+    </div>
+</div>

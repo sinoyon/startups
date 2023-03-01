@@ -1,0 +1,72 @@
+<div class="overlay" [ngClass]="{'overlay-block': loading$ | async}">
+    <ng-container *ngIf="loading$ | async">
+		<div class="overlay-layer bg-transparent" style="z-index: 1;">
+		  <div class="spinner spinner-center spinner-primary"></div>
+		</div>
+	</ng-container>
+    <div class="modal-body">
+        <div class="form-group d-flex justify-content-between align-items-center mb-3">
+            <div class="checkbox-inline">
+                <label class="checkbox">
+                <input type="checkbox" [(ngModel)]="isMergeToCategory">
+                <span></span>Merge to exist category</label>
+            </div>
+
+            <div class="d-flex align-items-center" *ngIf="selectedLang == 'others'">
+                <label class="me-2">Language to merge</label>
+                <ae-select [options]="languages" #languageSelector></ae-select>
+            </div>
+        </div>
+
+        <div class="row" style="min-height: 300px;">
+            <div class="col-lg-8" [hidden]="isMergeToCategory">
+                <div class="form-group">
+                    <label>Select main alias</label>
+                    <div class="input-group">
+                        <ae-select [options]="names" style="width: 100%;" maxHeight="200px" #mainAliasSelector></ae-select>
+                    </div>
+                </div>
+            </div>	
+            <div class="col-lg-8" [hidden]="!isMergeToCategory">
+                <div class="form-group">
+                    <label>Select exist category</label>
+                    <div class="input-group">
+                        <ae-select [options]="selectableCategories" maxHeight="200px" style="width: 100%;" [searchCb]="searchCategoriesCb" [showSearch]="true" #categorySelector></ae-select>
+                    </div>
+                </div>
+            </div>	
+            <div class="col-lg-4">
+                <div class="form-group">
+                    <label>Type</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control form-control-lg form-control-solid" [(ngModel)]="type" spellcheck="false" disabled>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-12">
+                <div class="form-group">
+                    <div class="alias-values">
+                        <div class="alias-value label label-inline mb-2 me-2" *ngFor="let value of values; index as i">
+                            {{value}}
+                        </div>
+                        <ng-container *ngIf="isMergeToCategory && categorySelector.selectedOption">
+                            <div class="alias-value label label-inline" *ngFor="let value of categorySelector.selectedOption.values">
+                                {{value}}
+                            </div>
+                        </ng-container>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <div>
+            <button type="button" class="btn btn-light btn-elevate me-1" (click)="modal.dismiss()" >
+            {{ 'GENERAL.CANCEL' | translate}}
+            </button>&nbsp;
+            <button type="button" class="btn btn-primary btn-elevate" (click)="onClickYes()">
+                {{ 'GENERAL.YES' | translate}}
+            </button>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,6 @@
+User-agent: *
+Disallow: /admin/
+Disallow: /auth/
+Disallow: /account/
+Disallow: /reports/
+Sitemap: https://startupswallet.com/api/sitemap.xml

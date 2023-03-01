@@ -1,0 +1,110 @@
+<ng-container  *ngLet="(alerts$ | async) as alerts">
+  <div class="h-100 d-flex flex-column w-100">
+    <div
+      class="d-flex align-items-center justify-content-between h-75px"
+    >
+      <div class="d-flex align-items-center mt-10  mb-6">
+        <h3 class="text-primary fw-boldest ps-9 mb-0 text-dark">
+          {{'USER_MENU.NOTIFICATIONS' | translate}}
+        </h3>
+        <span *ngIf="unread" class="fs-3 text-danger fw-bolder opacity-75 ps-3 mb-3">{{unread}}</span>
+        <span class="badge badge-light cursor-pointer ms-3"
+        *ngIf="!all && unread" style="padding: 3px;"
+        (click)="onClickMarkAsRead(null)">
+          <i class="la la-trash" style="font-size: 1.5rem !important;"></i>
+        </span>
+      </div>
+
+      <div
+            class="btn btn-sm btn-icon btn-active-light-primary me-7"
+            id="kt_drawer_notifications_close"
+          >
+        <span class="svg-icon svg-icon-2"></span>
+        <span
+          [inlineSVG]="'./assets/media/svg/close.svg'"
+          class="svg-icon svg-icon-2"
+        ></span>
+      </div>
+    </div>
+
+    <div
+      class="flex-root d-flex flex-column" style="max-height: calc(100vh - 75px);"
+      id="kt_topbar_notifications_1"
+      role="tabpanel"
+    >
+      <ng-container *ngIf="(all && alerts.length) || (!all && unread)">
+        <div class="scroll-y my-5 px-8 flex-root">
+          <ng-container *ngFor="let item of alerts.slice().reverse()">
+            <div class="d-flex flex-stack py-4"   *ngIf="item && (all || !item.read)">
+              <div class="d-flex align-items-center">
+                <div class="symbol symbol-35px me-4">
+                  <span class="symbol-label" *ngIf="!item.pic">
+                    <span
+                      class="svg-icon svg-icon-2"
+                    >
+                      <i class="{{item.iconClass}}"></i>
+                    </span>
+                  </span>
+                  <div class="symbol-label bg-transparent" *ngIf="item.pic"
+                  [ngStyle]="{ 'background-image': 'url(' + (item.pic) + ')'}"></div>
+                </div>
+
+                <div class="mb-0 me-2" (click)="onAction(item)">
+                  <div class="fs-6 text-gray-800 text-hover-primary fw-bolder cursor-pointer">
+                    {{ item.title }}
+                  </div>
+                  <div class="text-gray-400 fs-7">{{ date2string(item.time) }}</div>
+                </div>
+              </div>
+
+              <span class="badge badge-light cursor-pointer" style="padding: 3px;" *ngIf="!item.read"
+              (click)="onClickMarkAsRead(item)">
+                <i class="la la-trash" style="font-size: 2rem !important;"></i>
+              </span>
+            </div>
+          </ng-container>
+        </div>
+      </ng-container>
+      <ng-container *ngIf="!((all && alerts.length) || (!all && unread))">
+        <div class="flex-root d-flex justify-content-center align-items-center flex-column">
+          <div>
+            <span
+              class="svg-icon-1"
+              [setSVGAttributes]="{width: '54px', height: '66px'}"
+              [inlineSVG]="'./assets/media/svg/bell.svg'"
+            >
+            </span>
+          </div>
+          <div class="fs-4 text-dark pt-5 fw-bolder">
+            {{'OTHERS.no_notification' | translate}}
+          </div>
+        </div>
+      </ng-container>
+
+      <div class="py-3 text-center border-top">
+        <a *ngIf="!all"
+          class="btn btn-color-gray-600 btn-active-color-primary"
+          (click)="showAll(true)"
+        >
+          {{'OTHERS.read' | translate}}
+          <span
+            [inlineSVG]="'./assets/media/svg/arr064.svg'"
+            class="svg-icon svg-icon-5"
+          ></span>
+        </a>
+        <a
+        *ngIf="all"
+          class="btn btn-color-gray-600 btn-active-color-primary"
+          (click)="showAll(false)"
+        >
+          {{'OTHERS.unread' | translate}}
+          <span
+            [inlineSVG]="'./assets/media/svg/arr064.svg'"
+            class="svg-icon svg-icon-5"
+          ></span>
+        </a>
+      </div>
+    </div>
+  </div>
+</ng-container>
+

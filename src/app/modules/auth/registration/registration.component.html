@@ -1,0 +1,335 @@
+<!--begin::Signup-->
+<div class="login-form login-signup overlay" [ngClass]="{'login-dialog': popup}" #container>
+  <ng-container *ngIf="loading$ | async">
+		<div class="overlay-layer bg-transparent" style="z-index: 1;">
+		<div class="spinner-border spinner-border-lg align-middle"></div>
+		</div>
+	</ng-container>
+  <!--begin::Form-->
+  <form
+    class="form"
+    novalidate="novalidate"
+    id="kt_login_signup_form"
+    [formGroup]="registrationForm"
+  >
+    <!--begin::Title-->
+    <div class="pt-lg-0 pt-5">
+      <div class="kt-login__title mb-5">
+        <div class="welcome">{{'AUTH.GENERAL.WELCOME' | translate}}</div>
+        <div class="description">{{'AUTH.REGISTER.TITLE' | translate}}</div>
+      </div>
+    </div>
+    <!--end::Title-->
+
+    <!--begin::Form group-->
+    <div class="form-group mb-5">
+      <div class="form-check mb-2">
+        <input class="form-check-input" type="checkbox" formControlName="registrationInformation" name="registrationInformation" [ngClass]="{ 'is-invalid': f['registrationInformation'].invalid }"/>
+        <label class="form-check-label">{{'AUTH.REGISTER.ACCEPT_POLICY1' | translate}}
+          <a class="_info_link" (click)="common.openLinkWithNewTab(lang != 'fr' ? 'https://startupswallet-prod.s3.eu-central-1.amazonaws.com/assets/Registration+Information.pdf' : 'https://startupswallet-prod.s3.eu-central-1.amazonaws.com/assets/FR/VF+-+Informativa+registrazione.pdf')" >{{'AUTH.GENERAL.INFORMATION' | translate}}</a>
+          {{'AUTH.REGISTER.ACCEPT_POLICY2' | translate}}
+        </label>
+      </div>
+      <div class="form-check mb-2">
+        <input class="form-check-input" type="checkbox" formControlName="newsletter" name="newsletter"/>
+        <label class="form-check-label">{{'AUTH.REGISTER.RECEIVE_NEWSLETTER' | translate}} (<a class="_info_link" (click)="common.openLinkWithNewTab(lang != 'fr' ? 'https://startupswallet-prod.s3.eu-central-1.amazonaws.com/assets/Newsletter+Information.pdf' : 'https://startupswallet-prod.s3.eu-central-1.amazonaws.com/assets/FR/VF+-+Informativa+newsletter.pdf')" >{{'AUTH.GENERAL.INFORMATION' | translate}}</a>)
+        </label>
+      </div>
+    </div>
+    <!--end::Form group-->
+
+    <div class="form-group">
+      <div>
+        <label class="fs-5 fw-bolder text-dark mb-3">{{'OTHERS.country' | translate}}</label>
+        <select name="cty" id="cty" class="w-100 form-control-solid h-auto rounded-lg fs-5" style="padding: 10px;" (change)="selectCountry($event)">
+          <option *ngFor="let cty of countries" [value]="cty.id">{{cty.name}}</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="mt-10">
+      <button (click)="registrationWithLinkedin()"
+      [disabled]="f['registrationInformation'].invalid || f['country'].invalid"
+        class="w-100 btn p-0 d-flex align-items-center text-white" style="background-color: #0276a8;"
+      >
+        <div class="w-55px text-center">
+          <i class="socicon-linkedin fs-2 text-white"></i>
+        </div>
+        <div class="fw-bolder fs-5 px-8 py-6 flex-root" style="border-left: 1px solid #0000002e;">
+          {{ 'Sign up with LinkedIn' | translate }}
+        </div>
+      </button>
+    </div>
+    <div style="border-top: 1px solid #e2e2e2; height: 20px; margin-top: 20px;"></div>
+    <!-- begin::Alert error-->
+    <ng-container *ngIf="hasError">
+      <div class="mb-lg-15 alert alert-danger">
+        <div class="alert-text fw-bold">
+          {{'AUTH.VALIDATION.ALREADY_EXIST_EMAIL' | translate}}
+        </div>
+      </div>
+    </ng-container>
+    <!-- end::Alert error-->
+
+    <!--begin::Form group-->
+    <div class="mb-5 d-flex justify-content-between">
+      <div class="me-2">
+        <label class="fs-5 fw-bolder text-dark">{{'AUTH.INPUT.FIRSTNAME' | translate}}</label>
+        <input
+          class="form-control form-control-solid h-auto py-7 px-6 rounded-lg fs-5"
+          type="text"
+          name="firstName"
+          formControlName="firstName"
+          autocomplete="off"
+          [ngClass]="{
+            'is-invalid': f['firstName'].invalid && !f['firstName'].pristine
+          }"
+        />
+        <ng-container
+          [ngTemplateOutlet]="formError"
+          [ngTemplateOutletContext]="{
+            validation: 'required',
+            message: ('AUTH.VALIDATION.FIRSTNAME_REQUIRED' | translate),
+            control: f['firstName']
+          }"
+        ></ng-container>
+        <ng-container
+          [ngTemplateOutlet]="formError"
+          [ngTemplateOutletContext]="{
+            validation: 'minlength',
+            message: ('AUTH.VALIDATION.FIRSTNAME_MINLENGTH' | translate),
+            control: f['firstName']
+          }"
+        ></ng-container>
+        <ng-container
+          [ngTemplateOutlet]="formError"
+          [ngTemplateOutletContext]="{
+            validation: 'maxLength',
+            message: 'First name should have maximum 100 symbols',
+            control: f['firstName']
+          }"
+        ></ng-container>
+      </div>
+      <div>
+        <label class="fs-5 fw-bolder text-dark">{{'AUTH.INPUT.LASTNAME' | translate}}</label>
+        <input
+          class="form-control form-control-solid h-auto py-7 px-6 rounded-lg fs-5"
+          type="text"
+          name="lastName"
+          formControlName="lastName"
+          autocomplete="off"
+          [ngClass]="{
+            'is-invalid': f['lastName'].invalid && !f['lastName'].pristine
+          }"
+        />
+        <ng-container
+          [ngTemplateOutlet]="formError"
+          [ngTemplateOutletContext]="{
+            validation: 'required',
+            message: 'AUTH.VALIDATION.LASTNAME_REQUIRED' | translate,
+            control: f['lastName']
+          }"
+        ></ng-container>
+        <ng-container
+          [ngTemplateOutlet]="formError"
+          [ngTemplateOutletContext]="{
+            validation: 'minlength',
+            message: 'AUTH.VALIDATION.LASTNAME_MINLENGTH' | translate,
+            control: f['lastName']
+          }"
+        ></ng-container>
+        <ng-container
+          [ngTemplateOutlet]="formError"
+          [ngTemplateOutletContext]="{
+            validation: 'maxLength',
+            message: 'Last name should have maximum 100 symbols',
+            control: f['lastName']
+          }"
+        ></ng-container>
+      </div>
+    </div>
+    <!--end::Form group-->
+
+    <!--begin::Form group-->
+    <div class="mb-5">
+      <label class="fs-5 fw-bolder text-dark">{{ 'AUTH.INPUT.EMAIL' | translate}}</label>
+      <input
+        class="form-control form-control-solid h-auto py-7 px-6 rounded-lg fs-5"
+        type="email"
+        placeholder="Email"
+        name="email"
+        formControlName="email"
+        autocomplete="off"
+        [ngClass]="{ 'is-invalid': f['email'].invalid && !f['email'].pristine }"
+      />
+      <ng-container
+        [ngTemplateOutlet]="formError"
+        [ngTemplateOutletContext]="{
+          validation: 'required',
+          message: 'AUTH.VALIDATION.EMAIL_REQUIRED' | translate,
+          control: f['email']
+        }"
+      ></ng-container>
+      <ng-container
+        [ngTemplateOutlet]="formError"
+        [ngTemplateOutletContext]="{
+          validation: 'email',
+          message: 'AUTH.VALIDATION.EMAIL_INCORRECT' | translate,
+          control: f['email']
+        }"
+      ></ng-container>
+      <ng-container
+        [ngTemplateOutlet]="formError"
+        [ngTemplateOutletContext]="{
+          validation: 'minlength',
+          message: 'AUTH.VALIDATION.EMAIL_MINLENGTH' | translate,
+          control: f['email']
+        }"
+      ></ng-container>
+      <ng-container
+        [ngTemplateOutlet]="formError"
+        [ngTemplateOutletContext]="{
+          validation: 'maxLength',
+          message: 'Email should have maximum 360 symbols',
+          control: f['email']
+        }"
+      ></ng-container>
+    </div>
+    <!--end::Form group-->
+
+    <!--begin::Form group-->
+    <div class="mb-5">
+      <label class="fs-5 fw-bolder text-dark pt-5"
+        >{{'AUTH.INPUT.PASSWORD' | translate}}</label
+      >
+      <div class="position-relative">
+        <input
+          #passwordInput
+          class="form-control form-control-solid h-auto py-7 px-6 rounded-lg fs-5"
+          type="password"
+          placeholder="Password"
+          name="password"
+          formControlName="password"
+          autocomplete="off"
+          [ngClass]="{
+            'is-invalid': f['password'].invalid && !f['password'].pristine
+          }"
+          (keyup)="onChangePasswordInput($event)" (blur)="onChangePasswordInput($event)"
+          [ngbTooltip]="passwordSuggesting" [placement]="this.containerEl.nativeElement.offsetWidth > 500 ? 'left' : 'top'" [autoClose]="false" triggers="focus"
+        />
+        <div (click)="onClickShowPassowrd()"
+          class="toggle-password position-absolute cursor-pointer"
+          [ngClass]="{'show-password': passwordInput.type === 'text', 'is-invalid': f['password'].invalid && !f['password'].pristine}">
+        </div>
+      </div>
+    </div>
+    <!--end::Form group-->
+
+    <!--begin::Form group-->
+    <div class="mb-5">
+      <label class="fs-5 fw-bolder text-dark pt-5"
+        >{{'AUTH.INPUT.CONFIRM_PASSWORD' | translate}}</label
+      >
+      <input
+        #confirmPasswordInput
+        class="form-control form-control-solid h-auto py-7 px-6 rounded-lg fs-5"
+        type="password"
+        name="cPassword"
+        autocomplete="off"
+        formControlName="cPassword"
+        [ngClass]="{
+          'is-invalid': f['cPassword'].invalid && !f['cPassword'].pristine
+        }"
+      />
+      <ng-container
+        [ngTemplateOutlet]="formError"
+        [ngTemplateOutletContext]="{
+          validation: 'required',
+          message: 'AUTH.VALIDATION.CONFIRM_PASSWORD_REQUIRED' | translate,
+          control: f['cPassword']
+        }"
+      ></ng-container>
+      <ng-container
+        *ngIf="
+          f['cPassword'].errors &&
+          f['cPassword'].errors.ConfirmPassword && !f['cPassword'].pristine
+        "
+      >
+        <div class="fv-plugins-message-container">
+          <div class="fv-help-block">
+            {{'AUTH.VALIDATION.PASSWORD_NOT_CORRESPOND' | translate}}
+          </div>
+        </div>
+      </ng-container>
+    </div>
+    <!--end::Form group-->   
+
+    <!--begin::Form group-->
+    <div class="mb-5 d-flex flex-wrap pb-lg-0 pb-3 justify-content-between">
+
+      <button *ngIf="!popup"
+        routerLink="/auth/login"
+        class="btn btn-light-primary fw-bolder fs-5 px-8 py-6 my-3"
+      >
+      {{ 'AUTH.GENERAL.BACK_BUTTON' | translate }}
+      </button>
+
+      <div *ngIf="popup"
+        (click)="modal.close()"
+        class="btn btn-light-primary btn-fw-bolder fs-5 px-8 py-6 my-3 me-3"
+      >
+        {{ 'GENERAL.CLOSE' | translate }}
+      </div>
+
+      <button
+        type="submit"
+        id="kt_login_signup_submit"
+        (click)="submit()"
+        [disabled]="
+          registrationForm.invalid
+        "
+        class="btn btn-warning fw-bolder fs-5 px-8 py-6 my-3"
+      >
+      {{ 'AUTH.GENERAL.SIGNUP_BUTTON' | translate }}
+      </button>
+    </div>
+    <!--end::Form group-->
+  </form>
+  <!--end::Form-->
+</div>
+<!--end::Signup-->
+
+<ng-template
+  #formError
+  let-control="control"
+  let-message="message"
+  let-validation="validation"
+>
+  <ng-container
+    *ngIf="control.hasError(validation) && (control.dirty || control.touched)"
+  >
+    <div class="fv-plugins-message-container">
+      <div class="fv-help-block">
+        {{ message }}
+      </div>
+    </div>
+  </ng-container>
+</ng-template>
+<ng-template class="mb-7 ps-3 text-start"  #passwordSuggesting>
+
+  <div class="text-start">{{ ('AUTH.PASSWORD_STRENGTH.OVERVIEW') | translate }}</div>
+  <div class="ps-3 text-start">
+    <div><i class="fa" [ngClass]="{'fa-check-circle': passwordStrength.len, 'fa-minus-circle' : !passwordStrength.len, 'text-success': passwordStrength.len, 'text-danger': !passwordStrength.len}"></i><span class="ms-3">{{ ('AUTH.PASSWORD_STRENGTH.LENGTH') | translate }}</span></div>
+    <div><i class="fa" [ngClass]="{'fa-check-circle': passwordStrength.maxLen, 'fa-minus-circle' : !passwordStrength.maxLen, 'text-success': passwordStrength.maxLen, 'text-danger': !passwordStrength.maxLen}"></i><span class="ms-3">{{ ('AUTH.PASSWORD_STRENGTH.MAX_LENGTH') | translate }}</span></div>
+    <div><i class="fa" [ngClass]="{'fa-check-circle': passwordStrength.capital, 'fa-minus-circle' : !passwordStrength.capital, 'text-success': passwordStrength.capital, 'text-danger': !passwordStrength.capital}"></i><span class="ms-3">{{ ('AUTH.PASSWORD_STRENGTH.UPPERCASE') | translate }}</span></div>
+    <div><i class="fa" [ngClass]="{'fa-check-circle': passwordStrength.lower, 'fa-minus-circle' : !passwordStrength.lower, 'text-success': passwordStrength.lower, 'text-danger': !passwordStrength.lower}"></i><span class="ms-3">{{ ('AUTH.PASSWORD_STRENGTH.LOWERCASE') | translate }}</span></div>
+    <div>
+      <i class="fa" [ngClass]="{'fa-check-circle': passwordStrength.special, 'fa-minus-circle' : !passwordStrength.special, 'text-success': passwordStrength.special, 'text-danger': !passwordStrength.special}"></i>
+      <span class="ms-3">{{ ('AUTH.PASSWORD_STRENGTH.SPECIAL') | translate }}</span>
+      <div [ngbTooltip]="'AUTH.PASSWORD_STRENGTH.SPECIAL_TOOLTIP'| translate" class="ps-2" style="display: inline; "><i class="fa fa-info" style="color: #3f709d"></i></div>
+    </div>
+    <div><i class="fa" [ngClass]="{'fa-check-circle': passwordStrength.number, 'fa-minus-circle' : !passwordStrength.number, 'text-success': passwordStrength.number, 'text-danger': !passwordStrength.number}"></i><span class="ms-3">{{ ('AUTH.PASSWORD_STRENGTH.NUMBER') | translate }}</span></div>
+  </div>
+
+  <div class="text-start">{{ ('AUTH.PASSWORD_STRENGTH.EXAMPLE') | translate }}</div>
+</ng-template>

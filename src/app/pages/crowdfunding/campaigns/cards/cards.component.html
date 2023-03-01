@@ -1,0 +1,121 @@
+<div class="">
+	<!-- <div class="row justify-content-center">
+		<ng-container *ngIf="campaigns.length >= advs.length">
+			<ng-container [ngTemplateOutlet]="advCampaignTemplate" [ngTemplateOutletContext]="{start: 0}"></ng-container>
+			<ng-container [ngTemplateOutlet]="campaignTemplate" [ngTemplateOutletContext]="{start: 0}"></ng-container>
+		</ng-container>
+		<ng-container *ngIf="campaigns.length < advs.length">
+			<ng-container [ngTemplateOutlet]="campaignTemplate" [ngTemplateOutletContext]="{start: 0}"></ng-container>
+			<ng-container [ngTemplateOutlet]="advCampaignTemplate" [ngTemplateOutletContext]="{start: 0}"></ng-container>
+		</ng-container>
+	</div> -->
+
+	<ng-container *ngFor="let campaign of campaigns; index as i">
+		<ng-container *ngIf="i % columns == 0 && !isFilteredOrSorted">
+			<ng-container [ngTemplateOutlet]="advCampaignTemplate" [ngTemplateOutletContext]="{start: i / columns}"></ng-container>
+			<ng-container [ngTemplateOutlet]="campaignTemplate" [ngTemplateOutletContext]="{start: i / columns}"></ng-container>
+			<ng-container [ngTemplateOutlet]="advSourceTemplate" [ngTemplateOutletContext]="{start: i / columns}"></ng-container>
+		</ng-container>
+		<ng-container *ngIf="i % columns == 0 && isFilteredOrSorted">
+			<ng-container [ngTemplateOutlet]="campaignTemplate" [ngTemplateOutletContext]="{start: i / columns}"></ng-container>
+			<ng-container [ngTemplateOutlet]="advCampaignTemplate" [ngTemplateOutletContext]="{start: i / columns}"></ng-container>
+		</ng-container>
+	</ng-container>
+	<ng-container *ngIf="(campaigns.length - 1) / columns < (advs.length - 1) / columns">
+		<div class="row justify-content-center">
+			<ng-container *ngFor="let adv of advs; index as i">
+				<ng-container *ngIf="((campaigns.length - 1) / columns + 1) * columns <= i">
+					<div class="col-xl-4 col-md-6 mb-11">
+						<app-campaign-card (expandClick)="onExpandCard($event)" (videoClick)="videoClickEvent.emit($event)" (followClick)="followClickEvent.emit($event)" (walletClick)="walletClickEvent.emit($event)" (detailClick)="detailClickEvent.emit($event)" (externalClick)="externalClickEvent.emit($event)"
+							[data]="advs[(i) % advs.length]"
+							[type]="'sm'"
+              [expanded]="expandedAdv"
+						></app-campaign-card>
+					</div>
+				</ng-container>
+			</ng-container>
+		</div>
+	</ng-container>
+	<div class="d-flex" *ngIf="totalCount > 0">
+		<div class="d-flex align-items-center me-4"><span>{{'GENERAL.ADVERTISEMENT' | translate}}</span>
+			<div style="width: 1rem; height: 1rem; background: #0275f9 ;border: 1px solid #0275f9; margin-left: 1rem">
+				&nbsp;</div>
+		</div>
+		<div class="d-flex align-items-center"><span>{{'OTHERS.Campaign' | translate}}</span>
+			<div style="width: 1rem; height: 1rem; background: #003F87 ; border: 1px solid #003F87; margin-left: 1rem">
+				&nbsp;</div>
+		</div>
+	</div>
+</div>
+<ng-template #campaignTemplate let-start="start">
+	<ng-container *ngIf="start >= 0">
+		<div class="row justify-content-center">
+			<ng-container *ngFor="let i of [0,1,2]">
+				<ng-container *ngIf="i < columns">
+					<div class="col-xl-4 col-md-6 mb-11" *ngIf="start * columns +i < campaigns.length">
+						<app-campaign-card (expandClick)="onExpandCard($event)" (videoClick)="videoClickEvent.emit($event)" (followClick)="followClickEvent.emit($event)" (walletClick)="walletClickEvent.emit($event)" (detailClick)="detailClickEvent.emit($event)" (externalClick)="externalClickEvent.emit($event)"
+							[data]="campaigns[(start * columns +i)]"
+              [expanded]="expanded"
+						></app-campaign-card>
+					</div>
+				</ng-container>
+			</ng-container>
+		</div>
+	</ng-container>
+</ng-template>
+<ng-template #advCampaignTemplate let-start="start">
+	<ng-container *ngIf="start >= 0 && start * columns < advs.length ">
+		<div class="row justify-content-center">
+			<ng-container *ngFor="let i of [0,1,2]">
+				<ng-container *ngIf="i < columns">
+					<div class="col-xl-4 col-md-6 mb-11" *ngIf="(start * columns +i) <= advs.length - 1">
+						<app-campaign-card (expandClick)="onExpandCard($event)" (videoClick)="videoClickEvent.emit($event)" (followClick)="followClickEvent.emit($event)" (walletClick)="walletClickEvent.emit($event)" (detailClick)="detailClickEvent.emit($event)" (externalClick)="externalClickEvent.emit($event)"
+							[data]="advs[(start * columns +i)]"
+							[type]="'sm'"
+              [expanded]="expandedAdv"
+						></app-campaign-card>
+					</div>
+				</ng-container>
+			</ng-container>
+		</div>
+	</ng-container>
+</ng-template>
+<ng-template #advSourceTemplate let-start="start">
+	<ng-container *ngIf="sourceAdvs.length && start == 0">
+		<div class="row justify-content-center">
+			<div class="col-12 mb-11">
+				<app-campaign-card (expandClick)="onExpandCard($event)" (videoClick)="videoClickEvent.emit($event)" (followClick)="followClickEvent.emit($event)" (walletClick)="walletClickEvent.emit($event)" (detailClick)="detailClickEvent.emit($event)" (externalClick)="externalClickEvent.emit($event)"
+					[data]="sourceAdvs[0]"
+					[type]="'lg'"
+				></app-campaign-card>
+			</div>
+		</div>
+	</ng-container>
+</ng-template>
+
+
+<!-- <ng-template #campaignTemplate let-start="start">
+	<ng-container *ngFor="let campaign of campaigns; index as i">
+		<div class="col-xl-4 col-md-6 mb-11">
+			<app-campaign-card (expandClick)="onExpandCard($event)" (videoClick)="videoClickEvent.emit($event)" (followClick)="followClickEvent.emit($event)" (walletClick)="walletClickEvent.emit($event)" (detailClick)="detailClickEvent.emit($event)" (externalClick)="externalClickEvent.emit($event)"
+				[data]="campaign"
+				[expanded]="expanded"
+			></app-campaign-card>
+		</div>
+
+		<div *ngIf="i == 3">
+			<ng-container [ngTemplateOutlet]="advSourceTemplate" [ngTemplateOutletContext]="{start: 0}"></ng-container>
+		</div>
+	</ng-container>
+</ng-template>
+<ng-template #advCampaignTemplate let-start="start">
+	<ng-container *ngFor="let adv of advs; index as i">
+		<div class="col-xl-4 col-md-6 mb-11">
+			<app-campaign-card (expandClick)="onExpandCard($event)" (videoClick)="videoClickEvent.emit($event)" (followClick)="followClickEvent.emit($event)" (walletClick)="walletClickEvent.emit($event)" (detailClick)="detailClickEvent.emit($event)" (externalClick)="externalClickEvent.emit($event)"
+				[data]="adv"
+				[type]="'sm'"
+				[expanded]="expandedAdv"
+			></app-campaign-card>
+		</div>
+	</ng-container>
+</ng-template> -->

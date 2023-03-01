@@ -1,0 +1,103 @@
+<div class="overlay" [ngClass]="{'overlay-block': loading$ | async}">
+	<ng-container *ngIf="loading$ | async">
+		<div class="overlay-layer bg-transparent" style="z-index: 1;">
+		  <div class="spinner spinner-center spinner-primary"></div>
+		</div>
+	</ng-container>
+
+	<div class="modal-body">
+		<div class="d-flex align-items-center">
+			<div class="form-group mb-0 me-3">
+				<div class="">
+					<div class="form-check form-check-inline">
+						<input type="radio" class="form-check-input" name="periodTypeForDaily" [value]="'year'" (change)="onChangePeriodType($event)" [(ngModel)]="periodType">
+						<label class="form-check-label">By year</label>
+					</div>
+					<div class="form-check form-check-inline">
+						<input type="radio" class="form-check-input" name="periodTypeForDaily" [value]="'month'" (change)="onChangePeriodType($event)" [(ngModel)]="periodType">
+						<label class="form-check-label">By month</label>
+					</div>
+          <div class="form-check form-check-inline">
+            <input type="radio" class="form-check-input" name="periodTypeForDaily" [value]="'period'" (change)="onChangePeriodType($event)" [(ngModel)]="periodType">
+            <label class="form-check-label">By period</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input type="radio" class="form-check-input" name="periodTypeForDaily" [value]="'none'" (change)="onChangePeriodType($event)" [(ngModel)]="periodType">
+            <label class="form-check-label">None</label>
+          </div>
+				</div>
+			</div>
+			<div class="date-picker" *ngIf="periodType==='year'">
+				<div class="input-group">
+					<input type="text"
+					class="form-control"
+					[bsConfig]="{'minMode': 'year', 'dateInputFormat': 'YYYY'}"
+					#dp="bsDatepicker"
+					(bsValueChange)="onDateChanged($event)"
+					[(bsValue)]="periodStart"
+					bsDatepicker>
+					<button class="btn btn-outline-secondary calendar " (click)="dp.toggle()" type="button"></button>
+				</div>
+			</div>
+			<div class="date-picker" *ngIf="periodType==='month'">
+				<div class="input-group">
+					<input type="text"
+					class="form-control"
+					[(bsValue)]="periodStart"
+					[bsConfig]="{'minMode': 'month', 'dateInputFormat': 'MM/YYYY'}"
+					#dp="bsDatepicker"
+					(bsValueChange)="onDateChanged($event)"
+					bsDatepicker>
+					<button class="btn btn-outline-secondary calendar " (click)="dp.toggle()" type="button"></button>
+				</div>
+			</div>
+      <div class="date-picker" *ngIf="periodType==='day'">
+        <div class="input-group">
+          <input type="text"
+          class="form-control"
+          [bsConfig]="{}"
+          #dp="bsDatepicker"
+          (bsValueChange)="onDateChanged($event)"
+          [(bsValue)]="periodStart"
+          bsDatepicker>
+          <button class="btn btn-outline-secondary calendar " (click)="dp.toggle()" type="button"></button>
+        </div>
+      </div>
+      <div class="date-picker mb-1" *ngIf="periodType==='period'">
+        <div class="input-group">
+          <input type="text"
+          class="form-control w-250px"
+          [placement]="'right'"
+          [bsConfig]="{'displayOneMonthRange': true}"
+          [(bsValue)]="periodRange"
+          #dp="bsDaterangepicker"
+          (bsValueChange)="onDateRangeChanged($event)"
+          bsDaterangepicker>
+          <button class="btn btn-outline-secondary calendar " (click)="dp.toggle()" type="button"></button>
+        </div>
+      </div>
+		</div>
+		<div>
+			<lp-table
+				[hidden]="isEmptyTable"
+				[hasPadding]="false"
+				[showSelectAllCheckbox]="false"
+				[suppressRowClickSelection]="true"
+				[showDeleteColumn]="false"
+				[showCheckbox]="false"
+				[columnDefs]="columnDefs"
+				(action)="onAction($event)"
+				(paginationChanged)="onPaginationChanged($event)"
+				#tableCtrl
+			></lp-table>
+		</div>
+		<div class="d-flex justify-content-center align-items-center h-200px" *ngIf="isEmptyTable">{{'GENERAL.NO_RECORD_FOUND' | translate}}</div>
+	</div>
+	<div class="modal-footer">
+        <div>
+            <button type="button" class="btn btn-light btn-elevate me-1" (click)="modal.dismiss()">
+            {{ 'GENERAL.CLOSE' | translate}}
+            </button>
+        </div>
+    </div>
+</div>

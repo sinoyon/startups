@@ -1,0 +1,487 @@
+<div>
+	<div class="align-items-end">
+		<ul class="nav nav-dark nav-bold nav-tabs nav-tabs-line" style="margin-bottom: -1px" role="tablist">
+			<li class="nav-item" *ngFor="let tab of tabs" [hidden]="!getTabEnabled(tab)">
+				<a
+				  (click)="onClickTab(tab)"
+				  class="nav-link cursor-pointer"
+				  [ngClass]="{'active': tab==activeTab }"
+				  role="tab"
+				>
+				{{tab.title}}
+				</a>
+			</li>
+		</ul>
+	</div>
+	<div class="pt-5">
+        <div class="row">
+            <div class="col-12">
+                <div class="row" *ngIf="activeTab?.key==='main'">
+                    <div class="col-md-4">
+                        <div class="mb-2">
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="disable_cofig" [(ngModel)]="config.disabled">
+                                <label class="form-check-label" for="disable_cofig">Suspend this config</label>
+                            </div>
+                        </div>
+                        <div class="mb-2">
+                          <div class="form-check">
+                              <input type="checkbox" class="form-check-input" id="stop_cofig" [(ngModel)]="config.isStopByCountOfCampaigns">
+                              <label class="form-check-label" for="stop_cofig">Stop if count of campaigns is same</label>
+                          </div>
+                        </div>
+                        <div class="mb-2">
+                            <label>Type</label>
+                            <div>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" class="form-check-input" name="config_type" [value]="'campaign'" [(ngModel)]="config.type" (change)="onConfigTypeChanged()">
+                                    <label class="form-check-label" for>campaign</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" class="form-check-input" name="config_type" [value]="'company'" [(ngModel)]="config.type" (change)="onConfigTypeChanged()">
+                                    <label class="form-check-label">company</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-2" *ngIf="config.type !== 'company'" [ngClass]="{ 'no-selected' : selectedCampaignStatuses.length == 0 }">
+                            <label>Involved Campaign Status:</label>
+                            <ng-multiselect-dropdown
+                                style="min-width: 200px"
+                                [(ngModel)]="selectedCampaignStatuses"
+                                [ngModelOptions]="{standalone: true}"
+                                [settings]="multiSelectSettings"
+                                [data]="statuses"
+                                [placeholder]="'Select campaign status'"
+                                (onSelect)="onSelectCampaignStatus($event)"
+                                (onDeSelect)="onSelectCampaignStatus($event)"
+                                (onSelectAll)="onSelectCampaignStatus($event)"
+                            >
+                            </ng-multiselect-dropdown>
+                        </div>
+                        <div class="mb-1" *ngIf="config.type !== 'company'" [ngClass]="{ 'no-selected' : selectedCampaignTypologies.length == 0 }">
+                            <label>Involved Campaign Typologies:</label>
+                            <ng-multiselect-dropdown
+                                style="min-width: 200px"
+                                [(ngModel)]="selectedCampaignTypologies"
+                                [ngModelOptions]="{standalone: true}"
+                                [settings]="multiSelectSettings"
+                                [data]="typologies"
+                                [placeholder]="'Select campaign typologies'"
+                                (onSelect)="onSelectCampaignTypology($event)"
+                                (onDeSelect)="onSelectCampaignTypology($event)"
+                                (onSelectAll)="onSelectCampaignTypology($event)"
+                            >
+                            </ng-multiselect-dropdown>
+                        </div>
+                        <div class="mb-1" [ngClass]="{ 'no-selected' : selectedCountries.length == 0 }">
+                            <label>Involved Countries:</label>
+                            <ng-multiselect-dropdown
+                                style="min-width: 200px"
+                                [(ngModel)]="selectedCountries"
+                                [ngModelOptions]="{standalone: true}"
+                                [settings]="multiSelectSettings"
+                                [data]="countries"
+                                [placeholder]="'Select countries'"
+                                (onSelect)="onSelectCountry($event)"
+                                (onDeSelect)="onSelectCountry($event)"
+                                (onSelectAll)="onSelectCountry($event)"
+                            >
+                            </ng-multiselect-dropdown>
+                        </div>
+                        <div class="mb-1" [ngClass]="{ 'no-selected' : selectedLanguages.length == 0 }">
+                            <label>Involved Languages:</label>
+                            <ng-multiselect-dropdown
+                                style="min-width: 200px"
+                                [(ngModel)]="selectedLanguages"
+                                [ngModelOptions]="{standalone: true}"
+                                [settings]="multiSelectSettings"
+                                [data]="languages"
+                                [placeholder]="'Select languages'"
+                                (onSelect)="onSelectLanguage($event)"
+                                (onDeSelect)="onSelectLanguage($event)"
+                                (onSelectAll)="onSelectLanguage($event)"
+                            >
+                            </ng-multiselect-dropdown>
+                        </div>
+                        <div class="mb-1">
+                            <label>Default language ( for aliases)</label>
+                            <select
+                                [(ngModel)]="config.defaultLanguage"
+                                class="form-select form-select-sm"
+                                >
+                                <option *ngFor="let lng of selectedLanguages" value="{{lng.key}}">{{lng.title}}</option>
+                            </select>
+                        </div>
+
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="frame border" *ngIf="config.loadMainConfig">
+                            <label class="title">Campaigns extract</label>
+                            <div class="mb-1">
+                                <label>API URL</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control form-control-lg form-control-solid" [(ngModel)]="config.loadMainConfig.url"  spellcheck="false">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="mb-1">
+                                        <label>Request type</label>
+                                        <div>
+                                            <div class="form-check form-check-inline">
+                                                <input type="radio" class="form-check-input" name="main_request_type" [value]="'get'" [(ngModel)]="config.loadMainConfig.method" id="config_main_request_type_get">
+                                                <label class="form-check-label" for="config_main_request_type_get">GET</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input type="radio" class="form-check-input" name="main_request_type" [value]="'post'" [(ngModel)]="config.loadMainConfig.method" id="config_main_request_type_post">
+                                                <label class="form-check-label" for="config_main_request_type_post">POST</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input type="radio" class="form-check-input" name="main_request_type" [value]="'dynamic'" [(ngModel)]="config.loadMainConfig.method" id="config_main_request_type_dynamic_get">
+                                                <label class="form-check-label" for="config_main_request_type_dynamic_get">DYNAMIC GET</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6" *ngIf="config.loadMainConfig.method !== 'dynamic'">
+                                    <div class="mb-1">
+                                        <label>Headers</label>
+                                        <textarea class="form-control form-control-solid" [(ngModel)]="config.loadMainConfig.headers" rows="3"></textarea>
+                                    </div>
+                                </div>
+                                <div class="col-md-6" *ngIf="config.loadMainConfig.method === 'post'">
+                                    <div class="mb-1">
+                                        <label>Body</label>
+                                        <textarea class="form-control form-control-solid" [(ngModel)]="config.loadMainConfig.body" rows="3"></textarea>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                  <div class="mb-1">
+                                      <label>Path of Response</label>
+                                      <input type="text" class="form-control form-control-lg form-control-solid" [(ngModel)]="config.loadMainConfig.pathOfResult"  spellcheck="false">
+                                  </div>
+                                </div>
+                                <div class="col-md-12" *ngIf="config.loadMainConfig.method !== 'dynamic'">
+                                    <div class="mb-1">
+                                        <label>Result collection type</label>
+                                        <div>
+                                            <div class="form-check form-check-inline">
+                                                <input type="radio" class="form-check-input" name="main_result_collection_type" [value]="'pattern'" [(ngModel)]="config.loadMainConfig.resultCollectionType">
+                                                <label class="form-check-label">Html</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input type="radio" class="form-check-input" name="main_result_collection_type" [value]="'path'" [(ngModel)]="config.loadMainConfig.resultCollectionType">
+                                                <label class="form-check-label">Object</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="mb-1">
+                                        <label>Result collection</label>
+                                        <input type="text" class="form-control form-control-lg form-control-solid" [(ngModel)]="config.loadMainConfig.resultCollection"  spellcheck="false">
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="mb-1">
+                                        <label>Recursive type</label>
+                                        <div>
+                                            <div class="form-check form-check-inline">
+                                                <input type="radio" class="form-check-input" name="main_recursive_type" [value]="'page'" [(ngModel)]="config.loadMainConfig.recursiveType">
+                                                <label class="form-check-label">Page</label>
+                                            </div>
+                                            <div class="form-check form-check-inline" *ngIf="config.loadMainConfig.method === 'dynamic'">
+                                                <input type="radio" class="form-check-input" name="main_recursive_type" [value]="'scroll'" [(ngModel)]="config.loadMainConfig.recursiveType">
+                                                <label class="form-check-label">Scroll</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input type="radio" class="form-check-input" name="main_recursive_type" [value]="null" [(ngModel)]="config.loadMainConfig.recursiveType">
+                                                <label class="form-check-label">None</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12" *ngIf="config.loadMainConfig.method === 'dynamic'">
+                                    <div class="mb-1">
+                                        <label>Action type</label>
+                                        <div>
+                                            <div class="form-check form-check-inline">
+                                                <input type="radio" class="form-check-input" name="main_recursive_action_type" [value]="'click'" [(ngModel)]="config.loadMainConfig.actionType">
+                                                <label class="form-check-label">Click</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input type="radio" class="form-check-input" name="main_recursive_action_type" [value]="''" [(ngModel)]="config.loadMainConfig.actionType">
+                                                <label class="form-check-label">None</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12" *ngIf="config.loadMainConfig.method === 'dynamic'">
+                                    <div class="mb-1">
+                                        <label>Action target pattern</label>
+                                        <input type="text" class="form-control form-control-lg form-control-solid" [(ngModel)]="config.loadMainConfig.actionTargetPattern"  spellcheck="false">
+                                    </div>
+                                </div>
+                                <div class="col-md-12" *ngIf="config.loadMainConfig.recursiveType==='page'">
+                                    <div class="mb-1">
+                                        <label>Recursive total page collection</label>
+                                        <input type="text" class="form-control form-control-lg form-control-solid" [(ngModel)]="config.loadMainConfig.recursiveCollection"  spellcheck="false">
+                                    </div>
+                                    <div class="mb-1">
+                                        <label>Recursive input type</label>
+                                        <div>
+                                            <div class="form-check form-check-inline" *ngIf="config.loadMainConfig.method === 'post'">
+                                                <input type="radio" class="form-check-input" name="main_recursive_input_type" [value]="'body'" [(ngModel)]="config.loadMainConfig.recursiveInputType">
+                                                <label class="form-check-label">Body</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input type="radio" class="form-check-input" name="main_recursive_input_type" [value]="'params'" [(ngModel)]="config.loadMainConfig.recursiveInputType">
+                                                <label class="form-check-label">URL query param</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                              <input type="radio" class="form-check-input" name="main_recursive_input_type" [value]="'url'" [(ngModel)]="config.loadMainConfig.recursiveInputType">
+                                              <label class="form-check-label">URL</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input type="radio" class="form-check-input" name="main_recursive_type" [value]="null" [(ngModel)]="config.loadMainConfig.recursiveInputType">
+                                                <label class="form-check-label">None</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mb-1" *ngIf="config.loadMainConfig.recursiveInputType === 'url'">
+                                      <label>Recursive url</label>
+                                      <input type="text" class="form-control form-control-lg form-control-solid" [(ngModel)]="config.loadMainConfig.recursiveUrl"  spellcheck="false">
+                                    </div>
+                                    <div class="mb-1">
+                                      <label>Recursive page input collection</label>
+                                      <input type="text" class="form-control form-control-lg form-control-solid" [(ngModel)]="config.loadMainConfig.recursiveInputCollection"  spellcheck="false">
+                                    </div>
+                                    <div class="mb-1">
+                                        <label>Recursive input field</label>
+                                        <input type="text" class="form-control form-control-lg form-control-solid" [(ngModel)]="config.loadMainConfig.recursiveInputField"  spellcheck="false">
+                                    </div>
+                                    <div class="mb-1">
+                                        <label>Initial page( e.g 0 or 1)</label>
+                                        <input type="text" class="form-control form-control-lg form-control-solid" [(ngModel)]="config.loadMainConfig.recursiveInputInitialValue"  spellcheck="false">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-1">
+                                <button class="btn btn-primary" type="button" (click)="onLoadMain()">
+                                    Load
+                                </button>
+                            </div>
+                            <div class="mb-1">
+                                <div class="example">
+                                    <p class="text-capitalize" *ngIf="config.loadMainConfig.result?.length">
+                                        {{ config.loadMainConfig.result.length }} campaigns extracted
+                                    </p>
+                                    <div class="example-code position-relative">
+                                        <span class="ms-1 mt-1 cursor-pointer position-absolute start-0 top-0" *ngIf="config.loadMainConfig.result?.length"
+                                        [inlineSVG]="'./assets/media/svg/expand.svg'" (click)="onShowHtml(config.loadMainConfig.result)"></span>
+                                        <div class="example-highlight">
+                                            <pre class="language-html">
+                                            {{config.loadMainConfig?.result?.join('')}}
+                                            </pre>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="frame border" *ngIf="config.loadDetailConfig">
+                            <label class="title">Second api extract</label>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="frame border mb-4">
+                                        <div class="mb-1">
+                                            <label>Permalink collection</label>
+                                            <input type="text" class="form-control form-control-lg form-control-solid" [(ngModel)]="config.loadDetailConfig.permalinkCollection"  spellcheck="false">
+                                        </div>
+                                        <div class="mb-1">
+                                            <label>Permalink collection type</label>
+                                            <div class="from-check from-check-inline">
+                                                <div class="form-check form-check-inline">
+                                                    <input type="radio" class="form-check-input" name="detail_permalink_collection_type" [value]="'onclick'" [(ngModel)]="config.loadDetailConfig.permalinkCollectionType">
+                                                    <label class="form-check-label">onclick</label>
+                                                </div>
+                                                <div class="form-check form-check-inline">
+                                                    <input type="radio" class="form-check-input" name="detail_permalink_collection_type" [value]="'href'" [(ngModel)]="config.loadDetailConfig.permalinkCollectionType">
+                                                    <label class="form-check-label">href</label>
+                                                </div>
+                                                <div class="form-check form-check-inline">
+                                                    <input type="radio" class="form-check-input" name="detail_permalink_collection_type" [value]="'slug'" [(ngModel)]="config.loadDetailConfig.permalinkCollectionType">
+                                                    <label class="form-check-label">slug</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="mb-1">
+                                            <label>Permalink input type</label>
+                                            <div class="from-check from-check-inline">
+                                                <div class="form-check form-check-inline">
+                                                    <input type="radio" class="form-check-input" name="detail_permalink_input_type" [value]="'body'" [(ngModel)]="config.loadDetailConfig.permalinkInputType">
+                                                    <label class="form-check-label">body</label>
+                                                </div>
+                                                <div class="form-check form-check-inline">
+                                                    <input type="radio" class="form-check-input" name="detail_permalink_input_type" [value]="'header'" [(ngModel)]="config.loadDetailConfig.permalinkInputType">
+                                                    <label class="form-check-label">header</label>
+                                                </div>
+                                                <div class="form-check form-check-inline">
+                                                    <input type="radio" class="form-check-input" name="detail_permalink_input_type" [value]="null" [(ngModel)]="config.loadDetailConfig.permalinkInputType">
+                                                    <label class="form-check-label">none</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mb-1">
+                                        <label>API URL</label>
+                                        <div class="input-group">
+                                            <input type="text" class="form-control form-control-lg form-control-solid" [(ngModel)]="config.loadDetailConfig.url"  spellcheck="false">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="mb-1">
+                                        <label>Request type</label>
+                                        <div>
+                                            <div class="form-check form-check-inline">
+                                                <input type="radio" class="form-check-input" name="detail_request_type" [value]="'get'" [(ngModel)]="config.loadDetailConfig.method" id="config_detail_request_type_get">
+                                                <label class="form-check-label" for="config_detail_request_type_get">GET</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input type="radio" class="form-check-input" name="detail_request_type" [value]="'post'" [(ngModel)]="config.loadDetailConfig.method" id="config_detail_request_type_post">
+                                                <label class="form-check-label" for="config_detail_request_type_post">POST</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input type="radio" class="form-check-input" name="detail_request_type" [value]="'dynamic'" [(ngModel)]="config.loadDetailConfig.method" id="config_detail_request_type_dynamic_get">
+                                                <label class="form-check-label" for="config_detail_request_type_dynamic_get">DYNAMIC GET</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6" *ngIf="config.loadDetailConfig.method !== 'dynamic'">
+                                    <div class="mb-1">
+                                        <label>Headers</label>
+                                        <textarea class="form-control form-control-solid" [(ngModel)]="config.loadDetailConfig.headers" rows="3"></textarea>
+                                    </div>
+                                </div>
+                                <div class="col-md-6" *ngIf="config.loadDetailConfig.method === 'post'">
+                                    <div class="mb-1">
+                                        <label>Body</label>
+                                        <textarea class="form-control form-control-solid" [(ngModel)]="config.loadDetailConfig.body" rows="3"></textarea>
+                                    </div>
+                                </div>
+                                <div class="col-md-12" *ngIf="config.loadDetailConfig.method !== 'dynamic'">
+                                    <div class="mb-1">
+                                        <label>Result collection type</label>
+                                        <div>
+                                            <div class="form-check form-check-inline">
+                                                <input type="radio" class="form-check-input" name="detail_result_collection_type" [value]="'pattern'" [(ngModel)]="config.loadDetailConfig.resultCollectionType">
+                                                <label class="form-check-label">Html</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input type="radio" class="form-check-input" name="detail_result_collection_type" [value]="'path'" [(ngModel)]="config.loadDetailConfig.resultCollectionType">
+                                                <label class="form-check-label">Object</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="mb-1">
+                                        <label>Result collection</label>
+                                        <input type="text" class="form-control form-control-lg form-control-solid" [(ngModel)]="config.loadDetailConfig.resultCollection"  spellcheck="false">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-1">
+                                <button class="btn btn-primary" type="button" (click)="onExtractDetailPage({output: config.loadDetailConfig, data: config.loadMainConfig.result, withContent: config.type === 'company'})">
+                                    Load
+                                </button>
+                            </div>
+                            <div class="mb-1">
+                                <div class="example">
+                                    <div class="example-code">
+                                        <div class="example-highlight">
+                                            <pre class="language-html">
+                                            {{config.loadDetailConfig.detailUrl}}
+                                            </pre>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row" *ngIf="activeTab?.key==='company'">
+                    <div class="col-md-12">
+                        <app-company-field-extract-component #companyFieldExtractor
+                        [config]="config.companyFieldConfig" (extract)="onExtractCompanyField($event)"
+                        (extractCampaigns)="onExtractCompanyCampaigns($event)"
+                        [fields]="companyFields"
+                        [parent]="this"></app-company-field-extract-component>
+                    </div>
+                </div>
+                <div class="row" *ngIf="activeTab?.key==='campaign'">
+                    <div class="col-12 mb-3 d-flex justify-content-between border-bottom">
+                        <ul class="nav nav-dark nav-bold nav-tabs" role="tablist" style="margin-bottom: -1px;">
+                            <li class="nav-item" *ngFor="let item of statuses" [hidden]="item.disabled">
+                                <a
+                                    (click)="onClickStatus(item)"
+                                    class="nav-link cursor-pointer"
+                                    [ngClass]="{'active': item == activeStatus }"
+                                    role="tab"
+                                >
+                                {{item.title}}
+                                </a>
+                            </li>
+                        </ul>
+                        <ul class="nav nav-dark nav-bold nav-tabs" role="tablist"  style="margin-bottom: -1px;">
+                            <li class="nav-item" *ngFor="let item of typologies" [hidden]="item.disabled">
+                                <a
+                                    (click)="onClickTypology(item)"
+                                    class="nav-link cursor-pointer"
+                                    [ngClass]="{'active': item == activeTypology }"
+                                    role="tab"
+                                >
+                                {{item.title}}
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="col-md-12">
+                        <app-pre-select-component #preSelectExtractor [configs]="config.campaignStatusConfigs"
+                        [statuses]="statuses"
+                        [languages]="selectedLanguages"
+                        [status]="activeStatus"
+                        [typologies]="typologies"
+                        [typology]="activeTypology"
+                        (extract)="onExtractStatus($event)"
+                        (extractLink)="onExtractLink($event)"></app-pre-select-component>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="d-flex align-items-center justify-content-end">
+                            <a (click)="preSelectExtractor.onPrevExtract()" *ngIf="preSelectExtractor.getConfig().matchedIndex > 0"
+                            class="w-30px h-30px cursor-pointer d-flex justify-content-center align-items-center"><i class="text-primary fs-3 fa fa-angle-left"></i></a>
+                            <a (click)="preSelectExtractor.onNextExtract()" *ngIf="preSelectExtractor.getConfig().matchedCount > preSelectExtractor.getConfig().matchedIndex + 1"
+                            class="w-30px h-30px cursor-pointer d-flex justify-content-center align-items-center"><i class="text-primary fs-3 fa fa-angle-right"></i></a>
+                        </div>
+                        <app-field-extract-component #fieldExtractor
+                            [mainCollectionType]="config?.loadMainConfig?.resultCollectionType"
+                            [detailCollectionType]="config?.loadDeetailConfig?.resultCollectionType"
+                            [hideLink]="config.type === 'company'"
+                            [config]="config.campaignFieldConfig"  [statuses]="statuses" [typologies]="typologies"
+                            [status]="activeStatus" (extract)="onExtractField($event)"
+                            [typology]="activeTypology"
+                            [languages]="selectedLanguages"
+                            [defaultLanguage]="config.defaultLanguage"
+                            [fields]="campaignFields"
+                            [dynamicConfig]="config.campaignFieldDynamicConfig"></app-field-extract-component>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+	</div>
+</div>

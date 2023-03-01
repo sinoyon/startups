@@ -1,0 +1,115 @@
+<div>
+	<div ngbDropdown #searchDropdown="ngbDropdown"
+	    placement="bottom" autoClose="outside">
+    <form class="w-100 position-relative" autoComplete="off" ngbDropdownToggle [ngClass]="{'dropdown-toggle': false}">
+      <span
+        [inlineSVG]="'./assets/media/svg/search.svg'"
+        class="
+          svg-icon svg-icon-2 svg-icon-lg-1 svg-icon-gray-500
+          position-absolute
+          top-50
+          ms-5
+          translate-middle-y
+        "
+      ></span>
+      <input
+        #searchInput (keyup)="onSearch($event)"
+        type="text"
+        class="form-control form-control-solid px-15"
+        name="search"
+        placeholder="{{'OTHERS.search_username_email' | translate}}..."
+      />
+      <span
+        (click)="clear($event)"
+        [hidden]="!keyword || keyword === ''"
+        [inlineSVG]="'./assets/media/svg/close.svg'"
+        class="
+          svg-icon svg-icon-2 svg-icon-lg-1 svg-icon-gray-500
+          position-absolute
+          top-50
+          me-5
+          end-0
+          translate-middle-y
+        "
+      ></span>
+      <span *ngIf="loading$ | async"
+        style="background-color: #F5F8FA;"
+        class="
+          position-absolute
+          w-20px
+          top-50
+          me-5
+          end-0
+          translate-middle-y
+        "
+      >
+        <span class="spinner-border spinner-border-sm align-middle"></span>
+      </span>
+    </form>
+		<div ngbDropdownMenu *ngIf="peopleSearchQuery?.result.length"
+		class="dropdown-menu dropdown-menu-fit dropdown-menu-right dropdown-menu-anim dropdown-menu-lg px-5">
+			<div class="quick-search-wrapper px-5">
+				<div class="search-tabs d-flex justify-content-around mb-5">
+					<div class="item" *ngFor="let tab of tabs" [ngClass]="{'active': activeTab == tab}" (click)="onClickTab(tab)">
+						<div class="font-weight-boldest font-size-lg">{{tab.label | translate}}</div>
+					</div>
+				</div>
+				<div class="quick-search-result scroll-y me-n5 pe-5"
+          data-kt-scroll="true"
+          data-kt-scroll-activate="{default: true, lg: true}"
+          data-kt-scroll-max-height="auto"
+          [attr.data-kt-scroll-dependencies]="
+            '#kt_drawer_chat_messenger_header, #kt_drawer_chat_messenger_footer'
+          "
+          [attr.data-kt-scroll-wrappers]="
+            '#kt_drawer_chat_messenger_body'
+          "
+          [attr.data-kt-scroll-offset]="'0px'">
+					<ng-container  *ngIf="activeTab?.value === 'all' || activeTab?.value === 'people'">
+						<div class="quick-search__category"  *ngIf="activeTab?.value === 'all'">{{'OTHERS.addressbook' | translate}}</div>
+						<ng-container *ngFor="let item of peopleSearchQuery?.result">
+							<ng-container [ngTemplateOutlet]="itemTemplate" [ngTemplateOutletContext]="{item: item}"></ng-container>
+						</ng-container>
+						<div class="load-more" *ngIf="peopleSearchQuery?.result.length < peopleSearchQuery?.totalCount">
+							<button class="btn" (click)="search('people')">{{'OTHERS.more' | translate}}</button>
+						</div>
+					</ng-container>
+					<ng-container *ngIf="activeTab?.value === 'all' || activeTab?.value === 'contact'">
+						<div class="quick-search__category"  *ngIf="activeTab?.value === 'all'">{{'OTHERS.Conversations' | translate}}</div>
+						<ng-container *ngFor="let item of contactSearchQuery?.result">
+							<ng-container [ngTemplateOutlet]="itemTemplate" [ngTemplateOutletContext]="{item: item}"></ng-container>
+						</ng-container>
+						<div class="load-more" *ngIf="contactSearchQuery?.result.length < contactSearchQuery?.totalCount">
+							<button class="btn" (click)="search('contact')">{{'OTHERS.more' | translate}}</button>
+						</div>
+					</ng-container>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<ng-template #itemTemplate let-item="item">
+  <div class="d-flex flex-stack py-4" (click)="onClickItem(item); searchDropdown.close()">
+    <div class="d-flex align-items-center">
+      <div class="symbol symbol-45px symbol-circle">
+        <div class="symbol-label bg-transparent rounded-pill" [ngStyle]="{ 'background-image': 'url(' + ('./assets/media/users/default.jpg') + ')'}"></div>
+      </div>
+      <div class="ms-5">
+        <a
+          class="
+            fs-5
+            fw-bolder
+            text-gray-900 text-hover-primary
+            mb-2
+            cursor-pointer
+          "
+        >
+          {{item.name}}
+        </a>
+        <div class="fw-bold text-gray-400">{{item.email}}</div>
+      </div>
+    </div>
+  </div>
+  <div class="separator separator-dashed d-none"></div>
+</ng-template>

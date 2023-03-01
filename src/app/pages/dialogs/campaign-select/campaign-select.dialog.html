@@ -1,0 +1,79 @@
+<div class="overlay">
+    <ng-container *ngIf="loading$ | async">
+		<div class="overlay-layer bg-transparent" style="z-index: 1;">
+		  <div class="spinner spinner-center spinner-primary"></div>
+		</div>
+    </ng-container>
+    <div class="modal-body">
+        <div class="d-flex justify-content-center flex-wrap" id="typology_selector">
+            <div class="position-relative me-4">
+                <div class="wrap d-flex align-items-center cursor-pointer p-2"
+                [ngClass]="{'active': typology === 'all'}">
+                    <div class="d-flex flex-column align-items-center w-69px m-1" (click)="onClickTypology('all')">
+                        <span [inlineSVG]="'./assets/media/svg/all.svg'" 
+                            [setSVGAttributes]="{width: 40, height: 32}" class="me-2"></span>
+                        <span class="text-primary fs-5 fw-bolder mt-1">{{'OTHERS.all' | translate}}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="position-relative me-4">
+                <div class="wrap d-flex align-items-center cursor-pointer p-2"
+                [ngClass]="{'active': typology === 'equity'}">
+                    <div class="d-flex flex-column align-items-center w-69px m-1" (click)="onClickTypology('equity')">
+                        <span [inlineSVG]="'./assets/media/svg/equity.svg'" 
+                            [setSVGAttributes]="{width: 40, height: 32}" class="me-2"></span>
+                        <span class="text-primary fs-5 fw-bolder mt-1">{{'OTHERS.Equity' | translate}}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="position-relative">
+                <div class="wrap d-flex align-items-center cursor-pointer p-2"
+                [ngClass]="{'active': typology === 'lending'}">
+                    <div class="d-flex flex-column align-items-center w-69px m-1" (click)="onClickTypology('lending')">
+                        <span [inlineSVG]="'./assets/media/svg/lending.svg'" 
+                            [setSVGAttributes]="{width: 40, height: 32}" class="me-2"></span>
+                        <span class="text-primary fs-5 fw-bolder mt-1">{{'OTHERS.Lending' | translate}}</span>
+                    </div>
+                </div>
+            </div>
+            <!-- <div class="position-relative">
+                <div class="wrap d-flex align-items-center cursor-pointer p-2 h-100" [ngClass]="{'staging': !staging}">
+                    <div class="d-flex flex-column align-items-center w-90px m-3">
+                        <span [inlineSVG]="'./assets/media/svg/minibond.svg'" 
+                            [setSVGAttributes]="{width: 48, height: 39}" class="me-2"></span>
+                        <span class="text-primary fs-5 fw-bolder mt-1">Minibond</span>
+                    </div>
+                    <div class="d-flex flex-column align-items-center w-90px m-3 justify-content-center" *ngIf="!staging">
+                        <span class="text-primary fs-6 fw-bolder mt-1">{{ 'GENERAL.COMINGSOON' | translate}}</span>
+                    </div>
+                </div>
+            </div> -->
+        </div>         
+      <div>
+        <lp-table
+          [hidden]="isEmptyTable"
+          [hasPadding]="false"
+          [showSelectAllCheckbox]="false"
+          [suppressRowClickSelection]="false"
+          [showDeleteColumn]="false"
+          [showCheckbox]="false"
+          (action)="onAction($event)"
+          (paginationChanged)="onPaginationChanged($event)"
+          [columnDefs]="columnDefs"
+          #tableCtrl
+        ></lp-table>
+		</div>
+		<div class="d-flex justify-content-center align-items-center h-200px" *ngIf="isEmptyTable">{{'GENERAL.NO_RECORD_FOUND' | translate}}</div>
+    </div>
+    <div class="modal-footer">
+        <div>
+            <button type="button" class="btn btn-light btn-elevate me-1" (click)="modalActive.dismiss()">
+            {{ 'GENERAL.CLOSE' | translate}}
+            </button>&nbsp;
+            <button type="button" class="btn btn-primary btn-elevate" (click)="onYesClick()"
+            [disabled]="(loading$ | async) || tableCtrl.originSelectedRowIds.length < min">
+            {{ 'OTHERS.ADD_PORTFOLIO' | translate}}
+            </button>
+        </div>
+    </div>
+</div>

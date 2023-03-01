@@ -1,0 +1,197 @@
+<!--begin::Signin-->
+<div class="login-form login-signin overlay" [ngClass]="{'login-dialog': popup}">
+  <!--begin::Form-->
+  <form
+    class="form"
+    [formGroup]="loginForm"
+    novalidate="novalidate"
+    id="kt_login_signin_form"
+    (ngSubmit)="submit()"
+  >
+    <!--begin::Title-->
+    <div class="pt-lg-0 pt-5">
+      <div class="kt-login__title">
+        <div class="welcome">{{'AUTH.GENERAL.WELCOME' | translate}}</div>
+        <div class="description">
+          {{'AUTH.LOGIN.TITLE' | translate}}
+          <a *ngIf="!popup" routerLink="/auth/registration">{{'AUTH.GENERAL.SIGNUP_BUTTON' | translate}}</a>
+          <a *ngIf="popup" href="javascript:;" (click)="pageEvent.emit('registration')">{{'AUTH.GENERAL.SIGNUP_BUTTON' | translate}}</a>
+        </div>
+      </div>
+    </div>
+    <!--end::Title-->
+
+    <!-- begin::Alert error-->
+    <ng-container *ngIf="hasError">
+      <div class="mb-lg-15 alert alert-danger">
+        <div class="alert-text fw-bold">
+          {{'AUTH.VALIDATION.INVALID_LOGIN' | translate}}
+        </div>
+      </div>
+    </ng-container>
+    <!-- end::Alert error-->
+
+    <!--begin::Form group-->
+    <div class="mb-5">
+      <label class="fs-5 fw-bolder text-dark">{{'AUTH.INPUT.EMAIL' | translate}}</label>
+      <input
+        class="form-control form-control-solid h-auto py-7 px-6 rounded-1"
+        type="email"
+        name="email"
+        formControlName="email"
+        autocomplete="off"
+        [ngClass]="{ 'is-invalid': loginForm.controls['email'].invalid }"
+      />
+      <ng-container
+        [ngTemplateOutlet]="formError"
+        [ngTemplateOutletContext]="{
+          validation: 'required',
+          message: 'AUTH.VALIDATION.EMAIL_REQUIRED' | translate,
+          control: loginForm.controls['email']
+        }"
+      ></ng-container>
+      <ng-container
+        [ngTemplateOutlet]="formError"
+        [ngTemplateOutletContext]="{
+          validation: 'email',
+          message: 'AUTH.VALIDATION.EMAIL_INCORRECT' | translate,
+          control: loginForm.controls['email']
+        }"
+      ></ng-container>
+      <ng-container
+        [ngTemplateOutlet]="formError"
+        [ngTemplateOutletContext]="{
+          validation: 'minLength',
+          message: 'AUTH.VALIDATION.EMAIL_MINLENGTH' | translate,
+          control: loginForm.controls['email']
+        }"
+      ></ng-container>
+      <ng-container
+        [ngTemplateOutlet]="formError"
+        [ngTemplateOutletContext]="{
+          validation: 'maxLength',
+          message: 'Email should have maximum 360 symbols',
+          control: loginForm.controls['email']
+        }"
+      ></ng-container>
+    </div>
+    <!--end::Form group-->
+
+    <!--begin::Form group-->
+    <div class="mb-5">
+      <div class="d-flex justify-content-between mt-n5">
+        <label class="fs-5 fw-bolder text-dark pt-5"
+          >{{'AUTH.INPUT.PASSWORD' | translate}}</label
+        >
+        <a *ngIf="!popup"
+          routerLink="/auth/forgot-password"
+          [queryParams]="{email: loginForm.controls['email'].value}"
+          class="text-primary fs-5 fw-bolder text-hover-primary pt-5"
+          id="kt_login_forgot"
+        >
+          {{'AUTH.FORGOT.TITLE' | translate}}
+        </a>
+        <a *ngIf="popup"
+          (click)="pageEvent.emit('forgot-password')"
+          href="javascript:;"
+          class="text-primary fs-5 fw-bolder text-hover-primary pt-5"
+          id="kt_login_forgot"
+        >
+          {{'AUTH.FORGOT.TITLE' | translate}}
+        </a>
+      </div>
+      <div class="position-relative">
+        <input
+        #passwordInput
+        class="form-control form-control-solid h-auto py-7 px-6 rounded-1"
+        type="password"
+        name="password"
+        autocomplete="off"
+        formControlName="password"
+        [ngClass]="{ 'is-invalid': loginForm.controls['password'].invalid }"
+      />
+        <div (click)="onClickShowPassowrd()"
+          class="toggle-password position-absolute cursor-pointer"
+          [ngClass]="{'show-password': passwordInput.type === 'text', 'is-invalid': loginForm.controls['password'].invalid}">
+        </div>
+      </div>
+      <ng-container
+        [ngTemplateOutlet]="formError"
+        [ngTemplateOutletContext]="{
+          validation: 'required',
+          message: 'AUTH.VALIDATION.PASSWORD_REQUIRED' | translate,
+          control: loginForm.controls['password']
+        }"
+      ></ng-container>
+      <ng-container
+        [ngTemplateOutlet]="formError"
+        [ngTemplateOutletContext]="{
+          validation: 'minlength',
+          message: 'AUTH.VALIDATION.PASSWORD_MINLENGTH' | translate,
+          control: loginForm.controls['password']
+        }"
+      ></ng-container>
+      <ng-container
+        [ngTemplateOutlet]="formError"
+        [ngTemplateOutletContext]="{
+          validation: 'maxLength',
+          message: 'Password should have maximum 100 symbols',
+          control: loginForm.controls['password']
+        }"
+      ></ng-container>
+    </div>
+    <!--end::Form group-->
+
+    <!--begin::Action-->
+    <div class="pb-lg-0 pb-5 d-flex align-items-center justify-content-between">
+      <div *ngIf="popup"
+        (click)="modal.close()"
+        class="btn btn-light-primary btn-fw-bolder fs-5 px-8 py-6 my-3 me-3"
+      >
+        {{ 'GENERAL.CLOSE' | translate }}
+      </div>
+      <button
+        type="submit"
+        id="kt_login_signin_submit"
+        class="btn btn-warning fw-bolder fs-5 px-8 py-6 my-3"
+        [disabled]="loginForm.invalid"
+      >
+        {{ 'AUTH.LOGIN.BUTTON' | translate }}
+      </button>
+    </div>
+
+    <div style="border-top: 1px solid #e2e2e2; height: 20px; margin-top: 20px;"></div>
+    <div>
+      <div (click)="loginWithLinkedin()"
+        class="w-100 btn p-0 d-flex align-items-center text-white" style="background-color: #0276a8;"
+      >
+        <div class="w-55px text-center">
+          <i class="socicon-linkedin fs-2 text-white"></i>
+        </div>
+        <div class="fw-bolder fs-5 px-8 py-6 flex-root" style="border-left: 1px solid #0000002e;">
+          {{ 'Login with LinkedIn' | translate }}
+        </div>
+      </div>
+    </div>
+    <!--end::Action-->
+  </form>
+  <!--end::Form-->
+</div>
+<!--end::Signin-->
+
+<ng-template
+  #formError
+  let-control="control"
+  let-message="message"
+  let-validation="validation"
+>
+  <ng-container
+    *ngIf="control.hasError(validation) && (control.dirty || control.touched)"
+  >
+    <div class="fv-plugins-message-container">
+      <div class="fv-help-block">
+        {{ message }}
+      </div>
+    </div>
+  </ng-container>
+</ng-template>

@@ -1,0 +1,42 @@
+<!-- <div class="position-relative">
+	<div class="bg-primary cursor-pointer text-white d-flex py-2 px-4 rounded-1 align-items-center" (click)="toggleOpen($event);">
+		<div class="fs-5 text-uppercase me-4 fw-bold">{{(selectedOption?.label) | translate}}
+		</div>	
+		<i class="fa fs-4 lh-0 text-white" [ngClass]="{'fa-angle-down': !opened, 'fa-angle-up': opened}"></i>
+	</div>
+	<div class="position-absolute z-index-2 bg-white min-w-100 rounded-1 end-0" [ngClass]="{'d-block': opened, 'd-none': !opened}">
+		<div>
+			<ng-container *ngFor="let item of options; index as i">
+				<ng-container [ngTemplateOutlet]="itemTemplate" [ngTemplateOutletContext]="{item: item, index: i}"></ng-container>
+			</ng-container>
+		</div>
+	</div>
+</div>
+<ng-template #itemTemplate let-item="item" let-index="index" let-type="type">
+	<div class="py-2 px-4 fs-5 cursor-pointer bg-hover-light-primary d-flex justify-content-between" *ngIf="item!=selectedOption"
+		(click)="optionSelect(item, $event)">
+		<span>
+			{{item.label | translate}}
+		</span>
+		<span *ngIf="item.count!=null" class="ms-1 text-brand fw-bolder">{{(item.count)}}</span>
+	</div>
+</ng-template> -->
+
+
+<div class="d-flex bg-white rounded-1 overflow-hidden">
+	<ng-container *ngFor="let item of options; index as i">
+		<ng-container [ngTemplateOutlet]="itemTemplate" [ngTemplateOutletContext]="{item: item, selected: item==selectedOption}"></ng-container>
+	</ng-container>
+</div>
+<ng-template #itemTemplate let-item="item" let-selected="selected">
+	<div style="background: #ebebeb;" class="py-2 text-primary cursor-pointer px-4 fs-6" [ngClass]="{'bg-primary': selected, 'bg-hover-secondary': !selected}"
+		(click)="optionSelect(item, $event)">
+		<span 
+		[inlineSVG]="item.icon"
+		[setSVGAttributes]="{width: 16, height: 16}"
+		 class="me-2" 
+		 [ngClass]="{'white-svg': selected, 'primary-svg': !selected}">
+		</span>
+		<span [ngClass]="{'text-white': selected}">{{item.label | translate}}</span>
+	</div>
+</ng-template>

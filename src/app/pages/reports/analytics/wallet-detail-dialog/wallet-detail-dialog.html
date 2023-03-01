@@ -1,0 +1,24 @@
+<div class="overlay">
+    <div class="modal-body">
+        <div>
+            <lp-table
+                [hasPadding]="false"
+                [showSelectAllCheckbox]="false"
+                [showCheckbox]="false"
+                [suppressRowClickSelection]="true"
+                [showDeleteColumn]="false"
+                [columnDefs]="columnDefs"
+                (action)="onAction($event)"
+                (paginationChanged)="onPaginationChanged($event)"
+                #tableCtrl
+            ></lp-table>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <div>
+            <button type="button" class="btn btn-light btn-elevate me-1" (click)="modal.dismiss()">
+                {{ 'GENERAL.CLOSE' | translate}}
+            </button>
+        </div>
+    </div>
+</div>

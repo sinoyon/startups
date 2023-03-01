@@ -1,0 +1,124 @@
+
+:host{
+	.slider-pointer {
+		display: flex;
+		padding-bottom: 15px;
+		justify-content: center;
+		.pointer{
+			width: 20px;
+			height: 20px;
+			line-height: 20px;
+			text-align: center;
+			font-size: 11px;
+			background: #f69036;
+			border-radius: 50%;
+			color: white;
+			margin: 0 5px;
+			&.prev-pointer, &.next-pointer{
+				background: #d2d2d2;
+				color: black;
+			}
+		}
+	}
+	.slider {
+		position: relative;
+		padding: 0px 40px;
+		@media only screen and (max-width: 400px) {
+			padding: 0px 0px;
+			width: 100% !important;
+		}
+	}
+	
+	.slider-wrapper {
+		overflow: hidden;
+		position: relative;
+		background: transparent;
+		z-index: 1;
+		height: 100%;
+		padding: 5px 0;
+	}
+	
+	.items {
+		width: 10000px;
+		position: relative;
+		top: 0;
+		left: 0px;
+		height: 100%;
+		display: flex;
+	}
+	
+	.items.shifting {
+		transition: left .2s ease-out;
+	}
+	
+	.slide {
+		height: 100%;
+		transition: all 1s;
+		position: relative;
+		padding-left: 10px;
+		padding-right: 10px;
+		@media only screen and (max-width: 768px) {
+			.image-wrap {
+				display: none;
+			}
+		}
+		@media only screen and (max-width: 400px) {
+			// padding: 0;
+		}
+		::ng-deep app-campaign-box .campaign-box{
+			box-shadow: 0 0 10px 0 rgba(33, 33, 33, 0.15);
+		}
+	}
+	
+	.control {
+		position: absolute;
+		width: 40px;
+		height: 40px;
+		background: transparent;
+		border-radius: 20px;
+		z-index: 2;
+		top: calc(50% - 20px);
+		@media only screen and (max-width: 400px) {
+			border-radius: 50%;
+			background: #00000029;
+		}
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		text-shadow: 0 0 3px rgba(0, 0, 0, 0.3);
+		i{
+			color:#f69036;
+			font-size: 25px;
+			@media only screen and (max-width: 400px) {
+				// color: white;
+			}
+		}
+	}
+	
+	.prev,
+	.next {
+		background-size: 35px;
+		background-position: center;
+		background-repeat: no-repeat;
+		cursor: pointer;
+	}
+	
+	.prev {
+		left: 0px;
+		@media only screen and (max-width: 400px) {
+			left: 33px;
+		}
+	}
+	
+	.next {
+		right: 0px;
+		@media only screen and (max-width: 400px) {
+			right: 33px;
+		}
+	}
+	
+	.prev:active,
+	.next:active {
+		transform: scale(0.8);
+	}
+}

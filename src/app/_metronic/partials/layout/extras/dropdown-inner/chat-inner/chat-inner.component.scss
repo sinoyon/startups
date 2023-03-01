@@ -1,0 +1,36 @@
+:host {
+  .input-box {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    flex-shrink: 1;
+    overflow: hidden;
+    align-items: stretch;
+    min-height: 40px;
+    justify-content: center;
+    background-color: rgb(241, 241, 244);
+    border-radius: 20px;
+    padding: 9px 20px;
+    main {
+      flex-direction: column;
+      outline: none;
+      color: black;
+      font-size: 14px;
+      flex: 1;
+      .input-line {
+        min-height: 16px;
+      }
+    }
+  }
+  #send_chat_message_button {
+    background: linear-gradient(
+      135deg,
+      rgb(0, 188, 242),
+      rgb(0, 120, 212)
+    );
+  }
+  .message-content {
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+  }
+}

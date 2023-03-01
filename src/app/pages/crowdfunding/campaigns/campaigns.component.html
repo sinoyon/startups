@@ -1,0 +1,130 @@
+<div>
+	<div class="container px-0 d-flex align-items-center justify-content-between flex-wrap">
+		<h1 class="text-primary position-relative fw-boldest mb-4 text-nowrap">
+			{{'OTHERS.Aggregatore_Crowdfunding' | translate}}
+			<span class="position-relative ms-2 cursor-pointer" [ngbTooltip]="titleTooltipTemplate" triggers="click hover" placement="bottom-right" [closeDelay]="1000">
+				<span [inlineSVG]="'./assets/media/svg/question.svg'"></span>
+			</span>
+		</h1>
+		<div class="mb-4 d-flex align-items-center">
+			<app-crowdfunding-country-selector #countryCtrl [user]="user" class="me-4"></app-crowdfunding-country-selector><!-- (checkUser)="checkUser(false)" -->
+			<app-crowdfunding-typology-selector #typologyCtrl></app-crowdfunding-typology-selector>
+		</div>
+	</div>
+	<div class="container px-0 mb-4 d-flex">
+		<app-crowdfunding-view-selector #viewCtrl [user]="user"></app-crowdfunding-view-selector>
+	</div>
+	<div id="options_header" class="mb-4">
+		<div class="container px-0">
+			<div class="w-100 d-flex align-items-center">
+				<div class="d-flex px-4 py-2 cursor-pointer" (click)="onClickAddFilter()">
+					<span class="me-2" [inlineSVG]="'./assets/media/svg/plus.svg'"></span>
+					<span class="fs-5 fw-bolder text-primary text-nowrap">{{'OTHERS.ADD_FILTER' | translate}}</span>
+				</div>
+				<div class="overflow-hidden position-relative flex-root" #filterWrapper id="crowdfunding_filtered_wrapper">
+					<div class="d-flex" #filterItemsWrapper style="width: min-content;" id="crowdfunding_filtered_items_wrapper">
+						<ng-container *ngFor="let option of selectedFilterOptions">
+							<ng-container *ngIf="option.selected">
+								<ng-container [ngTemplateOutlet]="filterItemTemplate" [ngTemplateOutletContext]="{item: option}"></ng-container>
+							</ng-container>
+						</ng-container>
+					</div>
+					<div *ngIf="overFiltered.length > 0"
+					class="position-absolute top-0 d-flex h-100 end-0" style="background-color: #F5F8FA;"
+					[ngStyle]="{'left': overFiltered.left + 'px'}">
+							<div class="text-primary d-flex py-1 px-3 mx-1 rounded-1 align-items-center text-nowrap" (click)="onClickAddFilter()">
+								<div class="fs-5 me-2 fw-bold cursor-pointer">+ {{overFiltered.length}}</div>
+							</div>
+					</div>
+				</div>
+				<app-crowdfunding-sort-selector #sortCtrl (checkUser)="checkUser(false)" [user]="user" [hidden]="view === 'map'"></app-crowdfunding-sort-selector>
+			</div>
+		</div>
+	</div>
+
+	<div class="container px-0 position-relative d-block" *ngIf="view==='card'" id="card_view">
+		<div id="lazyBounce" style="position: absolute; top: 0; left: 0px; right: 0px; z-index: -1;" [ngStyle]="{'bottom': lazyBounceBottom + 'px'}"></div>
+		<app-crowdfunding-cards
+			[campaigns]="activeCampaignQuery.campaigns"
+			[totalCount]="activeCampaignQuery.totalCount"
+			[advs]="advs.campaigns"
+			[sourceAdvs]="advs.sources"
+			[expanded]="country == 'france' ? false : true"
+			[isFilteredOrSorted]="isFiltered || isSorted"
+			(videoClick)="onClickVideo($event)"
+			(followClick)="onClickFollowCampaign($event)"
+			(walletClick)="onClickWalletCampaign($event)"
+			(detailClick)="onClickDetailCampaign($event)"
+			(externalClick)="onClickExternalCampaign($event)"
+			(loadMore)="onClickLoadMore()"
+			*ngIf="activeCampaignQuery.totalCount > 0"
+		></app-crowdfunding-cards>
+	</div>
+	<div class="position-relative" id="list_view"  *ngIf="view === 'list'">
+		<div id="lazyBounce" style="position: absolute; top: 0; left: 0px; right: 0px; z-index: -1;" [ngStyle]="{'bottom': lazyBounceBottom + 'px'}"></div>
+		<app-crowdfunding-list
+		*ngIf="activeCampaignQuery.totalCount > 0"
+		(followClick)="onClickFollowCampaign($event)"
+		(walletClick)="onClickWalletCampaign($event)"
+		[campaigns]="activeCampaignQuery.campaigns" [typology]="typology"></app-crowdfunding-list>
+	</div>
+	<div class="d-flex flex-wrap" *ngIf="view==='map'" id="map_view">
+		<app-crowdfunding-map #map [fitBounds]="true" *ngIf="activeCampaignQuery.totalCount > 0"
+			[campaigns]="activeCampaignQuery.campaigns"
+			[wallets]="wallets"
+			[user]="user"
+			[locale]="locale"
+			(videoClick)="onClickVideo($event)"
+			(followClick)="onClickFollowCampaign($event)"
+			(walletClick)="onClickWalletCampaign($event)"
+			(detailClick)="onClickDetailCampaign($event)"
+			(externalClick)="onClickExternalCampaign($event)"
+		></app-crowdfunding-map>
+	</div>
+	<ng-container *ngIf="view==='list' || view === 'card'">
+		<div class="py-4 d-flex justify-content-center" *ngIf="!isLoadMore && activeCampaignQuery.totalCount > 9">
+			<div (click)="onClickLoadMore()" class="btn btn-warning hvr-grow-shadow"><span>{{ 'GENERAL.SHOW_MORE_RESULT' | translate}}</span></div>
+		</div>
+	</ng-container>
+	<ng-container>
+		<div class="container text-center pt-20 fw-bolder fs-3" *ngIf="activeCampaignQuery.totalCount == 0">
+			<span>
+				{{ 'GENERAL.NO_CAMPAIGN_FOR_FILTER' | translate}}
+			</span>
+		</div>
+	</ng-container>
+</div>
+<div class="modal" id="video_view">
+	<app-video-component
+	(close)="onCloseVideo()"
+	[campaigns]="isClickedAdvVideo ? advs.campaigns : activeCampaignQuery.campaigns"
+	[totalCount]="activeCampaignQuery.totalCount"
+	(followClick)="onClickFollowCampaign($event)"
+	(walletClick)="onClickWalletCampaign($event)"
+	(detailClick)="onClickDetailCampaign($event)"
+	(externalClick)="onClickExternalCampaign($event)"
+	#video
+	></app-video-component>
+</div>
+
+<ng-template #titleTooltipTemplate>
+	<h2 class="fs-7 fw-normal">
+		{{'OTHERS.homepage_tooltip1' | translate}}
+		<a (click)="common.openLinkWithNewTab('https://www.startupswallet.com/news/it/crowdfunding/equity-crowdfunding/crowdfunding-immobiliare-un-fenomeno-in-crescita-con-grandi-potenzialita-di-ritorno/')">{{'OTHERS.immobiliari' | translate}}</a>
+		{{'OTHERS.homepage_tooltip2' | translate}}
+		<a (click)="common.openLinkWithNewTab('https://www.startupswallet.com/news/it/crowdfunding/lending-crowdfunding-guadagnare-aiutando-le-aziende/')">lending</a>
+		,
+		<a (click)="common.openLinkWithNewTab('https://www.startupswallet.com/news/it/crowdfunding/minibond/')">minibond</a>
+			{{'OTHERS.AND' | translate}}
+		<a (click)="common.openLinkWithNewTab('https://www.startupswallet.com/news/it/crowdfunding/equity-crowdfunding/')">equity</a>
+		{{'OTHERS.homepage_tooltip3' | translate}}
+		<a (click)="common.openLinkWithNewTab('https://www.startupswallet.com/news/it/crowdfunding/piattaforme-equity-crowdfunding/')">{{'OTHERS.homepage_tooltip4' | translate}}</a>
+	</h2>
+</ng-template>
+<ng-template #filterItemTemplate let-item="item">
+	<div class="text-primary d-flex py-1 px-3 mx-1 rounded-1 align-items-center text-nowrap"
+	style="background: rgba(0, 63, 135, 0.08);">
+		<div class="fs-5 me-2">{{item.label | translate}}</div>
+		<span class="cursor-pointer" [inlineSVG]="'./assets/media/svg/close.svg'" (click)="item.selected = false; onFilterChanged()"></span>
+	</div>
+</ng-template>

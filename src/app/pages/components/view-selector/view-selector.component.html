@@ -1,0 +1,17 @@
+<div class="d-flex bg-white rounded-1 overflow-hidden">
+	<ng-container *ngFor="let item of options; index as i">
+		<ng-container [ngTemplateOutlet]="itemTemplate" [ngTemplateOutletContext]="{item: item, selected: item==selectedOption}"></ng-container>
+	</ng-container>
+</div>
+<ng-template #itemTemplate let-item="item" let-selected="selected">
+	<div class="py-2 text-primary cursor-pointer px-4 fs-6" [ngClass]="{'bg-primary': selected, 'bg-hover-secondary': !selected}"
+		(click)="optionSelect(item, $event)">
+		<span 
+		[inlineSVG]="item.icon"
+		[setSVGAttributes]="{width: 16, height: 16}"
+		 class="me-2" 
+		 [ngClass]="{'white-svg': selected, 'primary-svg': !selected}">
+		</span>
+		<span [ngClass]="{'text-white': selected}">{{item.label | translate}}</span>
+	</div>
+</ng-template>

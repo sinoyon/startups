@@ -1,0 +1,47 @@
+<div class="overlay">
+    <ng-container *ngIf="loading$ | async">
+		<div class="overlay-layer bg-transparent" style="z-index: 1;">
+		  <div class="spinner spinner-center spinner-primary"></div>
+		</div>
+    </ng-container>
+    <div class="modal-body">
+        <div *ngIf="!activeType" class="d-flex py-20 justify-content-center">
+          <div class="radio-inline">
+            <ng-container *ngFor="let item of types">
+              <ng-container *ngIf="!item.hidden">
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" [(ngModel)]="activeType" [value]="item" (change)="onChangeType()">
+                  <label class="form-check-label">{{ item.label }}</label>
+                </div>
+              </ng-container>
+            </ng-container>
+          </div>
+        </div>
+        <div [hidden]="!activeType">
+          <lp-table
+            [hidden]="isEmptyTable"
+            [hasPadding]="false"
+            [showSelectAllCheckbox]="false"
+            [suppressRowClickSelection]="true"
+            [showDeleteColumn]="false"
+            [columnDefs]="columnDefs"
+            (action)="onAction($event)"
+            (paginationChanged)="onPaginationChanged($event)"
+            #tableCtrl
+          ></lp-table>
+        </div>
+		    <div class="d-flex justify-content-center align-items-center h-200px" *ngIf="isEmptyTable && activeType">{{'GENERAL.NO_RECORD_FOUND' | translate}}</div>
+    </div>
+    <div class="modal-footer d-flex justify-content-between">
+      <div></div>
+      <div>
+        <button type="button" class="btn btn-light btn-elevate me-1" (click)="modal.dismiss()">
+          {{ 'GENERAL.CANCEL' | translate}}
+          </button>&nbsp;
+        <button type="button"  [hidden]="!activeType" class="btn btn-primary btn-elevate" (click)="onYesClick()"
+        [disabled]="(loading$ | async) || tableCtrl.originSelectedRowIds.length == 0">
+        {{ 'GENERAL.SAVE' | translate}}
+        </button>
+      </div>
+    </div>
+</div>

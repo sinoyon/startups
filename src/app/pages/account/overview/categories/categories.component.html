@@ -1,0 +1,32 @@
+<div
+class="d-flex flex-column mx-5 p-5 bg-white">
+    <div class="rounded p-2 mb-5">
+        <span class="me-5 svg-icon" [inlineSVG]="'./assets/media/svg/bulb.svg'" [setSVGAttributes]="{width: 20, height: 20}"></span>
+        <span class="fs-4 fw-bold">{{'USER.PROFILE.CATEGORIES.GET_NOTI_FOLLOW_CATEGORY' | translate}}
+            <a class="fw-bolder" routerLink="/account/settings/notification">{{ 'USER.PROFILE.CAMPAIGNS.CONGIF_NOTI' | translate}}</a>
+        </span>
+    </div>
+    <div>
+        <ng-container *ngFor="let category of categories">
+          <ng-container>
+            <div class="d-flex ps-2 py-4 align-items-center justify-content-between border-bottom">
+              <div class="d-flex align-items-center" [ngClass]="{'cursor-pointer': category.isFilter}" (click)="goHome(category)">
+                <div class="d-flex align-items-center" 
+                    triggers="click hover"
+                    [ngbTooltip]="category.isFilter? '' : ('USER.PROFILE.CATEGORIES.NOT_CAMPAIGNS' | translate)">
+                    <div class="symbol symbol-30px symbol-light me-2">
+                        <div class="symbol-label rounded-pill" [ngStyle]="{ 'background-image': 'url(' + (category.pic || './assets/media/misc/bg-1.jpg') + ')'}"></div>
+                    </div>
+                    <span class="text-dark-75 fw-bolder text-hover-primary mb-1 fs-6">{{ category.label}}</span>
+                </div>
+              </div>
+              <div class="d-flex">
+                <div class="py-1 btn rounded-0 text-nowrap text-uppercase fs-7 fw-bolder" (click)="onClickFollowCategory(category)" 
+                [ngClass]="{ 'btn-warning': user && category.follows.includes(user._id), 
+                'btn-outline-warning': !(user && category.follows.includes(user._id))}"> {{ (user && category.follows.includes(user._id) ? 'GENERAL.FOLLOWING': 'GENERAL.FOLLOW') | translate}}</div>
+              </div>
+            </div>
+          </ng-container>
+        </ng-container>
+      </div>
+</div>

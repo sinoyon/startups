@@ -1,0 +1,39 @@
+<div class="overlay">
+    <ng-container *ngIf="loading$ | async">
+      <div class="overlay-layer bg-transparent" style="z-index: 1;">
+        <div class="spinner-border spinner-center spinner-primary"></div>
+      </div>
+    </ng-container>
+    <div class="modal-body">
+      <div style="min-height: 200px; display: flex;">
+        <editor
+          style="flex: 1;"
+          #textEditor
+          plugins="print lists"
+          [init]="{
+            branding: false,
+            menubar: false,
+            min_height: 300
+            }"
+          toolbar="undo redo | formatselect | fontsizeselect |' +
+          ' bold italic underline forecolor backcolor | alignleft aligncenter ' +
+          ' alignright alignjustify | bullist numlist outdent indent |' +
+          ' removeformat"
+          apiKey="vjnhpihfm7y5gjs7b4fsyv9e6jb6a0gttrmdpw7bl6jacczj"
+          [(ngModel)]="comment"
+          (onInit)="onInitEditor($event)"
+          [ngModelOptions]="{standalone: true}"
+        ></editor>
+      </div>
+    </div>
+    <div class="modal-footer d-flex">
+          <button type="button" class="btn btn-primary btn-elevate" (click)="onYesClick()"
+          [disabled]="(loading$ | async)">
+          {{ 'GENERAL.SAVE' | translate}}
+          </button>
+          <button type="button" class="btn btn-elevate" (click)="modal.dismiss()"
+          >
+          {{ 'GENERAL.CLOSE' | translate}}
+          </button>
+    </div>
+</div>

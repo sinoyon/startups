@@ -1,0 +1,161 @@
+<div class="card card-custom overlay pt-3" [ngClass]="{'overlay-block': loading$ | async}">
+	<div class="card-header align-items-end d-flex justify-content-between flex-nowrap">
+		<ul class="nav nav-dark nav-bold nav-tabs nav-tabs-line" style="margin-bottom: -1px;" role="tablist">
+			<li class="nav-item" *ngFor="let item of tabs">
+				<a
+				  (click)="onClickTab(item)"
+				  class="nav-link cursor-pointer"
+				  [ngClass]="{'active': item==activeTab }"
+				  role="tab"
+				>
+				{{item.title}}
+				<span *ngIf="item.count && item.state === 'duplicated'" class="badge badge-warning fw-boldest" >{{item.count}}</span>
+				<span *ngIf="item.count && item.state === 'deleted'" class="badge badge-danger fw-boldest" >{{item.count}}</span>
+				<span *ngIf="item.count && item.state === 'no_valid'" class="badge badge-danger fw-boldest" >{{item.count}}</span>
+				<span *ngIf="item.count && (item.state !== 'deleted' && item.state !== 'duplicated' && item.state !== 'no_valid')" class="badge badge-light fw-boldest" >{{item.count}}</span>
+				</a>
+			</li>
+		</ul>
+		<div class="form-group pb-2">
+			<div class="form-check">
+				<input type="checkbox" class="form-check-input" [(ngModel)]="withCheckLink" (change)="loadState(); tableCtrl.willRefreshTable.next('DATA')">
+				<label class="form-check-label text-nowrap">With check link</label>
+			</div>
+		</div>
+	</div>
+	<div class="card-body">
+		<div class="d-flex flex-wrap align-items-center">
+      <div class="d-flex flex-column border p-2 rounded">
+				<div class="form-group mb-0 mb-2">
+					<div class="">
+						<div class="form-check form-check-inline">
+							<input type="radio" class="form-check-input" name="periodType" [value]="'year'" (change)="onChangePeriodType($event)" [(ngModel)]="periodType">
+							<label class="form-check-label">By year</label>
+						</div>
+						<div class="form-check form-check-inline">
+							<input type="radio" class="form-check-input" name="periodType" [value]="'month'" (change)="onChangePeriodType($event)" [(ngModel)]="periodType">
+							<label class="form-check-label">By month</label>
+						</div>
+						<div class="form-check form-check-inline">
+							<input type="radio" class="form-check-input" name="periodType" [value]="'period'" (change)="onChangePeriodType($event)" [(ngModel)]="periodType">
+							<label class="form-check-label">By period</label>
+						</div>
+						<div class="form-check form-check-inline">
+							<input type="radio" class="form-check-input" name="periodType" [value]="'none'" (change)="onChangePeriodType($event)" [(ngModel)]="periodType">
+							<label class="form-check-label">None</label>
+						</div>
+					</div>
+				</div>
+				<div class="d-flex align-items-center">
+					<div (click)="onClickNextPeriod(false)"
+					*ngIf="periodType !== 'period' && periodType !== 'none'"
+					class="w-30px h-30px cursor-pointer d-flex justify-content-center align-items-center"><i class="text-primary fs-3 fa fa-angle-left"></i></div>
+					<div class="date-picker" *ngIf="periodType==='year'">
+						<div class="input-group">
+							<input type="text"
+							class="form-control"
+							[bsConfig]="{'minMode': 'year', 'dateInputFormat': 'YYYY'}"
+							#dp="bsDatepicker"
+							(bsValueChange)="onDateChanged($event)"
+							[(bsValue)]="periodStart"
+							bsDatepicker>
+							<button class="btn btn-outline-secondary calendar " (click)="dp.toggle()" type="button"></button>
+						</div>
+					</div>
+					<div class="date-picker" *ngIf="periodType==='month'">
+						<div class="input-group">
+							<input type="text"
+							class="form-control"
+							[(bsValue)]="periodStart"
+							[bsConfig]="{'minMode': 'month', 'dateInputFormat': 'MM/YYYY'}"
+							#dp="bsDatepicker"
+							(bsValueChange)="onDateChanged($event)"
+							bsDatepicker>
+							<button class="btn btn-outline-secondary calendar " (click)="dp.toggle()" type="button"></button>
+						</div>
+					</div>
+					<div class="date-picker" *ngIf="periodType==='day'">
+						<div class="input-group">
+							<input type="text"
+							class="form-control"
+							[bsConfig]="{}"
+							#dp="bsDatepicker"
+							(bsValueChange)="onDateChanged($event)"
+							[(bsValue)]="periodStart"
+							bsDatepicker>
+							<button class="btn btn-outline-secondary calendar " (click)="dp.toggle()" type="button"></button>
+						</div>
+					</div>
+					<div class="date-picker mb-1" *ngIf="periodType==='period'">
+						<div class="input-group">
+							<input type="text"
+							class="form-control w-250px"
+							[placement]="'right'"
+							[bsConfig]="{'displayOneMonthRange': true}"
+							[(bsValue)]="periodRange"
+							#dp="bsDaterangepicker"
+							(bsValueChange)="onDateRangeChanged($event)"
+							bsDaterangepicker>
+							<button class="btn btn-outline-secondary calendar " (click)="dp.toggle()" type="button"></button>
+						</div>
+					</div>
+					<a (click)="onClickNextPeriod(true)"
+					*ngIf="periodType !== 'period' && periodType !== 'none'"
+					class="w-30px h-30px cursor-pointer d-flex justify-content-center align-items-center"><i class="text-primary fs-3 fa fa-angle-right"></i></a>
+				</div>
+			</div>
+			<div class="mx-3 form-control p-0 form-control-solid d-flex align-items-center d-none"  style="width: inherit;">
+				<ng-multiselect-dropdown
+					style="width: 100%;"
+					[(ngModel)]="selectedTypologies"
+					[ngModelOptions]="{standalone: true}"
+					[settings]="multiSelectSettings"
+					[data]="typologies"
+					[placeholder]="'Select typologies'"
+					(onSelect)="onSelectTypology()"
+					(onDeSelect)="onSelectTypology()"
+					(onSelectAll)="onSelectTypology()"
+					(onDeSelectAll)="onSelectTypology()"
+				>
+				</ng-multiselect-dropdown>
+			</div>
+			<div class="mx-3 form-control p-0 form-control-solid d-flex align-items-center" style="width: inherit;">
+				<ng-multiselect-dropdown
+					style="width: 100%;"
+					[(ngModel)]="selectedCountries"
+					[ngModelOptions]="{standalone: true}"
+					[settings]="multiSelectSettings"
+					[data]="countries"
+					[placeholder]="'Select countries'"
+					(onSelect)="onSelectCountry()"
+					(onDeSelect)="onSelectCountry()"
+					(onSelectAll)="onSelectCountry()"
+					(onDeSelectAll)="onSelectCountry()"
+				>
+				</ng-multiselect-dropdown>
+			</div>
+
+			<div class="px-3 d-flex align-items-center mb-1">
+				<button class="btn btn-primary btn-lg" (click)="downloadXLS()">
+					Download XLS
+				</button>
+			</div>
+		</div>
+
+		<div>
+			<lp-table
+				[hidden]="isEmptyTable"
+				[hasPadding]="false"
+				[showSelectAllCheckbox]="true"
+				[suppressRowClickSelection]="true"
+				[extraActions]="extraActions"
+				[showDeleteColumn]="true"
+				(action)="onAction($event)"
+				(paginationChanged)="onPaginationChanged($event)"
+				[columnDefs]="columnDefs"
+				#tableCtrl
+			></lp-table>
+		</div>
+		<div class="d-flex justify-content-center align-items-center h-200px" *ngIf="isEmptyTable">{{'GENERAL.NO_RECORD_FOUND' | translate}}</div>
+	</div>
+</div>

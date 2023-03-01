@@ -1,0 +1,16 @@
+<!-- splash screen -->
+<div #splashScreen id="splash-screen" [hidden]="!(loading$ | async)">
+  <div class="d-flex justify-content-center flex-column align-items-center p-10 rounded bg-white sp_div">
+    <img src="./assets/media/logos/logo.png" alt="Logo" class="w-150px mb-9"/>
+    <svg class="splash-spinner m-0" viewBox="0 0 50 50">
+      <circle
+        class="path"
+        cx="25"
+        cy="25"
+        r="20"
+        fill="none"
+        stroke-width="5"
+      ></circle>
+    </svg>
+  </div>
+</div>

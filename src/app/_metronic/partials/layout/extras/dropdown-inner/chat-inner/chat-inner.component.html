@@ -1,0 +1,432 @@
+<div class="card-header pe-5" id="kt_drawer_chat_messenger_header">
+  <div class="card-title">
+    <ng-container *ngIf="inside && selectedRoom && user">
+      <div class="cursor-pointer" *ngIf="user?.isAdmin">
+          <div (click)="onBackToList()" class="ms-n8 d-flex justify-content-center" style="width: 3rem;">
+              <span
+                [inlineSVG]="'./assets/media/svg/arr079.svg'"
+                class="svg-icon svg-icon-1"
+              ></span>
+          </div>
+      </div>
+      <div class="d-flex justify-content-center flex-column me-3">
+        <a
+          class="
+            fs-4
+            fw-bolder
+            text-gray-900 text-hover-primary
+            me-1
+            mb-2
+            lh-1
+            cursor-pointer
+          "
+          >{{selectedRoom?.name}}</a
+        >
+        <div class="mb-0 lh-1" *ngIf="selectedRoom.active">
+          <span
+            class="badge badge-success badge-circle w-10px h-10px me-1"
+          ></span
+          ><span class="fs-7 fw-bold text-gray-400">{{'OTHERS.Active' | translate}}</span>
+        </div>
+        <div class="mb-0 lh-1" *ngIf="!selectedRoom.active">
+          <span
+            class="badge badge-warning badge-circle w-10px h-10px me-1"
+          ></span
+          ><span class="fs-7 fw-bold text-gray-400">{{'OTHERS.Inactive' | translate}}</span>
+        </div>
+      </div>
+    </ng-container>
+    <ng-container *ngIf="!inside && user && user.isAdmin">
+      <div class="d-flex justify-content-center flex-column me-3">
+        <a
+          class="
+            fs-4
+            fw-bolder
+            text-gray-900 text-hover-primary
+            me-1
+            mb-2
+            lh-1
+            cursor-pointer
+          "
+          >{{user?.firstName }} {{user?.lastName }}</a
+        >
+        <div class="mb-0 lh-1">
+          <span
+            class="badge badge-success badge-circle w-10px h-10px me-1"
+          ></span
+          ><span class="fs-7 fw-bold text-gray-400">{{'OTHERS.Active' | translate}}</span>
+        </div>
+      </div>
+    </ng-container>
+    <ng-container *ngIf="!user">
+      <div class="d-flex justify-content-center flex-column me-3">
+        <a
+          class="
+            fs-4
+            fw-bolder
+            text-gray-900 text-hover-primary
+            me-1
+            mb-2
+            lh-1
+            cursor-pointer
+          "
+          >{{'GENERAL.CONTACT_WITH_SUPPORT' | translate}}</a
+        >
+      </div>
+    </ng-container>
+  </div>
+  <div class="card-toolbar">
+    <div
+      class="btn btn-sm btn-icon btn-active-light-primary"
+      id="kt_drawer_chat_close"
+    >
+      <span class="svg-icon svg-icon-2"></span>
+      <span
+        [inlineSVG]="'./assets/media/svg/close.svg'"
+        class="svg-icon svg-icon-2"
+      ></span>
+    </div>
+  </div>
+</div>
+<div class="card-body overlay" id="kt_drawer_chat_messenger_body">
+  <ng-container *ngIf="loading$ | async">
+		<div class="overlay-layer bg-transparent" style="z-index: 1;">
+		<div class="spinner-border spinner-border-lg align-middle"></div>
+		</div>
+	</ng-container>
+  <div *ngIf="!inside && user && user.isAdmin"
+    class="flex-column w-100"
+  >
+    <div id="kt_drawer_chat_messenger_search">
+      <app-chat-search (clickItem)="onClickSearchResultItem($event)"></app-chat-search>
+    </div>
+    <div
+      class="scroll-y me-n5 pe-5 pt-5"
+      data-kt-scroll="true"
+      data-kt-scroll-activate="{default: true, lg: true}"
+      data-kt-scroll-max-height="auto"
+      data-kt-scroll-dependencies="#kt_drawer_chat_messenger_header, #kt_drawer_chat_messenger_footer, #kt_drawer_chat_messenger_search"
+      data-kt-scroll-wrappers="#kt_drawer_chat_messenger_body"
+      data-kt-scroll-offset="0px"
+    >
+      <ng-container *ngIf="unreadRooms?.length">
+        <ng-container *ngFor="let item of unreadRooms">
+          <ng-container
+            [ngTemplateOutlet]="roomItem"
+            [ngTemplateOutletContext]="{
+              item: item
+            }"
+          ></ng-container>
+        </ng-container>
+      </ng-container>
+      <ng-container *ngIf="chatsQuery?.result.length">
+        <ng-container *ngFor="let item of chatsQuery.result">
+          <ng-container
+            *ngIf="!item.hidden"
+            [ngTemplateOutlet]="roomItem"
+            [ngTemplateOutletContext]="{
+              item: item
+            }"
+          ></ng-container>
+        </ng-container>
+        </ng-container>
+        <div class="load-more" *ngIf="chatsQuery?.result.length < chatsQuery?.totalCount">
+            <button class="btn" (click)="loadRooms()">{{'OTHERS.more' | translate}}</button>
+        </div>
+    </div>
+  </div>
+  <div *ngIf="inside && selectedRoom && user"
+    class="scroll-y me-n5 pe-5 d-flex flex-column-reverse justify-content-start align-items-stretch"
+    data-kt-element="messages"
+    data-kt-scroll="true"
+    data-kt-scroll-activate="{default: true, lg: true}"
+    data-kt-scroll-height="auto"
+    [attr.data-kt-scroll-dependencies]="
+      '#kt_drawer_chat_messenger_header, #kt_drawer_chat_messenger_footer'
+    "
+    [attr.data-kt-scroll-wrappers]="
+      '#kt_drawer_chat_messenger_body'
+    "
+    [attr.data-kt-scroll-offset]="'0px'"
+    #scroll
+  >
+    <div class="my-auto" *ngIf="selectedRoom?.type === 'people'">
+      <div class="welcome d-flex flex-column align-items-center px-6 py-4">
+          <div style="flex: 1"></div>
+          <div class="fs-5">{{'OTHERS.say_hi_to' | translate}} {{selectedRoom?.name}} {{'OTHERS.with_wave' | translate}}</div>
+          <button class="btn btn-primary mt-6 start-contact rounded-pill" (click)="onNewContact()">{{'OTHERS.say_hi' | translate}}</button>
+      </div>
+      <div></div>
+    </div>
+    <ng-container *ngIf="selectedRoom?._id && messageQuery?.result.length > 0">
+      <ng-container *ngFor="let item of messageQuery.result">
+        <ng-container
+          [ngTemplateOutlet]="messageItem"
+          [ngTemplateOutletContext]="{
+            item: item
+          }"
+        ></ng-container>
+      </ng-container>
+    </ng-container>
+    <div class="w-100 d-flex justify-content-center" *ngIf="messageQuery?.result.length < messageQuery?.totalCount">
+      <div class="text-uppercase bg-transparent p-3 fw-bold cursor-pointer bg-hover-secondary" (click)="loadRoomMessagesMore()">{{'OTHERS.load_more' | translate}}</div>
+    </div>
+  </div>
+  <div
+    *ngIf="!user"
+    class="scroll-y"
+    data-kt-scroll="true"
+    data-kt-scroll-activate="{default: true, lg: true}"
+    data-kt-scroll-height="auto"
+    [attr.data-kt-scroll-dependencies]="
+      '#kt_drawer_chat_messenger_header, #kt_drawer_chat_messenger_footer'
+    "
+    [attr.data-kt-scroll-wrappers]="
+      '#kt_drawer_chat_messenger_body'
+    "
+    [attr.data-kt-scroll-offset]="'0px'"
+  >
+    <form [formGroup]="registerForm" autocomplete="off">
+      <div class="mb-5 d-flex justify-content-between">
+        <div class="me-2">
+          <label class="fs-5 fw-bolder text-dark">{{'AUTH.INPUT.FIRSTNAME' | translate}}</label>
+          <input
+            class="form-control form-control-solid h-auto py-7 px-6 rounded-lg fs-5"
+            type="text"
+            name="firstName"
+            formControlName="firstName"
+            autocomplete="off"
+            [ngClass]="{
+              'is-invalid': f['firstName'].invalid && !f['firstName'].pristine
+            }"
+          />
+          <ng-container
+            [ngTemplateOutlet]="formError"
+            [ngTemplateOutletContext]="{
+              validation: 'required',
+              message: ('AUTH.VALIDATION.FIRSTNAME_REQUIRED' | translate),
+              control: f['firstName']
+            }"
+          ></ng-container>
+          <ng-container
+            [ngTemplateOutlet]="formError"
+            [ngTemplateOutletContext]="{
+              validation: 'minlength',
+              message: ('AUTH.VALIDATION.FIRSTNAME_MINLENGTH' | translate),
+              control: f['firstName']
+            }"
+          ></ng-container>
+          <ng-container
+            [ngTemplateOutlet]="formError"
+            [ngTemplateOutletContext]="{
+              validation: 'maxLength',
+              message: 'First name should have maximum 100 symbols',
+              control: f['firstName']
+            }"
+          ></ng-container>
+        </div>
+        <div>
+          <label class="fs-5 fw-bolder text-dark">{{'AUTH.INPUT.LASTNAME' | translate}}</label>
+          <input
+            class="form-control form-control-solid h-auto py-7 px-6 rounded-lg fs-5"
+            type="text"
+            name="lastName"
+            formControlName="lastName"
+            autocomplete="off"
+            [ngClass]="{
+              'is-invalid': f['lastName'].invalid && !f['lastName'].pristine
+            }"
+          />
+          <ng-container
+            [ngTemplateOutlet]="formError"
+            [ngTemplateOutletContext]="{
+              validation: 'required',
+              message: 'AUTH.VALIDATION.LASTNAME_REQUIRED' | translate,
+              control: f['lastName']
+            }"
+          ></ng-container>
+          <ng-container
+            [ngTemplateOutlet]="formError"
+            [ngTemplateOutletContext]="{
+              validation: 'minlength',
+              message: 'AUTH.VALIDATION.LASTNAME_MINLENGTH' | translate,
+              control: f['lastName']
+            }"
+          ></ng-container>
+          <ng-container
+            [ngTemplateOutlet]="formError"
+            [ngTemplateOutletContext]="{
+              validation: 'maxLength',
+              message: 'Last name should have maximum 100 symbols',
+              control: f['lastName']
+            }"
+          ></ng-container>
+        </div>
+      </div>
+      <div class="mb-5">
+        <label class="fs-5 fw-bolder text-dark">{{ 'AUTH.INPUT.EMAIL' | translate}}</label>
+        <input
+          class="form-control form-control-solid h-auto py-7 px-6 rounded-lg fs-5"
+          type="email"
+          placeholder="Email"
+          name="email"
+          formControlName="email"
+          autocomplete="off"
+          [ngClass]="{ 'is-invalid': f['email'].invalid && !f['email'].pristine }"
+        />
+        <ng-container
+          [ngTemplateOutlet]="formError"
+          [ngTemplateOutletContext]="{
+            validation: 'required',
+            message: 'AUTH.VALIDATION.EMAIL_REQUIRED' | translate,
+            control: f['email']
+          }"
+        ></ng-container>
+        <ng-container
+          [ngTemplateOutlet]="formError"
+          [ngTemplateOutletContext]="{
+            validation: 'email',
+            message: 'AUTH.VALIDATION.EMAIL_INCORRECT' | translate,
+            control: f['email']
+          }"
+        ></ng-container>
+      </div>
+      <div class="mb-5 d-flex flex-wrap pb-lg-0 pb-3 justify-content-between">
+        <button
+          type="submit"
+          id="kt_login_signup_submit"
+          (click)="startChat()"
+          [disabled]="
+          registerForm.invalid
+          "
+          class="btn btn-warning fw-bolder fs-5 px-8 py-6 my-3"
+        >
+        {{ 'GENERAL.START_CHAT' | translate }}
+        </button>
+      </div>
+    </form>
+  </div>
+  <div *ngIf="inside && selectedRoom && user && selectedRoom?.type !== 'people'"
+    class="card-footer pt-4 px-0"
+    id="kt_drawer_chat_messenger_footer"
+  >
+    <div class="d-flex align-items-stretch">
+      <div class="flex-root input-box">
+          <main id="chat_message_input" contenteditable="true" spellcheck="false" [perfectScrollbar]="{wheelPropagation: false}" [ngStyle]="{'max-height': '100px', 'position': 'relative'}" >
+              <div class="input-line">
+              </div>
+          </main>
+      </div>
+      <div class="d-flex align-items-end ms-2">
+          <div id="send_chat_message_button" class="w-40px h-40px rounded-pill d-flex justify-content-center align-items-center" (click)="onClickSend()">
+              <div><i style="font-size: 24px;" class="la la-paper-plane text-white"></i></div>
+          </div>
+      </div>
+    </div>
+  </div>
+</div>
+<ng-template
+  #formError
+  let-control="control"
+  let-message="message"
+  let-validation="validation"
+>
+  <ng-container
+    *ngIf="control.hasError(validation) && (control.dirty || control.touched)"
+  >
+    <div class="fv-plugins-message-container">
+      <div class="fv-help-block">
+        {{ message }}
+      </div>
+    </div>
+  </ng-container>
+</ng-template>
+<ng-template #roomItem let-item="item">
+  <div class="d-flex flex-stack py-4" (click)="setSelectedRoom(item)">
+    <div class="d-flex align-items-center">
+      <div class="symbol symbol-45px symbol-circle">
+        <div class="symbol-label bg-transparent rounded-pill" [ngStyle]="{ 'background-image': 'url(' + ('./assets/media/users/default.jpg') + ')'}"></div>
+        <!-- <span
+          class="symbol-label bg-light-danger text-danger fs-6 fw-bolder"
+        >
+          M
+        </span> -->
+      </div>
+
+      <div class="ms-5">
+        <a
+          class="
+            fs-5
+            fw-bolder
+            text-gray-900 text-hover-primary
+            mb-2
+            cursor-pointer
+          "
+        >
+          {{item.name}}
+        </a>
+        <div class="fw-bold text-gray-400">{{item.email}}</div>
+      </div>
+    </div>
+
+    <div class="d-flex flex-column align-items-end ms-2">
+      <!-- <span class="text-muted fs-7 mb-1">5 hrs</span> -->
+      <span class="badge badge-sm badge-circle badge-light-success" *ngIf="item.unreadMessageCount"
+        >{{item.unreadMessageCount}}</span
+      >
+    </div>
+  </div>
+  <div class="separator separator-dashed d-none"></div>
+</ng-template>
+<ng-template #messageItem let-item="item">
+  <div
+    [ngClass]="{
+      'justify-content-start': !item.me,
+      'justify-content-end': item.me
+    }"
+    class="mb-10"
+  >
+    <div
+      class="d-flex flex-column align-items"
+      [ngClass]="'align-items-' + (!item.me ? 'start' : 'end')"
+    >
+      <div class="d-flex align-items-center mb-2" *ngIf="item.start">
+        <ng-container *ngIf="!item.me">
+          <div div class="symbol symbol-35px symbol-circle">
+            <div class="symbol-label bg-transparent rounded-pill" [ngStyle]="{ 'background-image': 'url(' + ('./assets/media/users/default.jpg') + ')'}"></div>
+          </div>
+          <div class="ms-3">
+            <a
+              href="#"
+              class="fs-5 fw-bolder text-gray-900 text-hover-primary me-1"
+            >
+              {{ item.from.firstName }}
+            </a>
+            <span class="text-muted fs-7 mb-1">{{ item.createdTime }}</span>
+          </div>
+        </ng-container>
+        <ng-container *ngIf="item.me">
+          <div class="me-3">
+            <span class="text-muted fs-7 mb-1">{{ item.createdTime }}</span>
+            <a
+              href="#"
+              class="fs-5 fw-bolder text-gray-900 text-hover-primary ms-1"
+            >
+            {{'OTHERS.You' | translate}}
+            </a>
+          </div>
+          <div class="symbol symbol-35px symbol-circle">
+            <div class="symbol-label bg-transparent rounded-pill" [ngStyle]="{ 'background-image': 'url(' + ('./assets/media/users/default.jpg') + ')'}"></div>
+          </div>
+        </ng-container>
+      </div>
+
+      <div
+        class="message-content"
+        [ngClass]="getMessageCssClass(item)"
+        data-kt-element="message-text"
+        [innerHTML]="item.message"
+      ></div>
+    </div>
+  </div>
+</ng-template>

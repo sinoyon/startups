@@ -1,0 +1,38 @@
+<div class="row mx-5" id="account_campaigns">
+    <div class="col-12 p-5 bg-white mb-5">
+        <div class="rounded p-2">
+            <span class="me-5 svg-icon" [inlineSVG]="'./assets/media/svg/bulb.svg'" [setSVGAttributes]="{width: 20, height: 20}"></span>
+            <span class="fs-4 fw-bold">{{ 'USER.PROFILE.CAMPAIGNS.GET_NOTI_FOLLOW_COMPAIGN' | translate}}
+                <a class="fw-bolder" routerLink="/account/settings/notification">{{ 'USER.PROFILE.CAMPAIGNS.CONGIF_NOTI' | translate}}</a>
+            </span>
+        </div>
+    </div>
+    <div class="col-12 p-0 d-flex justify-content-between">
+        <div class="flex-root"></div>
+        <div class="mb-5">
+            <app-crowdfunding-typology-selector
+            [options]="optionsForTypology"
+             #typologyCtrl></app-crowdfunding-typology-selector>
+        </div>
+    </div>
+    <div class="col-12 p-0" [hidden]="campaigns.length==0">
+        <div id="list_view" class="position-relative">
+            <app-crowdfunding-list
+            #listCtrl
+            [fixHeader]="false"
+            [followable]="true"
+            [walletable]="true"
+            [fields]="fieldsForList"
+            [typology]="typology"
+            [row]="rowForList"
+            (followClick)="onClickFollowCampaign($event)"
+            (walletClick)="onClickWalletCampaign($event)"
+            [campaigns]="campaigns" [typology]="'all'"></app-crowdfunding-list>
+        </div>
+    </div>
+    <div class="col-12 p-0" *ngIf="campaigns.length == 0">
+        <div class="py-20 text-center fs-3">
+            {{ 'USER.PROFILE.CAMPAIGNS.NOT_FOLLOWS' | translate}}
+        </div>
+    </div>
+</div>

@@ -1,0 +1,75 @@
+:host ::ng-deep{
+    .ag-root{
+        max-height: 400px; // 500px;
+
+        @media only screen and (max-width: 400px) {
+            max-height: 330px;
+        }
+    }
+    .lp_tbl {
+        display: none !important;
+    }
+    #typology_selector{
+        .wrap{
+            position: relative;
+            div {z-index: 1};
+            &:hover:after{
+                content: '';
+                position: absolute;
+                width: 100%;
+                height: 100%;
+                background: #0000000f;
+                border-radius: 4px;
+                margin: -0.5rem;
+                z-index: 0;
+            }
+            &.active:after{
+                content: '';
+                position: absolute;
+                width: 100%;
+                height: 100%;
+                background: #0000000f;
+                border-radius: 4px;
+                margin: -0.5rem;
+                z-index: 0;
+            }
+            &:not(.active) >div:nth-child(2) {
+                display: none !important;
+            }
+        }
+        .staging {
+            &:hover {
+                &:after{
+                    background: #ffd33f6e !important;
+                }
+                >div:nth-child(2) {
+                    display: flex !important;
+                }
+                >div:nth-child(1) {
+                    display: none !important;
+                }
+            }
+            >div:nth-child(2) {
+                display: none !important;
+            }
+        }
+    }
+
+    @media only screen and (max-width: 767px) {
+        .data-table-paginate {
+            margin-left: 0 !important;
+        }
+    
+        .data-table-pager {
+            padding: 0;
+        }
+    }
+
+    .w-69px {
+        width: 69px !important;
+    }
+
+    .modal-footer {
+        padding-bottom: calc(1.5rem + env(safe-area-inset-bottom));
+    }
+}

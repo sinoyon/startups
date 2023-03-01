@@ -1,0 +1,61 @@
+@import "../../../../assets/sass/init";
+:host {
+    width: 100%;
+    .login-form {
+        max-width: 367px;
+        margin: auto;
+        .kt-login__title {
+            margin-bottom: 80px;
+            .welcome{
+            color: #003D89;
+            font-size: 24px;
+            line-height: 26px;
+            font-weight: bold;
+            text-transform: uppercase;
+            text-align: left;
+            margin-bottom: 15px;
+            }
+        }
+    }
+    .follow-content {
+        max-width: 620px;
+        margin: auto;
+        .title{
+            font-size: 24px;
+            font-weight: bold;
+            color: #003d89;
+            padding-left: 6px;
+        }
+        .categories{
+            margin-top: 46px;
+            display: flex;
+            flex-wrap: wrap;
+            .category{
+                height: 53px;
+                padding: 0 30px;
+                border-radius:30px;
+                background: #f3f6f9;
+                margin: 6px;
+                font-size: 14px;
+                font-weight: bold;
+                color: #003f87;
+                line-height: 53px;
+                text-align: center;
+                cursor: pointer;
+                &:hover {
+                    background: #e3e6e9;
+                }
+                &.selected {
+                    background: #003f87;
+                    color: white;
+                }
+            }
+        }
+    }
+    
+    .login-form, .follow-content {
+        @include media-breakpoint-down(md) {
+        margin-bottom: 300px;
+        }
+    }
+}

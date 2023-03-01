@@ -1,0 +1,11 @@
+:host ::ng-deep{
+    .ag-root{
+        max-height: 500px;
+        .deleted-row .ag-cell[col-id=name] {
+            background: #ffc3c3;
+        }
+        .duplicated-row .ag-cell[col-id=name] {
+            background: #ffe4b1;
+        }
+    }
+}

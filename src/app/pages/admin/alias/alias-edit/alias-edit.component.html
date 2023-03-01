@@ -1,0 +1,166 @@
+<div class="card card-custom gutter-b">
+  <ng-container *ngIf="isLoading$ | async">
+    <div class="progress h-5px rounded-0">
+      <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary" role="progressbar"
+        style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+    </div>
+  </ng-container>
+
+  <div class="card-body">
+    <ng-container>
+      <div class="mt-2" *ngIf="alias">
+        
+        <div class="mb-5" *ngIf="alias._id">
+          <a (click)="showCategory()" class="hvr-grow-shadow btn btn-primary rounded-pill btn-icon w-44px h-44px mx-2 cursor-pointer">
+            <i class="fa fa-link f-16px"></i>
+          </a>
+        </div>
+
+        <form action="#" class="form form-label-right" [formGroup]="formGroup" (ngSubmit)="save()">
+          <div class="row">
+            <div class="col-lg-4">
+              <label>Type</label>
+              <select class="form-control form-control-lg form-control-solid" name="type"
+                formControlName="type">
+                <option value="campaign.tag">Campaign tag</option>
+                <option value="company.type">Company type</option>
+              </select>
+            </div>
+            <div class="col-lg-2">
+              <div class="form-group">
+                <label>Language</label>
+                <div>
+                  <ae-select
+                  #languageSelector (change)="onChangeLanguage($event, languageSelector)" [value]="null"></ae-select>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-lg-5">
+              <div class="form-group">
+                <label>Link: </label>
+                <div class="input-group">
+                  <input type="text" class="form-control form-control-lg form-control-solid" [(ngModel)]="link" spellcheck="false" [ngModelOptions]="{standalone: true}">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-lg-4">
+              <div class="form-group">
+                <label>Names: </label>
+                <div class="input-group">
+                  <input type="text" class="form-control form-control-lg form-control-solid" [(ngModel)]="currentName" spellcheck="false" [ngModelOptions]="{standalone: true}">
+                </div>
+              </div>
+            </div>
+            <div class="col-lg-7">
+              <label>Description:</label>
+              <div class="input-group">
+                <textarea class="form-control form-control-solid" rows="9" [(ngModel)]="description" [ngModelOptions]="{standalone: true}"></textarea>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group row">
+            <div class="col-lg-4">
+              <div class="form-group">
+                <label>Synonyms: </label>
+                <div class="input-group">
+                  <input #synonymsInput type="text" class="form-control form-control-lg form-control-solid" [(ngModel)]="currentSynonym" spellcheck="false" [ngModelOptions]="{standalone: true}">
+                  <div class="input-group-append">
+                    <button class="btn btn-primary" *ngIf="currentSynonymIndex==-1" type="button" (click)="onAddValue()" [disabled]="!currentSynonym || currentSynonym.trim() === ''">
+                      Add
+                    </button>
+                    <button class="btn btn-primary"  *ngIf="currentSynonymIndex>=0" type="button" (click)="onUpdateValue()" [disabled]="!currentSynonym || currentSynonym.trim() === ''">
+                      Update
+                    </button>
+                    <button class="btn btn-secondary" *ngIf="currentSynonymIndex>=0" type="button" (click)="onCancelValue()" [disabled]="!currentSynonym || currentSynonym.trim() === ''">
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-lg-8">
+              <div class="form-group">
+                <label>&nbsp;</label>
+                <div class="mb-2">
+                  <button class="btn btn-primary btn-sm me-2" type="button" (click)="onCopyAll()">
+                    Copy All
+                  </button>
+                </div>
+                <div class="tags" [ngClass]="{'editing': currentSynonymIndex>=0}">
+                  <div class="tag badge badge-secondary me-2 pe-1 mb-2" *ngFor="let item of currentSynonyms; index as i" [ngClass]="{'editing': i == currentSynonymIndex}">
+                    {{item.value}}&nbsp;
+                    <span class="badge badge-secondary px-2 cursor-pointer action" (click)="onEditValue(item, i)"><i class="la la-pen"></i></span>
+                    <span class="badge badge-secondary px-2 cursor-pointer action" (click)="onMoveValue(item, i)" [ngbTooltip]="'COMMON.TABLE.MOVE' | translate"><i class="la la-exchange-alt"></i></span>
+                    <span class="badge badge-secondary px-2 cursor-pointer action" (click)="onDeleteValue(item, i)"><i class="la la-trash"></i></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+							<div class="mb-1">
+							  <label class="me-2">Picture</label>
+							  <div>
+								<div class="symbol h-100px w-100 border">
+								  <div class="symbol-label h-100 w-100 bg-transparent" id="alias_pic_preview" style="background-size: contain" [ngStyle]="{ 'background-image': 'url(' + alias.pic + ')'}"></div>
+								  <label
+									class="d-flex justify-content-center align-items-center position-absolute translate-middle top-0 start-100 rounded-circle h-25px w-25px bg-white bg-hover-secondary">
+									<i class="fa fa-pen"></i>
+									<input class="d-none" type="file" onclick="this.value = null" accept=".png, .jpg, .jpeg, .webp" (change)="picInputChanged($event)">
+								  </label>
+								</div>
+							  </div>
+							</div>
+						</div>
+          </div>
+
+          <div class="form-group row">
+            <div class="col-lg-4">
+              <label>Article url</label>
+              <input type="text" class="form-control form-control-lg form-control-solid" [(ngModel)]="article" [ngModelOptions]="{standalone: true}"/>
+            </div>
+            <div class="col-lg-4">
+              <label>Article title</label>
+              <input type="text" class="form-control form-control-lg form-control-solid" [(ngModel)]="articleTitle" [ngModelOptions]="{standalone: true}"/>
+            </div>
+            <div class="col-lg-4">
+              <label>Article feature image url</label>
+              <input type="text" class="form-control form-control-lg form-control-solid" [(ngModel)]="articleImageUrl" [ngModelOptions]="{standalone: true}"/>
+            </div>
+          </div>
+          <div class="form-group row">
+            <div class="col-lg-8">
+              <label>Article description</label>
+            <textarea class="form-control form-control-solid"
+            [(ngModel)]="articleDescription" [ngModelOptions]="{standalone: true}"></textarea>
+            </div>
+            <div class="col-lg-4">
+                <label>Article Date</label>
+                <div class="date-picker">
+                  <div class="input-group">
+                    <input type="text"
+                    class="form-control"
+                    [bsConfig]="{}"
+                    #dp="bsDatepicker"
+                    [(bsValue)]="articleDate"
+                    bsDatepicker>
+                    <button class="btn btn-outline-secondary calendar " (click)="dp.toggle()" type="button"></button>
+                  </div>
+                </div>
+            </div>
+          </div>
+
+          <div class="float-end">
+            <a class="btn btn-default fw-bold me-2" routerLink="/admin/aliases">Cancel</a>
+            <button type="submit" class="btn btn-primary fw-bold me-2"
+              [disabled]="formGroup.invalid">Save</button>
+          </div>
+        </form>
+      </div>
+    </ng-container>
+  </div>
+</div>

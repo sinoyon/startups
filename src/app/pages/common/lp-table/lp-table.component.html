@@ -1,0 +1,189 @@
+
+<div class="lp-table ag-theme-material overlay" [ngClass]="{'p-7' : hasPadding, 'overlay-block': isLoading | async}" #customTable>
+	<ng-container *ngIf="isLoading | async">
+		<div class="overlay-layer bg-transparent" style="z-index: 1;">
+		</div>
+	</ng-container>
+	<!-- <div style="margin-bottom: 10px; display: flex;">
+		<div class="search-wrap" *ngIf="showQuickSearch">
+			<div class="kt-input-icon kt-input-icon--left">
+				<input type="text" class="form-control" placeholder="Search..." id="generalSearch" [(ngModel)]="quickFilter" (keyup)="onFilterTextBoxChanged($event)">
+				<span class="kt-input-icon__icon kt-input-icon__icon--left">
+					<span><i class="fa fa-search"></i></span>
+				</span>
+			</div>
+			
+		</div>  
+		<button
+		(click)="onClearFilter()" *ngIf="gridApi?.isAnyFilterPresent()" 
+		class="btn btn-sm btn-success" style="margin-left: 10px; white-space: nowrap;" type="button" data-toggle="modal" data-target="#kt_modal_fetch_id">{{translate.CLEAR_FILTER}}</button>
+	</div> -->
+	<div style="position: relative; display: flex; justify-content: space-between; flex-wrap: wrap-reverse;" class="lp_tbl" (clickOutside)="isShowPreviewSelection=false">
+		<div [perfectScrollbar]="{wheelPropagation: false}"
+			class="preview-selection"
+			[hidden]="originSelectedRows.length==0 || !isShowPreviewSelection || selectionPreviewColumns.length==0"
+			style="
+			position: absolute;
+			top: calc(100% + 4px);
+			word-wrap: normal;
+			z-index: 10;
+			left: 10px;
+			max-height: 154px;
+			border: 1px solid #e6e8ee;
+			overflow: auto;
+			background: white;
+			max-width: 100%;
+			padding: 5px;
+			border-radius: 4px;
+		">
+			<table>
+				<tr>
+					<th *ngFor="let header of selectionPreviewColumns">{{header.name}}</th>
+				</tr>
+				<tr *ngFor="let row of originSelectedRows">
+					<td *ngFor="let header of selectionPreviewColumns">{{row[header.field]}}</td>
+				</tr>
+			</table>
+		</div>
+		<div>
+			<div class="btn-toolbar align-items-center" *ngIf="originSelectedRowIds.length>0">
+				<div class="fw-bolder">
+					{{getSelectionInfoString()}}
+				</div>
+				<div class="btn btn-sm  btn-icon" (click)="isShowPreviewSelection=!isShowPreviewSelection" style="border: 0px"><i class="la la-eye" ></i></div>
+			</div>
+		</div>
+		<div>
+			<div class="btn-toolbar">
+				<button class="btn btn-sm btn-icon" type="button" (click)="willRefreshTable.next('DATA')"
+					data-placement="bottom-right" [ngbTooltip]="('Reload table data' | translate)">
+					<i class="la la-sync"></i>
+				</button>
+				<ng-container *ngIf="originSelectedRowIds.length>0">
+					<div class="separator--v"></div>
+					<button *ngFor="let mainAction of mainActions; index as i" class="btn btn-sm "
+						[ngClass]="{'btn-icon': mainAction.iconOnly, 'kt-margin-l-0': i == 0, 'kt-margin-l-5': i > 0}"
+						[hidden]="mainAction.hidden"
+						data-placement="bottom-right" [ngbTooltip]="mainAction.text"
+						(click)="onMainAction(mainAction)">
+						<i *ngIf="mainAction.iconOnly" class="{{ mainAction.icon }}"></i>
+						{{ mainAction.iconOnly ? '' : mainAction.text}}
+					</button>
+					<button *ngFor="let extraAction of extraActions" class="btn btn-sm "
+						data-placement="bottom-right" [ngbTooltip]="extraAction.text"
+						[hidden]="extraAction.disabled || ( extraAction.min && extraAction.min > originSelectedRowIds.length) ||
+						( extraAction.max && extraAction.max < originSelectedRowIds.length)"
+						[ngClass]="{'btn-icon': extraAction.iconOnly, 'kt-margin-l-5': true}"
+						(click)="onExtraAction(extraAction)">
+						<i *ngIf="extraAction.icon" class="{{ extraAction.icon }}"></i>
+						{{ extraAction.iconOnly ? '' : extraAction.text}}
+					</button>
+				</ng-container>
+				<ng-container *ngIf="gridApi?.isAnyFilterPresent()">
+					<div class="separator--v"></div>
+					<button class="btn btn-sm  btn-icon" type="button" (click)="onClearFilter()"
+						data-placement="bottom-right" [ngbTooltip]="('COMMON.TABLE.CLEAR_FILTER' | translate)">
+						<i class="la la-filter"></i>
+					</button>
+				</ng-container>
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-sm-12">
+			<ag-grid-angular
+			#agGrid
+			id="myGrid"
+			style="margin: 1rem 0 !important;"
+			class="ag-theme-material"
+			[rowData]="rowData"
+			[rowClassRules]="rowClassRules"
+			[sortingOrder]="['desc', 'asc', null]"
+			[defaultColDef]="defaultColDef"
+			[colResizeDefault]="colResizeDefault"
+			[frameworkComponents]="frameworkComponents"
+			[floatingFilter]="showFloatingFilter"
+			[rowModelType]="rowModelType"
+			[serverSideStoreType]="'partial'"
+			[suppressRowDeselection]="false"
+			[rowSelection]="rowSelection"
+			[isRowSelectable]="isRowSelectable"
+			[rowMultiSelectWithClick]="rowMultiSelectWithClick"
+			[suppressRowClickSelection]="suppressRowClickSelection"
+			[cacheBlockSize]="cacheBlockSize"
+			[pagination]="true"
+			[suppressPaginationPanel]="true"
+			[suppressScrollOnNewData]="true"
+			[components]="components"
+			[getRowNodeId]="getRowNodeId"
+			[suppressClickEdit]="true"
+			[suppressColumnVirtualisation]="true"
+			[getContextMenuItems]="getContextMenuItems"
+			[allowContextMenuWithControlKey]="true"
+			[enableBrowserTooltips]="true"
+			[columnDefs]="_columnDefs"
+			(gridReady)="onGridReady($event)"
+			(cellValueChanged)="onCellValueChanged($event)"
+			(clickOutside)="onClickedOutside($event)"
+			(cellClicked)="onCellClicked($event)"
+			(selectionChanged)="onSelectionChanged($event)"
+			>
+			</ag-grid-angular>
+		</div>
+	</div>
+	
+	<div class="row" *ngIf="showPagination">
+		<div class="col-sm-12 col-md-5 d-flex space_between">
+			<div class="data-table-info" id="kt_table_1_info" role="status" aria-live="polite">{{getPaginationInfoString()}}</div>
+			<div class="data-table-length">
+				<label class="d-flex align_center">
+					{{'COMMON.TABLE.PAGE_SIZE_SELECT' | translate}}
+					<select 
+					[(ngModel)]="paginationPageSize" (change)="onPageSizeChanged()"
+					class="custom-select custom-select-sm form-control form-control-sm ms-1">
+						<option value="10">10</option>
+						<option value="25">25</option>
+						<option value="50">50</option>
+					</select>
+				</label>
+			</div>
+		</div>
+
+		<div class="col-sm-12 col-md-7 data-table-pager">			
+			<div class="data-table-paginate">
+				<ul class="pagination">
+					<li class="paginate_button page-item previous disabled"
+					[ngClass]="{'disabled': !canPrevious}">
+						<a (click)="onBtFirst()" aria-controls="kt_table_1" data-dt-idx="0" tabindex="0" class="page-link">
+							<i class="la la-angle-double-left"></i>
+						</a>
+					</li>
+					<li class="paginate_button page-item previous disabled"
+					[ngClass]="{'disabled': !canPrevious}">
+						<a (click)="onBtPrevious()" aria-controls="kt_table_1" data-dt-idx="0" tabindex="0" class="page-link">
+							<i class="la la-angle-left"></i>
+						</a>
+					</li>
+					<li *ngFor="let btn of pageBtns" class="paginate_button page-item"
+					[ngClass]="{'active': btn.index===gridApi.paginationGetCurrentPage()}">
+						<a (click)="onBtPage(btn)" class="page-link">{{btn.name}}</a>
+					</li>
+					<li class="paginate_button page-item next" 
+					[ngClass]="{'disabled': !canNext}" >
+						<a (click)="onBtNext()" aria-controls="kt_table_1" data-dt-idx="6" tabindex="0" class="page-link">
+							<i class="la la-angle-right"></i>
+						</a>
+					</li>
+					<li class="paginate_button page-item next" 
+					[ngClass]="{'disabled': !canNext}" >
+						<a (click)="onBtLast()" aria-controls="kt_table_1" data-dt-idx="6" tabindex="0" class="page-link">
+							<i class="la la-angle-double-right"></i>
+						</a>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</div>
+	
+	
+</div>

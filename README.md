@@ -1,0 +1,2 @@
+# StartupsWallet Frontend Script
+

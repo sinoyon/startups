@@ -1,0 +1,153 @@
+<div class="card card-custom gutter-b">
+  <ng-container *ngIf="isLoading$ | async">
+    <div class="progress h-5px rounded-0">
+      <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary" role="progressbar"
+        style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+    </div>
+  </ng-container>
+
+  <div class="card-body">
+    <ng-container>
+      <div class="mt-5" *ngIf="user">
+        <form action="#" class="form form-label-right" [formGroup]="formGroup" (ngSubmit)="save()">
+          <div class="form-group row">
+            <div class="col-lg-4">
+              <label>{{ 'AUTH.INPUT.FIRSTNAME' | translate }}</label>
+              <input type="text" class="form-control form-control-lg form-control-solid" autocomplete="off"
+                name="firstName" [class.is-invalid]="isControlInvalid('firstName')"
+                [class.is-valid]="isControlValid('firstName')" formControlName="firstName" />
+              <div class="valid-feedback" *ngIf="isControlValid('firstName')">{{ 'AUTH.INPUT.FIRSTNAME' | translate }} was entered correct</div>
+              <div class="invalid-feedback" *ngIf="controlHasError('required', 'firstName')">{{ 'AUTH.INPUT.FIRSTNAME' | translate }} is required</div>
+            </div>
+            <div class="col-lg-4">
+              <label>{{ 'AUTH.INPUT.LASTNAME' | translate }}</label>
+              <input type="text" class="form-control form-control-lg form-control-solid" autocomplete="off"
+                name="lastName" [class.is-invalid]="isControlInvalid('lastName')"
+                [class.is-valid]="isControlValid('lastName')" formControlName="lastName" />
+              <div class="valid-feedback" *ngIf="isControlValid('lastName')">{{ 'AUTH.INPUT.LASTNAME' | translate }} was entered correct</div>
+              <div class="invalid-feedback" *ngIf="controlHasError('required', 'lastName')">{{ 'AUTH.INPUT.LASTNAME' | translate }} is required</div>
+            </div>
+            <div class="col-lg-4">
+              <label>{{ 'AUTH.INPUT.EMAIL' | translate }}</label>
+              <input type="text" class="form-control form-control-lg form-control-solid" autocomplete="off"
+                name="email" [class.is-invalid]="isControlInvalid('email')"
+                [class.is-valid]="isControlValid('email')" formControlName="email" />
+              <div class="valid-feedback" *ngIf="isControlValid('email')">{{ 'AUTH.INPUT.EMAIL' | translate }} was entered correct</div>
+              <div class="invalid-feedback" *ngIf="controlHasError('required', 'email')">{{ 'AUTH.INPUT.EMAIL' | translate }} is required</div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Permission</label>
+            <div>
+                <div class="form-check form-check-inline">
+                    <input type="radio" class="form-check-input" name="permission_type" [value]="true" [(ngModel)]="user.hasRole" [ngModelOptions]="{standalone: true}" (change)="defineColumns()">
+                    <label class="form-check-label">with role</label>
+                </div>
+                <div class="form-check form-check-inline">
+                  <input type="radio" class="form-check-input" name="permission_type" [value]="false" [(ngModel)]="user.hasRole" [ngModelOptions]="{standalone: true}" (change)="defineColumns()">
+                  <label class="form-check-label">with permission</label>
+                </div>
+            </div>
+          </div>
+          <div class="pb-10" *ngIf="!user.hasRole">
+            <div class="table-responsive" style="overflow: visible;">
+                <table class="table table-head-custom table-vertical-center" >
+                    <thead>
+                        <tr class="text-left">
+                            <th>{{'Permission name' | translate}}</th>
+                            <th>Country</th>
+                            <th>Typology</th>
+                            <th>Allowed</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let item of user.permissions; let i = index;">
+                            <td class="pr-0 cursor-pointer">
+                              <div class="">
+                                <ae-select
+                                  [options]="permissions" [defaultUI]="true" (change)="onSelectPermission(item, $event)" [value]="item.permission"></ae-select>
+                              </div>
+                            </td>
+                            <td>
+                              <div class="form-control p-0 d-flex align-items-center" style="width: inherit;">
+                                <ng-multiselect-dropdown
+                                  style="width: 100%;"
+                                  [(ngModel)]="item.country"
+                                  [ngModelOptions]="{standalone: true}"
+                                  [settings]="multiSelectSettings"
+                                  [data]="countries"
+                                  [placeholder]="'Select countries'"
+                                >
+                                </ng-multiselect-dropdown>
+                              </div>
+                            </td>
+                            <td>
+                              <div class="form-control p-0 d-flex align-items-center" style="width: inherit;">
+                                <ng-multiselect-dropdown
+                                  style="width: 100%;"
+                                  [(ngModel)]="item.typology"
+                                  [ngModelOptions]="{standalone: true}"
+                                  [settings]="multiSelectSettings"
+                                  [data]="typologies"
+                                  [placeholder]="'Select typologies'"
+                                >
+                                </ng-multiselect-dropdown>
+                              </div>
+                            </td>
+                            <td>
+                              <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" [(ngModel)]="item.readable" [ngModelOptions]="{standalone: true}">
+                                <label class="form-check-label">READ</label>
+                              </div>
+                              <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" [(ngModel)]="item.writable" [ngModelOptions]="{standalone: true}">
+                                <label class="form-check-label">WRITE</label>
+                              </div>
+                              <div class="form-check">
+                                <input class="form-check-input" type="checkbox" [(ngModel)]="item.downloadable" [ngModelOptions]="{standalone: true}">
+                                <label class="form-check-label">DOWNLOAD</label>
+                              </div>
+                            </td>
+                            <td>
+                              <span class="cursor-pointer" (click)="deletePermission(item, i)"><i class="la la-trash fs-1"></i></span>
+                            </td>
+                        </tr>
+                        <tr>
+                          <td class="pr-0 cursor-pointer">
+                            <div class="btn btn-icon btn-secondary rounded-pill" (click)="onClickAddPermission()"><i class="fs-2 la la-plus"></i></div>
+                          </td>
+                          <td></td>
+                          <td></td>
+                          <td></td>
+                      </tr>
+                    </tbody>
+                </table>
+            </div>
+          </div>
+          <div class="pb-10" [hidden]="!user.hasRole">
+            <div>
+              <lp-table
+                [hidden]="isEmptyTable"
+                [hasPadding]="false"
+                [showSelectAllCheckbox]="false"
+                [suppressRowClickSelection]="true"
+                [showDeleteColumn]="false"
+                [columnDefs]="columnDefs"
+                (action)="onAction($event)"
+                (paginationChanged)="onPaginationChanged($event)"
+                #tableCtrl
+              ></lp-table>
+            </div>
+          </div>
+          <div class="float-end">
+            <a class="btn btn-default fw-bold me-2" routerLink="/admin/user-management/users">Cancel</a>
+            <button type="submit" class="btn btn-primary fw-bold me-2"
+              [disabled]="formGroup.invalid">Save</button>
+          </div>
+        </form>
+      </div>
+    </ng-container>
+  </div>
+</div>

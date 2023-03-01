@@ -1,0 +1,85 @@
+<ng-container *ngLet="user$ | async as _user">
+  <div class="d-flex">
+    <div class="d-flex align-items-center px-2 bg-hover-light-primary" *ngIf="!_user || _user.isGuest">
+      <a class="text-primary fs-4 text-uppercase fw-boldest" (click)="login()">{{'AUTH.LOGIN.BUTTON' | translate}}</a>
+    </div>
+
+    <div class="d-flex align-items-center px-2 bg-hover-light-primary">
+      <a class="text-primary fs-4 text-uppercase fw-boldest"
+        (click)="common.openLinkWithNewTab(lang != 'fr' ? 'https://startupswallet.com/news' : 'https://www.startupswallet.com/news/fr/')">{{'OTHERS.BLOG' | translate}}</a>
+    </div>
+    <div class="d-flex align-items-center px-2 bg-hover-light-primary">
+      <a class="text-primary fs-4 text-uppercase fw-boldest"
+        (click)="common.openLinkWithNewTab(lang != 'fr' ? 'https://www.startupswallet.com/news/it/crowdfunding/dashboard/crowd-dashboard/' : 'https://www.startupswallet.com/news/fr/crowd-dashboard-fr/')">{{'OTHERS.DASHBORAD' | translate}}</a>
+    </div>
+  </div>
+
+  <div class="d-flex">
+    <div *ngIf="(platform.ANDROID || platform.IOS)" class="d-flex align-items-center me-2"
+      [ngClass]="toolbarButtonMarginClass" data-kt-menu-target="#search_inner_dropdown" id="kt_header_search_toggle"
+      data-kt-menu-trigger="click" data-kt-menu-attach="parent" data-kt-menu-placement="bottom-end"
+      data-kt-menu-flip="bottom">
+      <div class="position-relative" [ngClass]="toolbarButtonHeightClass">
+        <span [ngClass]="toolbarButtonIconSizeClass">
+          <span [inlineSVG]="'./assets/media/svg/search.svg'"></span>
+        </span>
+      </div>
+    </div>
+    <div *ngIf="(!platform.ANDROID && !platform.IOS)" class="d-flex align-items-center me-2"
+      [ngClass]="toolbarButtonMarginClass" data-kt-menu-target="#search_inner_dropdown" id="kt_header_search_toggle"
+      data-kt-menu-trigger="click" data-kt-menu-attach="parent" data-kt-menu-placement="right-start"
+      data-kt-menu-flip="right-start">
+      <div class="position-relative" [ngClass]="toolbarButtonHeightClass">
+        <span [ngClass]="toolbarButtonIconSizeClass">
+          <span [inlineSVG]="'./assets/media/svg/search.svg'"></span>
+        </span>
+      </div>
+    </div>
+    <!-- <div *ngIf="!_user || _user.isGuest" class="d-flex align-items-center" [ngClass]="toolbarButtonMarginClass"
+      (click)="checkUser()">
+      <div class="position-relative" [ngClass]="toolbarButtonHeightClass">
+        <span [ngClass]="toolbarButtonIconSizeClass">
+          <span [inlineSVG]="'./assets/media/svg/search.svg'"></span>
+        </span>
+      </div>
+    </div> -->
+    <app-search-inner></app-search-inner>
+
+    <div class="d-flex align-items-center me-3" [ngClass]="toolbarButtonMarginClass" *ngIf="_user && !_user.isGuest">
+      <div class="position-relative" [ngClass]="toolbarButtonHeightClass" id="kt_drawer_notifications_toggle">
+        <span [ngClass]="toolbarButtonIconSizeClass" [inlineSVG]="'./assets/media/svg/bell.svg'">
+        </span>
+        <span *ngIf="unread" class="
+            bullet bullet-dot
+            bg-success
+            h-6px
+            w-6px
+            position-absolute
+            translate-middle
+            top-0
+            start-50
+            animation-blink
+          "></span>
+      </div>
+    </div>
+    <ng-container *ngIf="_user && !_user.isGuest">
+      <div class="d-flex align-items-center" [ngClass]="toolbarButtonMarginClass" id="kt_header_user_menu_toggle"
+        data-kt-menu-target="#user_inner_dropdown" data-kt-menu-trigger="click" data-kt-menu-attach="parent"
+        data-kt-menu-placement="bottom-end" data-kt-menu-flip="bottom">
+        <div class="cursor-pointer symbol position-relative" [ngClass]="toolbarUserAvatarHeightClass">
+          <div class="symbol-label bg-transparent rounded-pill"
+            [ngStyle]="{ 'background-image': 'url(' + (_user.pic || './assets/media/users/default.jpg') + ')'}"></div>
+        </div>
+      </div>
+      <app-user-inner></app-user-inner>
+    </ng-container>
+
+    <ng-container *ngIf="headerLeft === 'menu' && _user && _user.isAdmin">
+      <div class="d-flex align-items-center d-lg-none ms-2 me-n3" title="Show header menu">
+        <div class="btn btn-icon btn-active-light-primary w-md-40px h-md-40px" id="kt_header_menu_mobile_toggle" style="display: block;">
+          <span [inlineSVG]="'./assets/media/svg/mobile-menu.svg'" class="svg-icon svg-icon-1"></span>
+        </div>
+      </div>
+    </ng-container>
+  </div>
+</ng-container>

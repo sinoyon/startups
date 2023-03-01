@@ -1,0 +1,200 @@
+<div class="card card-custom gutter-b">
+  <ng-container *ngIf="isLoading$ | async">
+    <div class="progress h-5px rounded-0">
+      <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary" role="progressbar"
+        style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+    </div>
+  </ng-container>
+
+  <div class="card-body">
+    <ng-container>
+      <div class="mt-5" *ngIf="company">
+        <form action="#" class="form form-label-right" [formGroup]="formGroup" (ngSubmit)="save()">
+          <div class="form-group row">
+            <div class="col-lg-4">
+              <label>Name</label>
+              <input type="text" class="form-control form-control-lg form-control-solid" autocomplete="off"
+                name="name" [class.is-invalid]="isControlInvalid('name')"
+                [class.is-valid]="isControlValid('name')" formControlName="name" />
+              <div class="valid-feedback" *ngIf="isControlValid('name')">Name was entered correct</div>
+              <div class="invalid-feedback" *ngIf="controlHasError('required', 'name')">Name is required</div>
+            </div>
+            <div class="col-lg-4">
+              <label>Type</label>
+              <div class="input-group">
+                <ae-select
+                  [options]="types" style="flex: 1;" #typeSelector></ae-select>
+              </div>
+              <!-- <select class="form-control form-control-lg form-control-solid" name="type"
+                formControlName="type">
+                <option value> None </option>
+                <option [value]="type.value" *ngFor="let type of types">{{ type.title}}</option>
+              </select> -->
+            </div>
+            <div class="col-lg-4">
+              <label>Fiscal code</label>
+              <input type="text" class="form-control form-control-lg form-control-solid" autocomplete="off"
+                name="fiscalCode" [class.is-invalid]="isControlInvalid('fiscalCode')"
+                [class.is-valid]="isControlValid('fiscalCode')" formControlName="fiscalCode" />
+              <div class="valid-feedback" *ngIf="isControlValid('fiscalCode')">Fiscal code was entered correct</div>
+              <div class="invalid-feedback" *ngIf="controlHasError('required', 'fiscalCode')">Fiscal code is required</div>
+            </div>
+          </div>
+          <div class="form-group row">
+            <div class="col-lg-4">
+              <label>Selectable tags</label>
+              <div class="input-group">
+                <ae-select
+                  [options]="selectableTags" style="flex: 1;" [searchCb]="searchTagsCb" [showSearch]="true" #tagSelector></ae-select>
+              </div>
+            </div>
+            <div class="col-lg-4">
+              <div class="form-group">
+                <label>Tags</label>
+                <div class="tags">
+                  <div class="tag badge badge-secondary label-lg me-2 pe-1 mb-2" *ngFor="let tag of company.tags; index as i">
+                    {{tag.names[0].value}}&nbsp;
+                    <span class="badge badge-secondary ms-1 px-1 cursor-pointer bg-hover-white" *ngIf="i > 0" (click)="onSwap(tag, i, false)"><i class="la la-angle-left"></i></span>
+									  <span class="badge badge-secondary ms-1 px-1 cursor-pointer bg-hover-white" *ngIf="i < company.tags.length - 1" (click)="onSwap(tag, i)"><i class="la la-angle-right"></i></span>
+                    <span class="badge badge-secondary ms-1 px-1 cursor-pointer bg-hover-white" (click)="onDeleteTag(tag, i)"><i class="la la-trash"></i></span>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group" *ngIf="company.deletedTags?.length">
+                <label>Deleted tags</label>
+                <div class="tags">
+                  <div class="tag badge badge-secondary label-lg pe-1 mb-2" *ngFor="let tag of company.deletedTags; index as i">
+                    {{tag.names[0].value}}&nbsp;
+                    <span class="badge badge-secondary px-2 cursor-pointer bg-hover-white" (click)="onRestoreTag(tag, i)"><i class="fas fa-recycle"></i></span>
+								    <span class="badge badge-secondary px-2 cursor-pointer bg-hover-white" (click)="onDeleteTag(tag, i, true)"><i class="la la-trash"></i></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="form-group row">
+            <div class="col-lg-4">
+              <div class="form-group">
+                <label>Socials</label>
+                <div class="input-group">
+                  <input type="text" class="form-control form-control-lg form-control-solid" [(ngModel)]="currentSocial" spellcheck="false" [ngModelOptions]="{standalone: true}">
+                  <div class="input-group-append">
+                    <button class="btn btn-primary" *ngIf="currentSocialIndex==-1" type="button" (click)="onAddSocial()" [disabled]="!currentSocial || currentSocial.trim() === ''">
+                      Add
+                    </button>
+                    <button class="btn btn-primary"  *ngIf="currentSocialIndex>=0" type="button" (click)="onUpdateSocial()" [disabled]="!currentSocial || currentSocial.trim() === ''">
+                      Update
+                    </button>
+                    <button class="btn btn-secondary" *ngIf="currentSocialIndex>=0" type="button" (click)="onCancelSocial()" [disabled]="!currentSocial || currentSocial.trim() === ''">
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-lg-6">
+              <div class="form-group">
+                <label>&nbsp;</label>
+                <div class="tags" [ngClass]="{'editing': currentSocialIndex>=0}">
+                  <div class="tag badge badge-secondary label-lg me-2 pe-1 mb-2" *ngFor="let social of company.socials; index as i" [ngClass]="{'editing': i == currentSocialIndex}">
+                    {{social}}&nbsp;
+                    <span class="badge badge-secondary px-2 cursor-pointer bg-hover-white" (click)="onEditSocial(social, i)"><i class="la la-pen"></i></span>
+                    <span class="badge badge-secondary px-2 cursor-pointer bg-hover-white" (click)="onDeleteSocial(social, i)"><i class="la la-trash"></i></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="form-group row">
+            <div class="col-lg-4">
+              <label>Physical location</label>
+              <input type="text" class="form-control form-control-lg form-control-solid" [(ngModel)]="company.physicalLocation" [ngModelOptions]="{standalone: true}"/>
+            </div>
+            <div class="col-lg-4">
+              <label>Web page link</label>
+              <input type="text" class="form-control form-control-lg form-control-solid" [(ngModel)]="company.webPageLink" [ngModelOptions]="{standalone: true}"/>
+            </div>
+            <div class="col-lg-4">
+              <label>Contact email</label>
+              <input type="email" class="form-control form-control-lg form-control-solid" name="contactEmail"
+                autocomplete="off" [class.is-invalid]="isControlInvalid('contactEmail')"
+                [class.is-valid]="isControlValid('contactEmail')" formControlName="contactEmail" />
+              <div class="valid-feedback" *ngIf="isControlValid('contactEmail')">Contact email was entered correct</div>
+              <div class="invalid-feedback" *ngIf="controlHasError('email', 'contactEmail')">Email format is incorrect</div>
+            </div>
+          </div>
+          <div class="form-group row">
+            <div class="col-lg-4">
+              <label>Article url</label>
+              <input type="text" class="form-control form-control-lg form-control-solid" [(ngModel)]="company.article" [ngModelOptions]="{standalone: true}"/>
+            </div>
+            <div class="col-lg-4">
+              <label>Article title</label>
+              <input type="text" class="form-control form-control-lg form-control-solid" [(ngModel)]="company.articleTitle" [ngModelOptions]="{standalone: true}"/>
+            </div>
+            <div class="col-lg-4">
+              <label>Article feature image url</label>
+              <input type="text" class="form-control form-control-lg form-control-solid" [(ngModel)]="company.articleImageUrl" [ngModelOptions]="{standalone: true}"/>
+            </div>
+          </div>
+          <div class="form-group row">
+            <div class="col-lg-8">
+              <label>Article description</label>
+            <textarea class="form-control form-control-solid"
+            [(ngModel)]="company.articleDescription" [ngModelOptions]="{standalone: true}"></textarea>
+            </div>
+            <div class="col-lg-4">
+                <label>Article Date</label>
+                <div class="date-picker">
+                  <div class="input-group">
+                    <input type="text"
+                    class="form-control"
+                    [bsConfig]="{}"
+                    #dp="bsDatepicker"
+                    [(bsValue)]="company.articleDate"
+                    bsDatepicker>
+                    <button class="btn btn-outline-secondary calendar " (click)="dp.toggle()" type="button"></button>
+                  </div>
+                </div>
+            </div>
+          </div>
+          <div class="form-group row">
+            <div class="col-lg-12">
+              <label>Note</label>
+              <div style="min-height: 200px; display: flex;" class="overlay">
+                <ng-container *ngIf="!isLoadedEditor">
+                  <div class="overlay-layer bg-transparent" style="z-index: 1;">
+                    <div class="spinner spinner-center spinner-primary"></div>
+                  </div>
+                </ng-container>
+                <editor
+                  style="flex: 1;"
+                  #textEditor
+                  plugins="print lists"
+                  [init]="{
+                    branding: false,
+                    menubar: false,
+                    min_height: 300
+                    }"
+                  toolbar="undo redo | formatselect | fontsizeselect |' +
+                  ' bold italic underline forecolor backcolor | alignleft aligncenter ' +
+                  ' alignright alignjustify | bullist numlist outdent indent |' +
+                  ' removeformat"
+                  apiKey="vjnhpihfm7y5gjs7b4fsyv9e6jb6a0gttrmdpw7bl6jacczj"
+                  [(ngModel)]="company.note"
+                  (onInit)="onInitEditor($event)"
+                  [ngModelOptions]="{standalone: true}"
+                ></editor>
+              </div>
+            </div>
+          </div>
+          <div class="float-end">
+            <a class="btn btn-default fw-bold me-2" routerLink="/admin/companies">Cancel</a>
+            <button type="submit" class="btn btn-primary fw-bold me-2"
+              [disabled]="formGroup.invalid">Save</button>
+          </div>
+        </form>
+      </div>
+    </ng-container>
+  </div>
+</div>

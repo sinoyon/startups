@@ -1,0 +1,711 @@
+<ng-container [ngTemplateOutlet]="mainTemplate" [ngTemplateOutletContext]="{config: getConfig()}"></ng-container>
+<ng-template #mainTemplate let-config="config">
+    <ul class="nav nav-dark nav-bold nav-tabs" role="tablist" style="margin-bottom: -1px;" *ngIf="config">
+        <li class="nav-item" *ngFor="let tab of tabs">
+            <a
+                (click)="onClickTab(tab)"
+                class="nav-link cursor-pointer"
+                [ngClass]="{'active': tab == activeTab }"
+                role="tab"
+            >
+            {{tab.title}}<span style="color: red" *ngIf="!config[tab.key_matched]">(Not matched)</span>
+            </a>
+        </li>
+    </ul>
+    <div  class="pre-select-component border" *ngIf="config">
+        <!-- <label class="title" style="font-weight: 700;">Typology extract<span style="color: red" [hidden]="config.mainContent">(Not extracted)</span></label> -->
+        <div class="row">
+            <div class="col-md-6">
+                <ng-container *ngIf="activeTab?.key === 'status'">
+                    <div class="mb-1">
+                      <label>Pattern type</label>
+                      <div>
+                        <div class="form-check form-check-inline">
+                            <input type="radio" class="form-check-input" name="status_extract_ptype" [value]="'text'"  [(ngModel)]="config.type">
+                            <label class="form-check-label">text</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input type="radio" class="form-check-input" name="status_extract_ptype" [value]="'textWithChildren'" [(ngModel)]="config.type">
+                            <label class="form-check-label">text with children</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                          <input type="radio" class="form-check-input" name="status_extract_ptype"
+                          [value]="config.type!=='text' && config.type!=='textWithChildren' ? config.type : 'title'"
+                          [(ngModel)]="config.type">
+                          <label class="form-check-label">attribute</label>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="mb-1" *ngIf="config.type!=='text' && config.type!=='textWithChildren'">
+                      <label>attribute name (e.g href, title)</label>
+                      <div class="input-group">
+                          <input type="text" class="form-control form-control-lg form-control-solid" [(ngModel)]="config.type"  spellcheck="false">
+                          <div class="input-group-append">
+                          </div>
+                      </div>
+                    </div>
+                    <div class="mb-1">
+                        <label>Compare</label>
+                        <div>
+                            <div class="form-check form-check-inline">
+                                <input type="radio" class="form-check-input" name="status_extract_compare" [value]="'eq'" [(ngModel)]="config.match">
+                                <label class="form-check-label">equal</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                              <input type="radio" class="form-check-input" name="status_extract_compare" [value]="'ne'" [(ngModel)]="config.match">
+                              <label class="form-check-label">no equal</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input type="radio" class="form-check-input" name="status_extract_compare" [value]="'contain'" [(ngModel)]="config.match">
+                                <label class="form-check-label">contain</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                              <input type="radio" class="form-check-input" name="status_extract_compare" [value]="'none'" [(ngModel)]="config.match">
+                              <label class="form-check-label">no contain</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input type="radio" class="form-check-input" name="status_extract_compare" [value]="'start'" [(ngModel)]="config.match">
+                                <label class="form-check-label">start with</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input type="radio" class="form-check-input" name="status_extract_compare" [value]="'end'" [(ngModel)]="config.match">
+                                <label class="form-check-label">end with</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input type="radio" class="form-check-input" name="status_extract_compare" [value]="'gte'" [(ngModel)]="config.match">
+                                <label class="form-check-label"> >= </label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input type="radio" class="form-check-input" name="status_extract_compare" [value]="'gt'" [(ngModel)]="config.match">
+                                <label class="form-check-label"> > </label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input type="radio" class="form-check-input" name="status_extract_compare" [value]="'lte'" [(ngModel)]="config.match">
+                                <label class="form-check-label"> <= </label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input type="radio" class="form-check-input" name="status_extract_compare" [value]="'lt'" [(ngModel)]="config.match">
+                                <label class="form-check-label"> < </label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input type="radio" class="form-check-input" name="status_extract_compare" [value]="'exist'" [(ngModel)]="config.match">
+                                <label class="form-check-label">exist</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-1">
+                        <label>Pattern selector</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control form-control-lg form-control-solid" [(ngModel)]="config.pattern"  spellcheck="false">
+                        </div>
+                    </div>
+                    <div class="mb-1">
+                        <label>Value to compare</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control form-control-lg form-control-solid" [(ngModel)]="config.value"  spellcheck="false">
+                            <div class="input-group-append">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="border mt-8 p-3 position-relative mb-1">
+                        <div class="form-check form-check-inline" style="position: absolute;
+                        top: -0.8rem;
+                        left: 0.8rem;
+                        background: white;">
+                            <input type="checkbox" class="form-check-input" [(ngModel)]="config.hasSecond">
+                            <label class="form-check-label">Has second case</label>
+                        </div>
+                        <div *ngIf="config.hasSecond">
+                            <div class="mb-1 mt-2">
+                                <div class="form-check form-check-inline">
+                                    <input type="checkbox" class="form-check-input" [(ngModel)]="config.isAndSecond">
+                                    <label class="form-check-label">And</label>
+                                </div>
+                            </div>
+                            <div class="mb-1">
+                                <label>Pattern type</label>
+                                <div class="radio-inline">
+                                    <div class="form-check form-check-inline">
+                                        <input type="radio" class="form-check-input" name="status_extract_ptype_second" [value]="'text'"  [(ngModel)]="config.typeSecond">
+                                        <label class="form-check-label">text</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input type="radio" class="form-check-input" name="status_extract_ptype_second" [value]="'textWithChildren'" [(ngModel)]="config.typeSecond">
+                                        <label class="form-check-label">text with children</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                      <input type="radio" class="form-check-input" name="status_extract_ptype_second"
+                                      [value]="config.typeSecond!=='text' && config.typeSecond!=='textWithChildren' ? config.typeSecond : 'title'"
+                                      [(ngModel)]="config.typeSecond">
+                                      <label class="form-check-label">attribute</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-1" *ngIf="config.typeSecond!=='text' && config.typeSecond!=='textWithChildren'">
+                              <label>attribute name (e.g href, title)</label>
+                              <div class="input-group">
+                                  <input type="text" class="form-control form-control-lg form-control-solid" [(ngModel)]="config.typeSecond"  spellcheck="false">
+                                  <div class="input-group-append">
+                                  </div>
+                              </div>
+                            </div>
+                            <div class="mb-1">
+                                <label>Compare</label>
+                                <div class="radio-inline">
+                                    <div class="form-check form-check-inline">
+                                        <input type="radio" class="form-check-input" name="status_extract_compare_second" [value]="'eq'" [(ngModel)]="config.matchSecond">
+                                        <label class="form-check-label">equal</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                      <input type="radio" class="form-check-input" name="status_extract_compare_second" [value]="'ne'" [(ngModel)]="config.matchSecond">
+                                      <label class="form-check-label">no equal</label>
+                                  </div>
+                                    <div class="form-check form-check-inline">
+                                        <input type="radio" class="form-check-input" name="status_extract_compare_second" [value]="'contain'" [(ngModel)]="config.matchSecond">
+                                        <label class="form-check-label">contain</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                      <input type="radio" class="form-check-input" name="status_extract_compare_second" [value]="'none'" [(ngModel)]="config.matchSecond">
+                                      <label class="form-check-label">no contain</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input type="radio" class="form-check-input" name="status_extract_compare_second" [value]="'gte'" [(ngModel)]="config.matchSecond">
+                                        <label class="form-check-label"> >= </label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input type="radio" class="form-check-input" name="status_extract_compare_second" [value]="'gt'" [(ngModel)]="config.matchSecond">
+                                        <label class="form-check-label"> > </label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input type="radio" class="form-check-input" name="status_extract_compare_second" [value]="'lte'" [(ngModel)]="config.matchSecond">
+                                        <label class="form-check-label"> <= </label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input type="radio" class="form-check-input" name="status_extract_compare_second" [value]="'lt'" [(ngModel)]="config.matchSecond">
+                                        <label class="form-check-label"> < </label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input type="radio" class="form-check-input" name="status_extract_compare_second" [value]="'exist'" [(ngModel)]="config.matchSecond">
+                                        <label class="form-check-label">exist</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-1">
+                                <label>Pattern selector</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control form-control-lg form-control-solid" [(ngModel)]="config.patternSecond"  spellcheck="false">
+                                </div>
+                            </div>
+                            <div class="mb-1">
+                                <label>Value to compare</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control form-control-lg form-control-solid" [(ngModel)]="config.valueSecond"  spellcheck="false">
+                                    <div class="input-group-append">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="border mt-8 p-3 position-relative mb-1">
+                      <div class="form-check form-check-inline" style="position: absolute;
+                      top: -0.8rem;
+                      left: 0.8rem;
+                      background: white;">
+                          <input type="checkbox" class="form-check-input" [(ngModel)]="config.hasThird">
+                          <label class="form-check-label">Has third case</label>
+                      </div>
+                      <div *ngIf="config.hasThird">
+                          <div class="mb-1 mt-2">
+                              <div class="form-check form-check-inline">
+                                  <input type="checkbox" class="form-check-input" [(ngModel)]="config.isAndThird">
+                                  <label class="form-check-label">And</label>
+                              </div>
+                          </div>
+                          <div class="mb-1">
+                              <label>Pattern type</label>
+                              <div class="radio-inline">
+                                  <div class="form-check form-check-inline">
+                                      <input type="radio" class="form-check-input" name="status_extract_ptype_third" [value]="'text'"  [(ngModel)]="config.typeThird">
+                                      <label class="form-check-label">text</label>
+                                  </div>
+                                  <div class="form-check form-check-inline">
+                                      <input type="radio" class="form-check-input" name="status_extract_ptype_third" [value]="'textWithChildren'" [(ngModel)]="config.typeThird">
+                                      <label class="form-check-label">text with children</label>
+                                  </div>
+                                  <div class="form-check form-check-inline">
+                                    <input type="radio" class="form-check-input" name="status_extract_ptype_third"
+                                    [value]="config.typeThird!=='text' && config.typeThird!=='textWithChildren'? config.typeThird : 'title'"
+                                    [(ngModel)]="config.typeThird">
+                                    <label class="form-check-label">attribute</label>
+                                  </div>
+                              </div>
+                          </div>
+                          <div class="mb-1" *ngIf="config.typeThird!=='text' && config.typeThird!=='textWithChildren'">
+                            <label>attribute name (e.g href, title)</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control form-control-lg form-control-solid" [(ngModel)]="config.typeThird"  spellcheck="false">
+                                <div class="input-group-append">
+                                </div>
+                            </div>
+                          </div>
+                          <div class="mb-1">
+                              <label>Compare</label>
+                              <div class="radio-inline">
+                                  <div class="form-check form-check-inline">
+                                      <input type="radio" class="form-check-input" name="status_extract_compare_third" [value]="'eq'" [(ngModel)]="config.matchThird">
+                                      <label class="form-check-label">equal</label>
+                                  </div>
+                                  <div class="form-check form-check-inline">
+                                    <input type="radio" class="form-check-input" name="status_extract_compare_third" [value]="'ne'" [(ngModel)]="config.matchThird">
+                                    <label class="form-check-label">no equal</label>
+                                  </div>
+                                  <div class="form-check form-check-inline">
+                                      <input type="radio" class="form-check-input" name="status_extract_compare_third" [value]="'contain'" [(ngModel)]="config.matchThird">
+                                      <label class="form-check-label">contain</label>
+                                  </div>
+                                  <div class="form-check form-check-inline">
+                                    <input type="radio" class="form-check-input" name="status_extract_compare_third" [value]="'none'" [(ngModel)]="config.matchThird">
+                                    <label class="form-check-label">no contain</label>
+                                  </div>
+                                  <div class="form-check form-check-inline">
+                                      <input type="radio" class="form-check-input" name="status_extract_compare_third" [value]="'gte'" [(ngModel)]="config.matchThird">
+                                      <label class="form-check-label"> >= </label>
+                                  </div>
+                                  <div class="form-check form-check-inline">
+                                      <input type="radio" class="form-check-input" name="status_extract_compare_third" [value]="'gt'" [(ngModel)]="config.matchThird">
+                                      <label class="form-check-label"> > </label>
+                                  </div>
+                                  <div class="form-check form-check-inline">
+                                      <input type="radio" class="form-check-input" name="status_extract_compare_third" [value]="'lte'" [(ngModel)]="config.matchThird">
+                                      <label class="form-check-label"> <= </label>
+                                  </div>
+                                  <div class="form-check form-check-inline">
+                                      <input type="radio" class="form-check-input" name="status_extract_compare_third" [value]="'lt'" [(ngModel)]="config.matchThird">
+                                      <label class="form-check-label"> < </label>
+                                  </div>
+                                  <div class="form-check form-check-inline">
+                                      <input type="radio" class="form-check-input" name="status_extract_compare_third" [value]="'exist'" [(ngModel)]="config.matchThird">
+                                      <label class="form-check-label">exist</label>
+                                  </div>
+                              </div>
+                          </div>
+                          <div class="mb-1">
+                              <label>Pattern selector</label>
+                              <div class="input-group">
+                                  <input type="text" class="form-control form-control-lg form-control-solid" [(ngModel)]="config.patternThird"  spellcheck="false">
+                              </div>
+                          </div>
+                          <div class="mb-1">
+                              <label>Value to compare</label>
+                              <div class="input-group">
+                                  <input type="text" class="form-control form-control-lg form-control-solid" [(ngModel)]="config.valueThird"  spellcheck="false">
+                                  <div class="input-group-append">
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+                </ng-container>
+
+                <ng-container *ngIf="activeTab?.key === 'typology'">
+                    <div class="mb-1">
+                        <div class="form-check form-check-inline">
+                            <label class="form-check-label" style="color: black; font-weight: 500;">
+                            <input type="checkbox" class="form-check-input" [(ngModel)]="config.isDefaultTypology">
+                            <span></span>As default typology</label>
+                        </div>
+                    </div>
+                    <ng-container *ngIf="!config.isDefaultTypology">
+                      <div class="mb-1">
+                        <label>Pattern type</label>
+                        <div>
+                          <div class="form-check form-check-inline">
+                              <input type="radio" class="form-check-input" name="typology_extract_ptype" [value]="'text'"  [(ngModel)]="config.type_typology">
+                              <label class="form-check-label">text</label>
+                          </div>
+                          <div class="form-check form-check-inline">
+                              <input type="radio" class="form-check-input" name="typology_extract_ptype" [value]="'textWithChildren'" [(ngModel)]="config.type_typology">
+                              <label class="form-check-label">text with children</label>
+                          </div>
+                          <div class="form-check form-check-inline">
+                            <input type="radio" class="form-check-input" name="typology_extract_ptype"
+                            [value]="config.type_typology!=='text' && config.type_typology!=='textWithChildren' ? config.type_typology: 'title'"
+                            [(ngModel)]="config.type_typology">
+                            <label class="form-check-label">attribute</label>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="mb-1" *ngIf="config.type_typology!=='text' && config.type_typology!=='textWithChildren'">
+                        <label>attribute name (e.g href, title)</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control form-control-lg form-control-solid" [(ngModel)]="config.type_typology"  spellcheck="false">
+                            <div class="input-group-append">
+                            </div>
+                        </div>
+                      </div>
+                      <div class="mb-1">
+                          <label>Compare</label>
+                          <div>
+                              <div class="form-check form-check-inline">
+                                  <input type="radio" class="form-check-input" name="typology_extract_compare" [value]="'eq'" [(ngModel)]="config.match_typology">
+                                  <label class="form-check-label">equal</label>
+                              </div>
+                              <div class="form-check form-check-inline">
+                                <input type="radio" class="form-check-input" name="typology_extract_compare" [value]="'ne'" [(ngModel)]="config.match_typology">
+                                <label class="form-check-label">no equal</label>
+                              </div>
+                              <div class="form-check form-check-inline">
+                                  <input type="radio" class="form-check-input" name="typology_extract_compare" [value]="'contain'" [(ngModel)]="config.match_typology">
+                                  <label class="form-check-label">contain</label>
+                              </div>
+                              <div class="form-check form-check-inline">
+                                <input type="radio" class="form-check-input" name="typology_extract_compare" [value]="'none'" [(ngModel)]="config.match_typology">
+                                <label class="form-check-label">no contain</label>
+                              </div>
+                              <div class="form-check form-check-inline">
+                                  <input type="radio" class="form-check-input" name="typology_extract_compare" [value]="'gte'" [(ngModel)]="config.match_typology">
+                                  <label class="form-check-label">>=</label>
+                              </div>
+                              <div class="form-check form-check-inline">
+                                  <input type="radio" class="form-check-input" name="typology_extract_compare" [value]="'gt'" [(ngModel)]="config.match_typology">
+                                  <label class="form-check-label"> > </label>
+                              </div>
+                              <div class="form-check form-check-inline">
+                                  <input type="radio" class="form-check-input" name="typology_extract_compare" [value]="'lte'" [(ngModel)]="config.match_typology">
+                                  <label class="form-check-label"> <= </label>
+                              </div>
+                              <div class="form-check form-check-inline">
+                                  <input type="radio" class="form-check-input" name="typology_extract_compare" [value]="'lt'" [(ngModel)]="config.match_typology">
+                                  <label class="form-check-label"> < </label>
+                              </div>
+                              <div class="form-check form-check-inline">
+                                  <input type="radio" class="form-check-input" name="typology_extract_compare" [value]="'exist'" [(ngModel)]="config.match_typology">
+                                  <label class="form-check-label">exist</label>
+                              </div>
+                          </div>
+                      </div>
+                      <div class="mb-1">
+                          <label>Pattern selector</label>
+                          <div class="input-group">
+                              <input type="text" class="form-control form-control-lg form-control-solid" [(ngModel)]="config.pattern_typology"  spellcheck="false">
+                          </div>
+                      </div>
+                      <div class="mb-1">
+                          <label>Value to compare</label>
+                          <div class="input-group">
+                              <input type="text" class="form-control form-control-lg form-control-solid" [(ngModel)]="config.value_typology"  spellcheck="false">
+                              <div class="input-group-append">
+                              </div>
+                          </div>
+                      </div>
+                      <div class="border mt-8 p-3 position-relative mb-1">
+                        <div class="form-check form-check-inline" style="position: absolute;
+                        top: -0.8rem;
+                        left: 0.8rem;
+                        background: white;">
+                            <input type="checkbox" class="form-check-input" [(ngModel)]="config.hasSecond_typology">
+                            <label class="form-check-label">Has second case</label>
+                        </div>
+                        <div *ngIf="config.hasSecond_typology">
+                            <div class="mb-1 mt-2">
+                                <div class="form-check form-check-inline">
+                                    <input type="checkbox" class="form-check-input" [(ngModel)]="config.isAndSecond_typology">
+                                    <label class="form-check-label">And</label>
+                                </div>
+                            </div>
+                            <div class="mb-1">
+                                <label>Pattern type</label>
+                                <div class="radio-inline">
+                                    <div class="form-check form-check-inline">
+                                        <input type="radio" class="form-check-input" name="typology_extract_ptype_second" [value]="'text'"  [(ngModel)]="config.typeSecond_typology">
+                                        <label class="form-check-label">text</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input type="radio" class="form-check-input" name="typology_extract_ptype_second" [value]="'textWithChildren'" [(ngModel)]="config.typeSecond_typology">
+                                        <label class="form-check-label">text with children</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                      <input type="radio" class="form-check-input" name="typology_extract_ptype_second"
+                                      [value]="config.typeSecond_typology!=='text' && config.typeSecond_typology!=='textWithChildren' ? config.typeSecond_typology : 'title'"
+                                      [(ngModel)]="config.typeSecond_typology">
+                                      <label class="form-check-label">attribute</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-1" *ngIf="config.typeSecond_typology!=='text' && config.typeSecond_typology!=='textWithChildren'">
+                              <label>attribute name (e.g href, title)</label>
+                              <div class="input-group">
+                                  <input type="text" class="form-control form-control-lg form-control-solid" [(ngModel)]="config.typeSecond_typology"  spellcheck="false">
+                                  <div class="input-group-append">
+                                  </div>
+                              </div>
+                            </div>
+                            <div class="mb-1">
+                                <label>Compare</label>
+                                <div class="radio-inline">
+                                    <div class="form-check form-check-inline">
+                                        <input type="radio" class="form-check-input" name="typology_extract_compare_second" [value]="'eq'" [(ngModel)]="config.matchSecond_typology">
+                                        <label class="form-check-label">equal</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                      <input type="radio" class="form-check-input" name="typology_extract_compare_second" [value]="'ne'" [(ngModel)]="config.matchSecond_typology">
+                                      <label class="form-check-label">no equal</label>
+                                  </div>
+                                    <div class="form-check form-check-inline">
+                                        <input type="radio" class="form-check-input" name="typology_extract_compare_second" [value]="'contain'" [(ngModel)]="config.matchSecond_typology">
+                                        <label class="form-check-label">contain</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                      <input type="radio" class="form-check-input" name="typology_extract_compare_second" [value]="'none'" [(ngModel)]="config.matchSecond_typology">
+                                      <label class="form-check-label">no contain</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input type="radio" class="form-check-input" name="typology_extract_compare_second" [value]="'gte'" [(ngModel)]="config.matchSecond_typology">
+                                        <label class="form-check-label"> >= </label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input type="radio" class="form-check-input" name="typology_extract_compare_second" [value]="'gt'" [(ngModel)]="config.matchSecond_typology">
+                                        <label class="form-check-label"> > </label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input type="radio" class="form-check-input" name="typology_extract_compare_second" [value]="'lte'" [(ngModel)]="config.matchSecond_typology">
+                                        <label class="form-check-label"> <= </label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input type="radio" class="form-check-input" name="typology_extract_compare_second" [value]="'lt'" [(ngModel)]="config.matchSecond_typology">
+                                        <label class="form-check-label"> < </label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input type="radio" class="form-check-input" name="typology_extract_compare_second" [value]="'exist'" [(ngModel)]="config.matchSecond_typology">
+                                        <label class="form-check-label">exist</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-1">
+                                <label>Pattern selector</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control form-control-lg form-control-solid" [(ngModel)]="config.patternSecond_typology"  spellcheck="false">
+                                </div>
+                            </div>
+                            <div class="mb-1">
+                                <label>Value to compare</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control form-control-lg form-control-solid" [(ngModel)]="config.valueSecond_typology"  spellcheck="false">
+                                    <div class="input-group-append">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                      </div>
+                      <div class="border mt-8 p-3 position-relative mb-1">
+                        <div class="form-check form-check-inline" style="position: absolute;
+                        top: -0.8rem;
+                        left: 0.8rem;
+                        background: white;">
+                            <input type="checkbox" class="form-check-input" [(ngModel)]="config.hasThird_typology">
+                            <label class="form-check-label">Has third case</label>
+                        </div>
+                        <div *ngIf="config.hasThird_typology">
+                            <div class="mb-1 mt-2">
+                                <div class="form-check form-check-inline">
+                                    <input type="checkbox" class="form-check-input" [(ngModel)]="config.isAndThird_typology">
+                                    <label class="form-check-label">And</label>
+                                </div>
+                            </div>
+                            <div class="mb-1">
+                                <label>Pattern type</label>
+                                <div class="radio-inline">
+                                    <div class="form-check form-check-inline">
+                                        <input type="radio" class="form-check-input" name="typology_extract_ptype_third" [value]="'text'"  [(ngModel)]="config.typeThird_typology">
+                                        <label class="form-check-label">text</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input type="radio" class="form-check-input" name="typology_extract_ptype_third" [value]="'textWithChildren'" [(ngModel)]="config.typeThird_typology">
+                                        <label class="form-check-label">text with children</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                      <input type="radio" class="form-check-input" name="typology_extract_ptype_third"
+                                      [value]="config.typeThird_typology!=='text' && config.typeThird_typology!=='textWithChildren' ? config.typeThird_typology : 'title'"
+                                      [(ngModel)]="config.typeThird_typology">
+                                      <label class="form-check-label">attribute</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-1" *ngIf="config.typeThird_typology!=='text' && config.typeThird_typology!=='textWithChildren'">
+                              <label>attribute name (e.g href, title)</label>
+                              <div class="input-group">
+                                  <input type="text" class="form-control form-control-lg form-control-solid" [(ngModel)]="config.typeThird_typology"  spellcheck="false">
+                                  <div class="input-group-append">
+                                  </div>
+                              </div>
+                            </div>
+                            <div class="mb-1">
+                                <label>Compare</label>
+                                <div class="radio-inline">
+                                    <div class="form-check form-check-inline">
+                                        <input type="radio" class="form-check-input" name="typology_extract_compare_third" [value]="'eq'" [(ngModel)]="config.matchThird_typology">
+                                        <label class="form-check-label">equal</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                      <input type="radio" class="form-check-input" name="typology_extract_compare_third" [value]="'ne'" [(ngModel)]="config.matchThird_typology">
+                                      <label class="form-check-label">no equal</label>
+                                  </div>
+                                    <div class="form-check form-check-inline">
+                                        <input type="radio" class="form-check-input" name="typology_extract_compare_third" [value]="'contain'" [(ngModel)]="config.matchThird_typology">
+                                        <label class="form-check-label">contain</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                      <input type="radio" class="form-check-input" name="typology_extract_compare_third" [value]="'none'" [(ngModel)]="config.matchThird_typology">
+                                      <label class="form-check-label">no contain</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input type="radio" class="form-check-input" name="typology_extract_compare_third" [value]="'gte'" [(ngModel)]="config.matchThird_typology">
+                                        <label class="form-check-label"> >= </label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input type="radio" class="form-check-input" name="typology_extract_compare_third" [value]="'gt'" [(ngModel)]="config.matchThird_typology">
+                                        <label class="form-check-label"> > </label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input type="radio" class="form-check-input" name="typology_extract_compare_third" [value]="'lte'" [(ngModel)]="config.matchThird_typology">
+                                        <label class="form-check-label"> <= </label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input type="radio" class="form-check-input" name="typology_extract_compare_third" [value]="'lt'" [(ngModel)]="config.matchThird_typology">
+                                        <label class="form-check-label"> < </label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input type="radio" class="form-check-input" name="typology_extract_compare_third" [value]="'exist'" [(ngModel)]="config.matchThird_typology">
+                                        <label class="form-check-label">exist</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-1">
+                                <label>Pattern selector</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control form-control-lg form-control-solid" [(ngModel)]="config.patternThird_typology"  spellcheck="false">
+                                </div>
+                            </div>
+                            <div class="mb-1">
+                                <label>Value to compare</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control form-control-lg form-control-solid" [(ngModel)]="config.valueThird_typology"  spellcheck="false">
+                                    <div class="input-group-append">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                      </div>
+                    </ng-container>
+                </ng-container>
+                <div class="mb-1 pt-4">
+                    <div class="frame border p-1 pt-3 mb-4" *ngIf="getAvailableCopyStatuses() as availableStatuses"  [hidden]="activeTab?.key === 'typology' && config.isDefaultTypology">
+                        <label class="title">Copy from (status)</label>
+                        <div class="d-flex flex-wrap">
+                            <button *ngFor="let st of availableStatuses" class="btn btn-sm me-2 mb-2 btn-outline-primary text-uppercase btn-square" type="button" (click)="onCopyFrom(st)" [disabled]="loading$ | async">
+                                {{st.title}}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-1 pt-4">
+                    <div class="frame border p-1 pt-3 mb-4" *ngIf="getAvailableCopyTypologies() as availableTypologies"  [hidden]="activeTab?.key === 'typology' && config.isDefaultTypology">
+                        <label class="title">Copy from (typology)</label>
+                        <div class="d-flex flex-wrap">
+                            <button *ngFor="let tp of availableTypologies" class="btn btn-sm me-2 mb-2 btn-outline-primary text-uppercase btn-square" type="button" (click)="onCopyFrom(tp, 'typology')" [disabled]="loading$ | async">
+                                {{tp.title}}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <button class="btn btn-primary btn-sm mb-2" type="button" (click)="onExtract()" [disabled]="loading$ | async">
+                    Extract
+                </button>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-1">
+                            <div class="example">
+                                <p  class="mb-1">
+                                    Extracted Campaign
+                                </p>
+                                <div *ngIf="config.matchedCount" class="d-flex align-items-center justify-content-between">{{config.matchedCount}} are extracted
+                                </div>
+                                <div class="example-code">
+                                    <span class="ms-1 mt-1 cursor-pointer position-absolute start-0 top-0" *ngIf="config.matchedCount"
+                                        [inlineSVG]="'./assets/media/svg/expand.svg'" (click)="onShowHtml(config.mainContent)"></span>
+                                    <div class="example-highlight">
+                                        <pre class="language-html">
+                                            {{ decodeHtml(config.mainContent || 'Not extracted')}}
+                                        </pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <div class="example">
+                                <p>
+                                    Second api: {{ config.detailUrl}}
+                                </p>
+                                <div class="example-code">
+                                    <span class="ms-1 mt-1 cursor-pointer position-absolute start-0 top-0" *ngIf="config.detailContent"
+                                        [inlineSVG]="'./assets/media/svg/expand.svg'" (click)="onShowHtml(config.detailContent)"></span>
+                                    <div class="example-highlight">
+                                        <pre class="language-html">
+                                            {{ decodeHtml(config.detailContent || 'Not extracted')}}
+                                        </pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="frame border" *ngIf="languages.length">
+                            <div class="mb-2" *ngFor="let lng of languages">
+                                <div class="example">
+                                    <p class="mb-1">
+                                        Second api({{lng.title}}): {{ config['detailUrl_'+lng.key]}}
+                                    </p>
+                                    <div class="example-code">
+                                        <span class="ms-1 mt-1 cursor-pointer position-absolute start-0 top-0" *ngIf="config['detailContent_'+lng.key]"
+                                            [inlineSVG]="'./assets/media/svg/expand.svg'" (click)="onShowHtml(config['detailContent_'+lng.key])"></span>
+                                        <div class="example-highlight">
+                                            <pre class="language-html">
+                                                {{ decodeHtml(config['detailContent_'+lng.key] || 'Not extracted')}}
+                                            </pre>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <ng-container *ngIf="false && config.linkUrl">
+            <div class="mb-1 pt-4" >
+                <button class="btn btn-primary btn-sm mb-2" type="button" (click)="onExtractLink()" [disabled]="loading$ | async">
+                    Extract Link Page
+                </button>
+            </div>
+            <div class="mb-1">
+                <div class="example">
+                    <p>
+                        Link Page: {{ config.linkUrl}}
+                    </p>
+                    <div class="example-code">
+                        <span class="ms-1 mt-1 cursor-pointer position-absolute start-0 top-0" *ngIf="config.linkContent"
+                        [inlineSVG]="'./assets/media/svg/expand.svg'" (click)="onShowHtml(config.linkContent)"></span>
+                        <div class="example-highlight">
+                            <pre class="language-html">
+                                {{ config.linkContent || 'Not extracted'}}
+                            </pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </ng-container>
+    </div>
+</ng-template>
+

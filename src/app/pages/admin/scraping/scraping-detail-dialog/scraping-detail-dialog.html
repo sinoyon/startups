@@ -1,0 +1,297 @@
+<div class="overlay">
+    <div class="modal-header pb-0"  [hidden]="selectedItem">
+        <ul class="nav nav-dark nav-bold nav-tabs nav-tabs-line" style="margin-bottom: -1px;" role="tablist">
+			<li class="nav-item" *ngFor="let item of tabs">
+				<a
+				  (click)="onClickTab(item)"
+				  class="nav-link cursor-pointer"
+				  [ngClass]="{'active': item==activeTab }"
+				  [hidden]="item.hidden"
+				  role="tab"
+				>
+				{{item.title}}
+                <span *ngIf="scraped > 0 && item.state === 'scraped'" class="label label-warning label-inline fw-boldest" >{{scraped}}</span>
+                <span *ngIf="updated > 0 && item.state === 'updated'" class="label label-warning label-inline fw-boldest" >{{updated}}</span>
+                <span *ngIf="created > 0 && item.state === 'created'" class="label label-warning label-inline fw-boldest" >{{created}}</span>
+                <span *ngIf="error > 0 && item.state === 'error'" class="label label-warning label-inline fw-boldest" >{{error}}</span>
+                <span *ngIf="warning > 0 && item.state === 'warning'" class="label label-warning label-inline fw-boldest" >{{warning}}</span>
+				</a>
+			</li>
+		</ul>
+    </div>
+    <div class="modal-body">
+        <div class="mb-1 d-flex justify-content-start align-items-start" *ngIf="!selectedItem">
+            <div class="form-control p-0 form-control-solid d-flex align-items-center" style="width: inherit;">
+                <ng-multiselect-dropdown
+                    [(ngModel)]="selectedCampaignTypologies"
+                    [ngModelOptions]="{standalone: true}"
+                    [settings]="multiSelectSettings"
+                    [data]="typologies"
+                    [placeholder]="'Select typologies'"
+                    (onSelect)="onSelectCampaignTypology($event)"
+                    (onDeSelect)="onSelectCampaignTypology($event)"
+                    (onSelectAll)="onSelectCampaignTypology($event)"
+                    (onDeSelectAll)="onSelectCampaignTypology($event)"
+                >
+                </ng-multiselect-dropdown>
+            </div>
+            <div class="mx-3 form-control p-0 form-control-solid d-flex align-items-center"  style="width: inherit;">
+                <ng-multiselect-dropdown
+                    style="width: 100%;"
+                    [(ngModel)]="selectedCampaignCountries"
+                    [ngModelOptions]="{standalone: true}"
+                    [settings]="multiSelectSettings"
+                    [data]="countries"
+                    [placeholder]="'Select countries'"
+                    (onSelect)="onSelectCampaignCountry($event)"
+                    (onDeSelect)="onSelectCampaignCountry($event)"
+                    (onSelectAll)="onSelectCampaignCountry($event)"
+                    (onDeSelectAll)="onSelectCampaignCountry($event)"
+                >
+                </ng-multiselect-dropdown>
+            </div>
+            <div class="flex-root"></div>
+            <div *ngIf="activeTab?.state==='updated' || activeTab?.state==='created'" class="d-flex flex-column">
+				<div class="me-3">
+					<span class="fw-boldest">Company equity</span>: <span class="bg-light-primary px-1">€ {{addCommas(companyEquityCampaigns.raised)}}, {{addCommas(companyEquityCampaigns.investorCount)}}</span>
+				</div>
+				<div class="me-3">
+					<span class="fw-boldest">Company lending</span>: <span class="bg-light-primary px-1">€ {{addCommas(companyLendingCampaigns.raised)}}, {{addCommas(companyLendingCampaigns.investorCount)}}</span>
+				</div>
+				<div class="me-3">
+					<span class="fw-boldest">Real estate equity</span>: <span class="bg-light-primary px-1">€ {{addCommas(realEstateEquityCampaigns.raised)}}, {{addCommas(realEstateEquityCampaigns.investorCount)}}</span>
+				</div>
+				<div class="me-3">
+					<span class="fw-boldest">Real estate lending</span>: <span class="bg-light-primary px-1">€ {{addCommas(realEstateLendingCampaigns.raised)}}, {{addCommas(realEstateLendingCampaigns.investorCount)}}</span>
+				</div>
+			</div>
+        </div>
+        <div [hidden]="selectedItem">
+            <lp-table
+                [hasPadding]="false"
+                [showSelectAllCheckbox]="false"
+                [showCheckbox]="false"
+                [suppressRowClickSelection]="true"
+                [showDeleteColumn]="false"
+                (action)="onAction($event)"
+                [columnDefs]="columnDefs"
+                (paginationChanged)="onPaginationChanged($event)"
+                #tableCtrl
+            ></lp-table>
+        </div>
+        <div *ngIf="selectedItem">
+            <ng-container  *ngIf="activeTab.state === 'created' || activeTab.state === 'updated'">
+                <div style="border-bottom: 1px solid #e2e2e2;" class="d-flex pb-2 mb-4">
+                    <div style="display: flex; align-items: center"><span class="text-capitalize">{{activeTab.state}}</span>
+                        <div style="width: 1rem; height: 1rem; background: #0abb87;border: 1px solid #0abb87; margin-left: 1rem">
+                            &nbsp;</div>
+                    </div>
+                    <div class="d-flex align-items-center ps-4">
+                        <a target="_blank" href="{{selectedItem.detailLink}}">
+                            <i class="fa fa-link" style="color: blue"></i>
+                        </a>
+                    </div>
+                    <div class="d-flex align-items-center ps-4" *ngIf="selectedItem.originLink">
+                        <a target="_blank" href="{{selectedItem.originLink}}">
+                            <i class="fa fa-link"></i>
+                        </a>
+                    </div>
+                    <div style="flex: 1; display: flex; align-items: center; justify-content: flex-end;">
+                        <div class="action arrow kt-margin-r-10" [ngClass]="{'disabled': !selectedItem?.hasPrev}">
+                            <i class="la la-arrow-left" (click)="viewCampaignDetail(false)"></i>
+                        </div>
+                        <div class="action arrow" (click)="viewCampaignDetail(true)" [ngClass]="{'disabled': !selectedItem?.hasNext}">
+                            <i class="la la-arrow-right"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="overflow-hidden">
+                    <div class="table-responsive pe-4 position-relative" [perfectScrollbar]="{wheelPropagation: false, suppressScrollX : false}" style="max-height: calc(100vh - 300px)">
+                        <table class="table table-head-custom table-vertical-center" >
+                            <thead>
+                                <tr class="text-left">
+                                    <th width="150px">{{'Field Name' | translate}}</th>
+                                    <th width="40%">{{'Current' | translate}}</th>
+                                    <th>{{'Previous' | translate }}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <ng-container *ngFor="let key of previewKeys">
+                                    <tr *ngIf="selectedItem[key.key]" class="{{selectedItem[key.key].class}} ">
+                                        <td>
+                                            <div class="text-capitalize fw-bolder">
+                                                {{ key.key }}
+                                                <ng-container *ngIf="key.detail">
+                                                    <span class="d-inline-block w-25px h-25px text-cetner cursor-pointer ms-2" *ngIf="!selectedItem[key.key].detail"
+                                                    (click)="selectedItem[key.key].detail=true"><i class='la la-eye'></i></span>
+                                                    <span class="d-inline-block w-25px h-25px text-cetner cursor-pointer ms-2" *ngIf="selectedItem[key.key].detail"
+                                                    (click)="selectedItem[key.key].detail=false"><i class='la la-eye-slash'></i></span>
+                                                </ng-container>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <ng-container *ngIf="selectedItem[key.key].current!=undefined">
+                                                <ng-container *ngIf="key.detail">
+                                                    <ng-container *ngIf="key.type==='array'">
+                                                        <ng-container *ngIf="!selectedItem[key.key].detail">
+                                                            <div class="word-break-all">
+                                                                {{selectedItem[key.key].current[0]}}
+                                                            </div>
+                                                        </ng-container>
+                                                        <ng-container *ngIf="selectedItem[key.key].detail">
+                                                            <div *ngFor="let c of selectedItem[key.key].current" class="word-break-all">
+                                                                {{c}}
+                                                                <br>
+                                                            </div>
+                                                        </ng-container>
+                                                    </ng-container>
+                                                    <div *ngIf="key.type!=='array'"class="word-break-all">
+                                                        <ng-container *ngIf="selectedItem[key.key].detail">
+                                                            {{selectedItem[key.key].current}}
+                                                        </ng-container>
+                                                        <ng-container *ngIf="!selectedItem[key.key].detail">
+                                                            {{selectedItem[key.key].currentShort}}
+                                                        </ng-container>
+                                                    </div>
+                                                </ng-container>
+                                                <ng-container *ngIf="!key.detail">
+                                                    <ng-container *ngIf="key.type==='array'">
+                                                        <ng-container>
+                                                            <div *ngFor="let c of selectedItem[key.key].current" class="word-break-all">
+                                                                {{c}}
+                                                                <br>
+                                                            </div>
+                                                        </ng-container>
+                                                    </ng-container>
+                                                    <div *ngIf="key.type!=='array'"class="word-break-all">
+                                                        <ng-container *ngIf="key.type==='url' && selectedItem[key.key].current">
+                                                          <a href="{{selectedItem[key.key].current}}" target="_blank">{{selectedItem[key.key].current}}</a>
+                                                        </ng-container>
+                                                        <ng-container *ngIf="key.type!=='url'">
+                                                          {{selectedItem[key.key].current}}
+                                                          <span *ngIf="selectedItem[key.key].dx">({{selectedItem[key.key].dx}})</span>
+                                                        </ng-container>
+                                                    </div>
+                                                </ng-container>
+                                            </ng-container>
+                                        </td>
+                                        <td>
+                                            <ng-container *ngIf="selectedItem[key.key].prev!=undefined">
+                                                <ng-container *ngIf="key.detail">
+                                                    <ng-container *ngIf="key.type==='array'">
+                                                        <ng-container *ngIf="!selectedItem[key.key].detail">
+                                                            <div class="word-break-all">
+                                                                {{selectedItem[key.key].prev[0]}}
+                                                            </div>
+                                                        </ng-container>
+                                                        <ng-container *ngIf="selectedItem[key.key].detail">
+                                                            <div *ngFor="let c of selectedItem[key.key].prev" class="word-break-all">
+                                                                {{c}}
+                                                                <br>
+                                                            </div>
+                                                        </ng-container>
+                                                    </ng-container>
+                                                    <div *ngIf="key.type!=='array'"class="word-break-all">
+                                                        <ng-container *ngIf="selectedItem[key.key].detail">
+                                                            {{selectedItem[key.key].prev}}
+                                                        </ng-container>
+                                                        <ng-container *ngIf="!selectedItem[key.key].detail">
+                                                            {{selectedItem[key.key].prevShort}}
+                                                        </ng-container>
+                                                    </div>
+                                                </ng-container>
+                                                <ng-container *ngIf="!key.detail">
+                                                    <ng-container *ngIf="key.type==='array'">
+                                                        <ng-container>
+                                                            <div *ngFor="let c of selectedItem[key.key].prev" class="word-break-all">
+                                                                {{c}}
+                                                                <br>
+                                                            </div>
+                                                        </ng-container>
+                                                    </ng-container>
+                                                    <div *ngIf="key.type!=='array'"class="word-break-all">
+                                                      <ng-container *ngIf="key.type==='url' && selectedItem[key.key].prev">
+                                                        <a href="{{selectedItem[key.key].prev}}" target="_blank">{{selectedItem[key.key].prev}}</a>
+                                                      </ng-container>
+                                                      <ng-container *ngIf="key.type!=='url'">
+                                                        {{selectedItem[key.key].prev}}
+                                                      </ng-container>
+                                                    </div>
+                                                </ng-container>
+                                            </ng-container>
+                                        </td>
+                                    </tr>
+                                </ng-container>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </ng-container>
+            <ng-container *ngIf="activeTab.state === 'warning'">
+                <div style="border-bottom: 1px solid #e2e2e2;" class="d-flex pb-2 mb-4">
+                    <div style="display: flex; align-items: center"><span>{{selectedItem.sourceName}}</span>
+                        <div style="width: 1rem; height: 1rem; background: #0abb87;border: 1px solid #0abb87; margin-left: 1rem">
+                            &nbsp;</div>
+                    </div>
+                    <div class="d-flex align-items-center ps-4">
+                        <a target="_blank" href="{{selectedItem.sourceLink}}">
+                            <i class="fa fa-link"></i>
+                        </a>
+                    </div>
+                    <div style="flex: 1; display: flex; align-items: center; justify-content: flex-end;">
+                        <div class="action arrow kt-margin-r-10" [ngClass]="{'disabled': !selectedItem?.hasPrev}">
+                            <i class="la la-arrow-left" (click)="viewWarningDetail(false)"></i>
+                        </div>
+                        <div class="action arrow" (click)="viewWarningDetail(true)" [ngClass]="{'disabled': !selectedItem?.hasNext}">
+                            <i class="la la-arrow-right"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="overflow-hidden" >
+                    <div class="table-responsive pe-4 position-relative" [perfectScrollbar]="{wheelPropagation: false, suppressScrollX : false}" style="max-height: calc(100vh - 300px)">
+                        <table class="table table-head-custom table-vertical-center" >
+                            <thead>
+                                <tr class="text-left">
+                                    <th>{{'Warning type' | translate}}</th>
+                                    <th>{{'Content' | translate}}</th>
+                                    <th>{{'Detail' | translate }}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <ng-container *ngFor="let item of selectedItem.content">
+                                    <tr>
+                                        <td>
+                                            <div class="text-capitalize fw-bolder">
+                                                {{ item.type }}
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="text-capitalize">
+                                                {{ item.value }}
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="label label-inline me-1" *ngFor="let ltr of item.detail">
+                                                {{ ltr.name }}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </ng-container>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </ng-container>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <div>
+            <button type="button" class="btn btn-light btn-elevate me-1" (click)="onBack()" *ngIf="selectedItem">
+            {{ 'AUTH.GENERAL.BACK_BUTTON' | translate}}
+            </button>&nbsp;
+            <button type="button" class="btn btn-light btn-elevate me-1" (click)="activeModal.dismiss()">
+                {{ 'GENERAL.CANCEL' | translate}}
+            </button>
+        </div>
+    </div>
+</div>

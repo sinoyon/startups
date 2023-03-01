@@ -1,0 +1,23 @@
+:host{
+    .pattern-extract-component{
+        &.border{
+            padding: 1.4em;
+            border: 1px solid #EBEDF3;
+            border-radius: 0.42rem;
+        }
+        position: relative;
+        
+        .form-group{
+            margin-bottom: 1rem;
+        }
+        .title {
+            position: absolute;
+            top: -0.8rem;
+            left: 0.8rem;
+            background: white;
+            padding: 0 3px;
+            font-size: 1rem;
+            font-weight: 400;
+        }
+    }
+}

@@ -1,0 +1,27 @@
+:host ::ng-deep {
+  .ag-root {
+    max-height: 500px;
+    span.social {
+      width: 24px;
+      display: inline-block;
+      vertical-align: middle;
+      height: 24px;
+      border-radius: 50%;
+      background: #575764;
+      a {
+        display: flex;
+        height: 100%;
+        justify-content: center;
+        align-items: center;
+        i {
+          font-size: 13px !important;
+          line-height: 0px;
+        }
+      }
+      a,
+      a:hover {
+        color: #fff;
+      }
+    }
+  }
+}

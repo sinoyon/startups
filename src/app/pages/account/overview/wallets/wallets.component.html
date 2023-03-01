@@ -1,0 +1,154 @@
+<div class="row mx-5">
+    <div class="col-12 p-5 bg-white mb-5">
+        <div class="rounded p-2">
+            <span class="me-5 svg-icon" [inlineSVG]="'./assets/media/svg/bulb.svg'" [setSVGAttributes]="{width: 20, height: 20}"></span>
+            <span class="fs-4 fw-bold">{{ 'USER.PROFILE.CAMPAIGNS.GET_NOTI_FOLLOW_COMPAIGN' | translate}}
+                <a class="fw-bolder" routerLink="/account/settings/notification">{{ 'USER.PROFILE.CAMPAIGNS.CONGIF_NOTI' | translate}}</a>
+            </span>
+        </div>
+    </div>
+    <div class="col-12 p-0 d-flex justify-content-between">
+        <div class="d-flex flex-wrap">
+            <div class="rounded d-flex bg-white p-4 align-items-center me-5 mb-5">
+                <div class="me-2">
+                    <div>{{ 'USER.PROFILE.WALLET_CAMPAIGNS.TOTAL_INVEST' | translate}}</div>
+                    <div>
+                        <span class="text-primary fw-boldest fs-2 px-1">{{totalAmountInvested}} €</span>
+                    </div>
+                </div>
+                <div class="p-3 bg-primary rounded">
+                    <span [inlineSVG]="'./assets/media/svg/canvas-up.svg'" class="white-svg"
+                    [setSVGAttributes]="{width: 24, height: 24}"></span>
+                </div>
+            </div>
+            <div class="rounded d-flex bg-white p-4 align-items-center  mb-5">
+                <div class="me-2">
+                    <div>{{ 'USER.PROFILE.WALLET_CAMPAIGNS.NUMBER_PROJECT' | translate}}</div>
+                    <div>
+                        <span class="text-primary fw-boldest fs-2 px-1">{{totalInvestment}}</span>
+                    </div>
+                </div>
+                <div class="p-3 bg-primary rounded">
+                    <span [inlineSVG]="'./assets/media/svg/project.svg'" class="white-svg"
+                    [setSVGAttributes]="{width: 24, height: 24}"></span>
+                </div>
+            </div>
+        </div>
+        <div class="mb-5">
+            <app-crowdfunding-typology-selector
+            [options]="optionsForTypology"
+             #typologyCtrl></app-crowdfunding-typology-selector>
+        </div>
+    </div>
+    <div class="col-12 p-0 d-flex justify-content-between flex-wrap">
+        <div class="d-flex mb-5">
+            <app-crowdfunding-view-selector
+            [options]="optionsForView"
+            #viewCtrl [user]="user"></app-crowdfunding-view-selector>
+        </div>
+        <div class="btn btn-sm btn-warning mb-5 "
+        (click)="onClickAdd()"
+        >
+            <i class="la la-plus"></i>
+            <span>{{ 'USER.PROFILE.WALLET_CAMPAIGNS.ADD_INVEST' | translate}}</span>
+        </div>
+    </div>
+    <div class="col-12 p-0" *ngIf="selectedWallets.length">
+        <div *ngIf="view==='list'" id="list_view" class="position-relative">
+            <app-crowdfunding-list
+            [fixHeader]="false"
+            [editable]="true"
+            [deletable]="true"
+            [followable]="false"
+            [walletable]="false"
+            [fields]="fieldsForList"
+            [typology]="typology"
+            [row]="rowForList"
+            (deleteClick)="onClickDelete($event)"
+            (editClick)="onUpdateInvest($event)"
+            *ngIf="selectedWallets.length > 0"
+            [campaigns]="selectedWallets" [typology]="'all'"></app-crowdfunding-list>
+        </div>
+        <div *ngIf="view==='map'" id="map_view" [hidden]="mapMarkerCount==0">
+            <app-crowdfunding-map #map [fitBounds]="true"
+                [campaigns]="selectedWallets"
+                [wallets]="[]"
+                [user]="user"
+                [locale]="locale"
+            ></app-crowdfunding-map>
+        </div>
+        <div *ngIf="view==='chart'">
+            <div class="row">
+                <div class="col-lg-6 mb-5" *ngIf="byYearChartOptions">
+                    <div class="card card-custom gutter-b h-100">
+                        <div class="card-header border-0">
+                            <div class="card-title">
+                                <div class="card-label">
+                                    <div class="fw-bolder">{{'CHART.PER_YEAR' | translate}}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <apx-chart
+                                [series]="byYearChartOptions.series"
+                                [chart]="byYearChartOptions.chart"
+                                [xaxis]="byYearChartOptions.xaxis"
+                                [yaxis]="byYearChartOptions.yaxis"
+                                [dataLabels]="byYearChartOptions.dataLabels"
+                            ></apx-chart>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 mb-5" *ngIf="byCategoryChartOptions">
+                    <div class="card card-custom gutter-b h-100">
+                        <div class="card-header border-0">
+                            <div class="card-title">
+                                <div class="card-label">
+                                    <div class="fw-bolder">{{'CHART.PER_CATEGORY' | translate}}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <apx-chart
+                                [series]="byCategoryChartOptions.series"
+                                [chart]="byCategoryChartOptions.chart"
+                                [labels]="byCategoryChartOptions.labels"
+                                [responsive]="byCategoryChartOptions.responsive"
+                                [legend]="byCategoryChartOptions.legend"
+                                [yaxis]="byCategoryChartOptions.yaxis"
+                                [dataLabels]="byCategoryChartOptions.dataLabels"
+                            ></apx-chart>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 mb-5" *ngIf="bySourceChartOptions">
+                    <div class="card card-custom gutter-b h-100">
+                        <div class="card-header border-0">
+                            <div class="card-title">
+                                <div class="card-label">
+                                    <div class="fw-bolder">{{'CHART.PER_PLATFORM' | translate}}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <apx-chart
+                                [series]="bySourceChartOptions.series"
+                                [chart]="bySourceChartOptions.chart"
+                                [labels]="bySourceChartOptions.labels"
+                                [responsive]="bySourceChartOptions.responsive"
+                                [legend]="bySourceChartOptions.legend"
+                                [yaxis]="bySourceChartOptions.yaxis"
+                                [dataLabels]="bySourceChartOptions.dataLabels"
+                            ></apx-chart>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 p-0" *ngIf="(view!=='map' && selectedWallets.length == 0) || (view==='map' && mapMarkerCount==0)">
+        <div class="py-20 text-center fs-3">
+            {{ 'USER.PROFILE.WALLET_CAMPAIGNS.NOT_CAMPAIGNS' | translate}}
+        </div>
+    </div>
+</div>

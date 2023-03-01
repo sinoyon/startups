@@ -1,0 +1,18 @@
+<div class="d-flex flex-column flex-root h-100 pb-8" id="kt_login_wrapper" [perfectScrollbar]="{wheelPropagation: true}" style="max-height: 90vh;">
+  <!--begin::Login-->
+  <div class="login login-1 login-signin-on d-flex flex-row flex-row-fluid bg-white" id="kt_login">
+    <!--begin::Content-->
+    <div
+      class="login-content flex-row-fluid d-flex flex-column justify-content-center position-relative overflow-hidden pt-7 mx-auto" style="padding: 0 15px;">
+      <!--begin::Content body-->
+      <div class="d-flex flex-column-fluid justify-content-center">
+        <app-login *ngIf="page==='login'" [popup]="true" (close)="close()" (page)="page=$event"></app-login>
+        <app-registration *ngIf="page==='registration'" [popup]="true" (close)="close()"></app-registration>
+        <app-forgot-password *ngIf="page==='forgot-password'" [popup]="true" (close)="close()"></app-forgot-password>
+      </div>
+      <!--end::Content body-->
+    </div>
+    <!--end::Content-->
+  </div>
+  <!--end::Login-->
+</div>

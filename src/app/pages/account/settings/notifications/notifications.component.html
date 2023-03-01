@@ -1,0 +1,104 @@
+<div
+class="d-flex flex-column mx-5 p-5 bg-white">
+  <div class="rounded p-2 mb-5 d-flex justify-content-between align-items-center">
+    <div>
+      <span class="me-5 svg-icon" [inlineSVG]="'./assets/media/svg/bulb.svg'" [setSVGAttributes]="{width: 20, height: 20}"></span>
+      <span class="fs-4 fw-bold">{{'OTHERS.disable_email_noti' | translate}} startupswallet.com</span>
+    </div>
+    <button type="button" class="btn btn-primary" (click)="save()" [disabled]="compareWithOld()">
+      <ng-container *ngIf="!(loading$ | async)">{{'OTHERS.save_changes' | translate}}</ng-container>
+      <ng-container *ngIf="loading$ | async">
+        <span class="indicator-progress" [style.display]="'block'">
+          {{'OTHERS.plz_wait' | translate}}...{{ " " }}
+          <span
+            class="spinner-border spinner-border-sm align-middle ms-2"
+          ></span>
+        </span>
+      </ng-container>
+    </button>
+  </div>
+  <div>
+    <ng-container *ngFor="let item of configs">
+      <ng-container *ngIf="item.keys">
+        <div class="d-flex py-3 pt-10 align-items-center justify-content-between border-bottom">
+          <div class="d-flex align-items-center">
+            <div class="fs-4 fw-bolder text-break">{{item.label | translate}}
+              <span *ngIf="item.tooltip"
+              [ngbTooltip]="item.tooltip | translate"
+              [inlineSVG]="'./assets/media/svg/bulb.svg'"
+              class="ms-2 cursor-pointer svg-icon" [setSVGAttributes]="{width: 20, height: 20}">
+            </span>
+            </div>
+          </div>
+          <div class="d-flex">
+            <div class="w-55px me-1 align-center">
+                <span
+                [inlineSVG]="'./assets/media/svg/email.svg'"
+                class="svg-icon svg-icon-4" [setSVGAttributes]="{width: 20, height: 20}"></span>
+                {{'AUTH.INPUT.EMAIL' | translate}}
+            </div>
+            <div class="form-check p-0 me-3">
+              <input
+              class="form-check-input m-0"
+              [checked]="categoryCheck(item, false)"
+              [indeterminate]="categoryIndeterminate(item, false)"
+              (change)="onClickCategory(item, false)"
+              type="checkbox"
+              />
+            </div>
+            <div class="w-65px align-center">
+              <span
+              [inlineSVG]="'./assets/media/svg/phone.svg'"
+              class="svg-icon svg-icon-4" [setSVGAttributes]="{width: 20, height: 20}"></span>
+              {{'OTHERS.Device' | translate}}
+            </div>
+            <div class="form-check p-0">
+              <input
+              class="form-check-input m-0"
+              [checked]="categoryCheck(item, true)"
+              [indeterminate]="categoryIndeterminate(item, true)"
+              (change)="onClickCategory(item, true)"
+              type="checkbox"
+              />
+            </div>
+          </div>
+        </div>
+      </ng-container>
+      <ng-container *ngIf="!item.keys">
+        <div class="d-flex ps-2 py-4 align-items-center justify-content-between border-bottom">
+          <div class="d-flex align-items-center">
+            <div class="fs-4 text-break">
+              <span [innerHtml]="item.label | translate">
+              </span>
+              <a class="fw-bolder" *ngIf="item.link && item.linkLabel" [routerLink]="item.link">&nbsp; {{ item.linkLabel | translate}}</a>
+              <span *ngIf="item.tooltip"
+              [ngbTooltip]="item.tooltip | translate"
+              [inlineSVG]="'./assets/media/svg/bulb.svg'"
+              class="ms-2 cursor-pointer svg-icon" [setSVGAttributes]="{width: 20, height: 20}">
+            </span>
+            </div>
+          </div>
+          <div class="d-flex">
+            <div class="form-check p-0 me-3">
+              <input
+              class="form-check-input m-0"
+              type="checkbox"
+              [(ngModel)]="notification[item.mKey][item.sKey]" [ngModelOptions]="{standalone: true}"
+              />
+            </div>
+            <div class="w-65px">
+            </div>
+            <div class="form-check p-0">
+              <input
+              class="form-check-input m-0"
+              type="checkbox"
+              [(ngModel)]="notificationApp[item.mKey][item.sKey]" [ngModelOptions]="{standalone: true}"
+              />
+            </div>
+          </div>
+        </div>
+      </ng-container>
+    </ng-container>
+  </div>
+</div>
+

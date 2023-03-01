@@ -1,0 +1,152 @@
+<div
+class="d-flex flex-column mx-5 p-5 bg-white min-h-100">
+  <div class="rounded p-2 mb-5 d-flex justify-content-between align-items-center">
+    <div>
+      <span class="me-5 svg-icon" [inlineSVG]="'./assets/media/svg/bulb.svg'" [setSVGAttributes]="{width: 20, height: 20}"></span>
+      <span class="fs-4 fw-bold">{{'OTHERS.update_personal_data' | translate}}</span>
+    </div>
+    <button type="submit" class="btn btn-primary" [disabled]="!(form.dirty || !form.pristine)">
+      <ng-container *ngIf="!(loading$ | async)">{{'OTHERS.save_changes' | translate}}</ng-container>
+      <ng-container *ngIf="loading$ | async">
+        <span class="indicator-progress" [style.display]="'block'">
+          {{'OTHERS.plz_wait' | translate}}...{{ " " }}
+          <span
+            class="spinner-border spinner-border-sm align-middle ms-2"
+          ></span>
+        </span>
+      </ng-container>
+    </button>
+  </div>
+  <div>
+    <ng-container>
+        <form [formGroup]="form"
+        novalidate="novalidate"
+        (ngSubmit)="save()">
+            <div class="row pt-8">
+                <div class="col-lg-6 mb-5">
+                    <label class="fs-5 fw-bolder text-dark">{{'AUTH.INPUT.FIRSTNAME' | translate}}</label>
+                    <input
+                    class="form-control form-control-solid h-auto py-6 px-6 rounded-1"
+                    type="text"
+                    name="firstName"
+                    formControlName="firstName"
+                    autocomplete="off"
+                    [ngClass]="{ 'is-invalid': form.controls['firstName'].invalid }"
+                    />
+                    <ng-container
+                    [ngTemplateOutlet]="formError"
+                    [ngTemplateOutletContext]="{
+                        validation: 'required',
+                        message: 'AUTH.VALIDATION.FIRSTNAME_REQUIRED' | translate,
+                        control: form.controls['firstName']
+                    }"
+                    ></ng-container>
+                </div>
+                <div class="col-lg-6 mb-5">
+                    <label class="fs-5 fw-bolder text-dark">{{'AUTH.INPUT.LASTNAME' | translate}}</label>
+                    <input
+                    class="form-control form-control-solid h-auto py-6 px-6 rounded-1"
+                    type="text"
+                    name="lastName"
+                    formControlName="lastName"
+                    autocomplete="off"
+                    [ngClass]="{ 'is-invalid': form.controls['lastName'].invalid }"
+                    />
+                    <ng-container
+                    [ngTemplateOutlet]="formError"
+                    [ngTemplateOutletContext]="{
+                        validation: 'required',
+                        message: 'AUTH.VALIDATION.LASTNAME_REQUIRED' | translate,
+                        control: form.controls['lastName']
+                    }"
+                    ></ng-container>
+                </div>
+                <div class="col-lg-6 mb-5">
+                    <label class="fs-5 fw-bolder text-dark">{{'AUTH.INPUT.PHONE' | translate}}</label>
+                    <input
+                    class="form-control form-control-solid h-auto py-6 px-6 rounded-1"
+                    type="text"
+                    name="phone"
+                    formControlName="phone"
+                    autocomplete="off"
+                    [ngClass]="{ 'is-invalid': form.controls['phone'].invalid }"
+                    />
+                </div>
+                <div class="col-lg-6 mb-5">
+                    <label class="fs-5 fw-bolder text-dark">{{'USER.PROFILE.PERSONAL.profile_linked' | translate}}</label>
+                    <input
+                    placeholder="https://www.linkedin.com/in/mariorossi/"
+                    class="form-control form-control-solid h-auto py-6 px-6 rounded-1"
+                    type="text"
+                    name="linkedInProfileUrl"
+                    formControlName="linkedInProfileUrl"
+                    autocomplete="off"
+                    [ngClass]="{ 'is-invalid': form.controls['linkedInProfileUrl'].invalid }"
+                    />
+                </div>
+                <div class="col-lg-6 mb-5">
+                  <label class="fs-5 fw-bolder text-dark">{{'USER.PROFILE.PERSONAL.role' | translate}}</label>
+                  <input
+                  class="form-control form-control-solid h-auto py-6 px-6 rounded-1"
+                  type="text"
+                  name="jobTitle"
+                  formControlName="jobTitle"
+                  autocomplete="off"
+                  [ngClass]="{ 'is-invalid': form.controls['jobTitle'].invalid }"
+                  />
+                </div>
+                <div class="col-lg-6 mb-5">
+                  <label class="fs-5 fw-bolder text-dark">{{'USER.PROFILE.PERSONAL.city' | translate}}</label>
+                  <input
+                  class="form-control form-control-solid h-auto py-6 px-6 rounded-1"
+                  type="text"
+                  name="city"
+                  formControlName="city"
+                  autocomplete="off"
+                  [ngClass]="{ 'is-invalid': form.controls['city'].invalid }"
+                  />
+                </div>
+                <div class="col-lg-6 mb-5">
+                  <label class="fs-5 fw-bolder text-dark">{{'USER.PROFILE.PERSONAL.current_company' | translate}}</label>
+                  <input
+                  class="form-control form-control-solid h-auto py-6 px-6 rounded-1"
+                  type="text"
+                  name="actualCompany"
+                  formControlName="actualCompany"
+                  autocomplete="off"
+                  [ngClass]="{ 'is-invalid': form.controls['actualCompany'].invalid }"
+                  />
+              </div>
+            </div>
+        </form>
+    </ng-container>
+    <br>
+    <div class="row mb-5">
+      <div class="col-lg-4">
+        <div class="menu-item d-flex mt-2 mb-2" style="justify-content: space-between; align-items: center;">
+          <span class="fs-2 fw-bold me-5">{{'OTHERS.subscribe_email' | translate}}</span>
+          <toggle-button [newsletter]="user.newsletter" (changed)="changeSubscribe($event)">
+          </toggle-button>
+        </div>
+      </div>
+    </div>
+    <br>
+    <a href="javascript:void(0)" class="mt-8 mb-8 text-danger fs-4" (click)="deletAccount()">{{'USER.PROFILE.PERSONAL.DELEETE_ACCOUNT' | translate}}</a>
+  </div>
+</div>
+<ng-template
+  #formError
+  let-control="control"
+  let-message="message"
+  let-validation="validation"
+>
+  <ng-container
+    *ngIf="control.hasError(validation) && (control.dirty || control.touched)"
+  >
+    <div class="fv-plugins-message-container">
+      <div class="fv-help-block">
+        {{ message }}
+      </div>
+    </div>
+  </ng-container>
+</ng-template>

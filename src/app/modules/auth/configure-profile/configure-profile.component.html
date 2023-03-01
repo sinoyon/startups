@@ -1,0 +1,46 @@
+<div class="overlay">
+	<ng-container *ngIf="loading$ | async">
+		<div class="overlay-layer bg-transparent" style="z-index: 1;">
+		<div class="spinner-border spinner-border-lg align-middle"></div>
+		</div>
+	</ng-container>
+	<div class="login-form login-signin" [hidden]="followView">
+		<!--begin::Title-->
+		<div class="pt-lg-0 pt-5">
+			<div class="kt-login__title">
+			<div class="welcome">{{ 'AUTH.GENERAL.WELCOME' | translate }}</div>
+			</div>
+		</div>
+		<!--end::Title-->
+
+	</div>
+	<div class="follow-content"  [hidden]="!followView">
+		<!--begin::Title-->
+		<div class="pt-lg-0 pt-5">
+			<div class="title">{{ 'USER.FOLLOW.TITLE' | translate }}</div>
+		</div>
+		<!--end::Title-->
+		
+		<div class="categories">
+			<div *ngFor="let item of categories" class="category"
+				(click)="onClickFollowCategory(item)"
+				[ngClass]="{'selected': user && item.follows && item.follows.includes(user._id)}">
+				{{ item.label}}
+			</div>
+		</div>
+		<!--begin::Action-->
+		<div class="pb-lg-0 pb-5 d-flex align-items-center">
+			<button
+			(click)="submitFollow()"
+			class="btn btn-warning fw-bolder fs-5 px-8 py-6 my-3 me-3"
+			>
+			{{ 'USER.FOLLOW.BUTTON' | translate }}
+			</button>
+		
+			<ng-container *ngIf="loading$ | async">
+			<span class="spinner spinner-primary ms-5"></span>
+			</ng-container>
+		</div>
+		<!--end::Action-->
+	</div>
+</div>

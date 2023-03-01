@@ -1,0 +1,27 @@
+<div class="position-relative">
+	<div class="bg-white d-flex py-2 px-2 rounded-1 align-items-center cursor-pointer" (click)="toggleOpen($event);"><!-- [ngClass]="{'cursor-pointer': user && user.isAdmin}" -->
+		<span [inlineSVG]="'./assets/media/svg/global.svg'"
+			[setSVGAttributes]="{width: 20, height: 20}">
+		</span>
+		<div class="w-5px h-5px bg-primary rounded-pill mx-2"></div>
+		<div class="fs-5 text-uppercase me-4 fw-bold text-primary fw-boldest">{{(selectedOption?.label.substr(0,2)) | translate}}
+		</div>
+		<i class="fa fs-4 lh-0 text-primary" [ngClass]="{'fa-angle-down': !opened, 'fa-angle-up': opened}"></i>
+	</div>
+	<div class="position-absolute z-index-2 bg-white min-w-100 top-100 rounded-1 end-0" [ngClass]="{'d-block': opened, 'd-none': !opened}">
+		<div>
+			<ng-container *ngFor="let item of options; index as i">
+				<ng-container [ngTemplateOutlet]="itemTemplate" [ngTemplateOutletContext]="{item: item}"></ng-container>
+			</ng-container>
+		</div>
+	</div>
+</div>
+<ng-template #itemTemplate let-item="item">
+	<div class="py-2 px-4 fs-5 text-nowrap cursor-pointer bg-hover-light-primary" *ngIf="item!=selectedOption && !item.hidden"
+		(click)="optionSelect(item, $event)">
+		<span>
+			{{item.label | translate}}
+		</span>
+	</div>
+	<div class="separator my-1" *ngIf="item.value === 'europe' && item!=selectedOption && !item.hidden"></div>
+</ng-template>

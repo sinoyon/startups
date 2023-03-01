@@ -1,0 +1,479 @@
+<div *ngIf="config" class="field-extract-component border">
+    <label class="title" style="font-weight: 700;">Field extract</label>
+    <div class="row" style="flex-wrap: nowrap;">
+        <div class="col-md-6" style="max-width: 300px;">
+            <ul class="nav flex-column flex-nowrap pe-4 nav-pills" role="tablist"
+                [perfectScrollbar]="{wheelPropagation: false}" [ngStyle]="{ 'max-height': '500px', 'position': 'relative'}">
+                <ng-container *ngFor="let item of fields">
+                    <li class="nav-item mb-2" *ngIf="(!hideLink || item.key !== 'link') && (!item.statuses_n || (status && !item.statuses_n.includes(status.key))) && (!item.typologies || (typology && item.typologies.includes(typology.key)))">
+                        <a class="d-flex nav-link cursor-pointer bg-hover-secondary" [ngClass]="{'active':activeField?.key==item.key}" data-toggle="tab" role="tab" (click)="onClickField(item)"
+                         >
+                            <span class="nav-icon" [ngbTooltip]="item.key"><i class="fa fa-code"></i></span>
+                            <span class="nav-text flex-root text-capitalize">{{item.title}}</span>
+                            <span class="w-20px h-20px text-center rounded-pill bg-success" *ngIf="getFieldStatus(item) === 'success'"><i class="text-white fa fa-check"></i></span>
+                            <span class="w-20px h-20px text-center rounded-pill bg-warning" *ngIf="getFieldStatus(item) === 'warning'"><i class="text-white fa fa-info"></i></span>
+                            <ng-container *ngLet="getAvailableCopyStatuses(item) as availableStatuses">
+                              <ng-container *ngLet="getAvailableCopyTypologies(item) as availableTypologies">
+                                <ng-container *ngIf="availableStatuses && availableTypologies && (availableStatuses.length || availableTypologies.length) && getFieldStatus(item) == null">
+                                  <span class="w-20px h-20px text-center rounded-pill bg-info"><i class="text-white fa fa-copy"></i></span>
+                                </ng-container>
+                              </ng-container>
+                            </ng-container>
+                        </a>
+                    </li>
+                </ng-container>
+            </ul>
+        </div>
+        <div class="col-md-6" style="max-width: calc(100% - 300px); flex: 1;">
+            <ng-container *ngIf="getConfig() as activeFieldConfig">
+                <div class="mb-1" *ngIf="dynamicConfig">
+                    <div class="form-check">
+                        <label class="form-check-label" style="color: black; font-weight: 500;">
+                        <input type="checkbox" class="form-check-input" [(ngModel)]="dynamicConfig[activeField.key]">
+                        <span></span>update per scraping</label>
+                    </div>
+                </div>
+                <div class="mb-1" *ngIf="activeField?.type === 'code'">
+                    <div class="form-check">
+                        <label class="form-check-label" style="color: black; font-weight: 500;">
+                        <input type="checkbox" class="form-check-input" [(ngModel)]="activeFieldConfig.auto">
+                        <span></span>generate automatically</label>
+                    </div>
+                </div>
+                <div class="mb-1">
+                    <label>Extract from</label>
+                    <div>
+                        <div class="form-check form-check-inline">
+                            <input type="radio" class="form-check-input" name="field_extract_from" [value]="'main'" [(ngModel)]="activeFieldConfig.from">
+                            <label class="form-check-label">main api</label>
+                        </div>
+                        <div class="form-check form-check-inline" [hidden]="hideFrom">
+                            <input type="radio" class="form-check-input" name="field_extract_from" [value]="'detail'" [(ngModel)]="activeFieldConfig.from">
+                            <label class="form-check-label">second api</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input type="radio" class="form-check-input" name="field_extract_from" [value]="'formula'" [(ngModel)]="activeFieldConfig.from">
+                            <label class="form-check-label">formula</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input type="radio" class="form-check-input" name="field_extract_from" [value]="'combine'" [(ngModel)]="activeFieldConfig.from">
+                            <label class="form-check-label">combine</label>
+                        </div>
+                        <div class="form-check form-check-inline" [hidden]="hideFrom || activeField?.key==='link'">
+                            <input type="radio" class="form-check-input" name="field_extract_from" [value]="'link'" [(ngModel)]="activeFieldConfig.from">
+                            <label class="form-check-label">link page</label>
+                        </div>
+                    </div>
+                </div>
+                <ng-container *ngIf="activeFieldConfig.from === 'main' || activeFieldConfig.from === 'detail' || activeFieldConfig.from === 'link'">
+                    <div class="mb-1" *ngIf="activeField.type==='number'">
+                        <label>Number decimal format</label>
+                        <div class="form-check form-check-inline">
+                            <input type="radio" class="form-check-input" name="field_extract_ndf" [value]="undefined" [(ngModel)]="activeFieldConfig.numberDecimalPoint">
+                            <label class="form-check-label">none</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input type="radio" class="form-check-input" name="field_extract_ndf" [value]="','" [(ngModel)]="activeFieldConfig.numberDecimalPoint">
+                            <label class="form-check-label">comma</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input type="radio" class="form-check-input" name="field_extract_ndf" [value]="'.'" [(ngModel)]="activeFieldConfig.numberDecimalPoint">
+                            <label class="form-check-label">point</label>
+                        </div>
+                    </div>
+                    <div class="mb-1" *ngIf="activeField.type==='number'">
+                        <label>Number unit</label>
+                        <div>
+                            <div class="form-check form-check-inline">
+                                <input type="radio" class="form-check-input" name="field_extract_nu" [value]="undefined" [(ngModel)]="activeFieldConfig.numberUnit">
+                                <label class="form-check-label">none</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input type="radio" class="form-check-input" name="field_extract_nu" [value]="activeFieldConfig.numberUnit!=undefined? activeFieldConfig.numberUnit: '100'" [(ngModel)]="activeFieldConfig.numberUnit">
+                                <label class="form-check-label">formula (e.g 100, 0.01 )</label>
+                            </div>
+                        </div>
+                        <ng-container *ngIf="activeFieldConfig.numberUnit != undefined">
+                            <label>formula</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control form-control-lg form-control-solid" [(ngModel)]="activeFieldConfig.numberUnit"  spellcheck="false">
+                            </div>
+                        </ng-container>
+                    </div>
+                    <div class="mb-1" *ngIf="activeField.type==='date'">
+                        <label>Date format</label>
+                        <div>
+                            <div class="form-check form-check-inline">
+                                <input type="radio" class="form-check-input" name="field_extract_ndf" [value]="undefined" [(ngModel)]="activeFieldConfig.dateFormat">
+                                <label class="form-check-label">none (full date format)</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input type="radio" class="form-check-input" name="field_extract_ndf" [value]="'number'" [(ngModel)]="activeFieldConfig.dateFormat">
+                                <label class="form-check-label">left days</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input type="radio" class="form-check-input" name="field_extract_ndf" [value]="activeFieldConfig.dateFormat!=null && activeFieldConfig.dateFormat !== 'number'? activeFieldConfig.dateFormat: 'DD/MM/YYYY'" [(ngModel)]="activeFieldConfig.dateFormat">
+                                <label class="form-check-label">format</label>
+                            </div>
+                        </div>
+                        <ng-container *ngIf="activeFieldConfig.dateFormat!=null && activeFieldConfig.dateFormat !== 'number'">
+                            <label>Format string</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control form-control-lg form-control-solid" [(ngModel)]="activeFieldConfig.dateFormat"  spellcheck="false">
+                            </div>
+                        </ng-container>
+                    </div>
+                    <div class="mb-1" *ngIf="activeField.type==='month'">
+                        <label>Date format</label>
+                        <div>
+                            <div class="form-check form-check-inline">
+                                <input type="radio" class="form-check-input" name="field_extract_ndf" [value]="'number'" [(ngModel)]="activeFieldConfig.dateFormat">
+                                <label class="form-check-label">left month</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input type="radio" class="form-check-input" name="field_extract_ndf" [value]="activeFieldConfig.dateFormat !== 'number' ? activeFieldConfig.dateFormat: 'mm/yyyy'" [(ngModel)]="activeFieldConfig.dateFormat">
+                                <label class="form-check-label">format</label>
+                            </div>
+                        </div>
+                        <ng-container *ngIf="activeFieldConfig.dateFormat !== 'number'">
+                            <label>Format string</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control form-control-lg form-control-solid" [(ngModel)]="activeFieldConfig.dateFormat"  spellcheck="false">
+                            </div>
+                        </ng-container>
+                    </div>
+                    <div class="mb-1">
+                        <label>Pattern type</label>
+                        <div *ngIf="(activeFieldConfig.from === 'main') || (activeFieldConfig.from === 'detail')"><!--mainCollectionType!=='path' &&, detailCollectionType !== 'path' && -->
+                            <div class="form-check form-check-inline">
+                                <input type="radio" class="form-check-input" name="field_extract_ptype" [value]="'text'"  [(ngModel)]="activeFieldConfig.type">
+                                <label class="form-check-label">text</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input type="radio" class="form-check-input" name="field_extract_ptype" [value]="'textWithChildren'" [(ngModel)]="activeFieldConfig.type">
+                                <label class="form-check-label">text with children</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input type="radio" class="form-check-input" name="field_extract_ptype" [value]="'backgroundImage'" [(ngModel)]="activeFieldConfig.type">
+                                <label class="form-check-label">background image</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input type="radio" class="form-check-input" name="field_extract_ptype" [value]="'backgroundStyle'" [(ngModel)]="activeFieldConfig.type">
+                                <label class="form-check-label">background style</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input type="radio" class="form-check-input" name="field_extract_ptype" [value]="'html'" [(ngModel)]="activeFieldConfig.type">
+                                <label class="form-check-label">html</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input type="radio" class="form-check-input" name="field_extract_ptype" [value]="'slug'" [(ngModel)]="activeFieldConfig.type">
+                                <label class="form-check-label">slug</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input type="radio" class="form-check-input" name="field_extract_ptype" [value]="'define'" [(ngModel)]="activeFieldConfig.type">
+                                <label class="form-check-label">define</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input type="radio" class="form-check-input" name="field_extract_ptype" [value]="activeFieldConfig.type!=='text' && activeFieldConfig.type!=='textWithChildren'
+                                && activeFieldConfig.type!=='backgroundImage' && activeFieldConfig.type!=='backgroundStyle'
+                                && activeFieldConfig.type!=='slug' && activeFieldConfig.type!=='html' && activeFieldConfig.type!=='define' ? activeFieldConfig.type : 'href'" [(ngModel)]="activeFieldConfig.type">
+                                <label class="form-check-label">attr</label>
+                            </div>
+                        </div>
+                        <!-- <div *ngIf="(mainCollectionType==='path' && activeFieldConfig.from === 'main') || (detailCollectionType === 'path' && activeFieldConfig.from === 'detail')">
+                            <div class="form-check form-check-inline">
+                                <input type="radio" class="form-check-input" name="field_extract_ptype" [value]="'text'"  [(ngModel)]="activeFieldConfig.type">
+                                <label class="form-check-label">text</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input type="radio" class="form-check-input" name="field_extract_ptype" [value]="'define'" [(ngModel)]="activeFieldConfig.type">
+                                <label class="form-check-label">define</label>
+                            </div>
+                        </div> -->
+                    </div>
+                    <div class="mb-1" *ngIf="((mainCollectionType!=='path' && activeFieldConfig.from === 'main') || (detailCollectionType !== 'path' && activeFieldConfig.from === 'detail')) && activeFieldConfig.type!=='text' && activeFieldConfig.type!=='textWithChildren'
+                    && activeFieldConfig.type!=='backgroundImage' && activeFieldConfig.type!=='backgroundStyle'
+                    && activeFieldConfig.type!=='slug' && activeFieldConfig.type!=='html' && activeFieldConfig.type!=='define'">
+                        <label>Attr name (e.g href, onclick, src, min, max, title)</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control form-control-lg form-control-solid" [(ngModel)]="activeFieldConfig.type"  spellcheck="false">
+                            <div class="input-group-append">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="border mt-8 p-3 position-relative mb-1">
+                        <div class="form-check form-check-inline" style="position: absolute;
+                        top: -0.8rem;
+                        left: 0.8rem;
+                        background: white;">
+                            <input type="checkbox" class="form-check-input" [(ngModel)]="activeFieldConfig.byPrev" id="field_extract_by_prev">
+                            <label class="form-check-label" for="field_extract_by_prev">
+                                Extract by prev element
+                                <strong style="color: red" [hidden]="activeFieldConfig.isMatchedPrev || !activeFieldConfig.byPrev">
+                                    (Not extracted)
+                                </strong>
+                            </label>
+                        </div>
+                        <div *ngIf="activeFieldConfig.byPrev">
+                            <div class="mb-1">
+                                <label>Pattern type</label>
+                                <div>
+                                    <div class="form-check form-check-inline">
+                                        <input type="radio" class="form-check-input" name="field_extract_ptype_pre" [value]="'text'"  [(ngModel)]="activeFieldConfig.type_prev">
+                                        <label class="form-check-label">text</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input type="radio" class="form-check-input" name="field_extract_ptype_pre" [value]="'textWithChildren'" [(ngModel)]="activeFieldConfig.type_prev">
+                                        <label class="form-check-label">text with children</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input type="radio" class="form-check-input" name="field_extract_ptype_pre" [value]="'title'" [(ngModel)]="activeFieldConfig.type_prev">
+                                        <label class="form-check-label">title</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-1">
+                                <label>Compare</label>
+                                <div>
+                                    <div class="form-check form-check-inline">
+                                        <input type="radio" class="form-check-input" name="field_extract_compare_pre" [value]="'eq'" [(ngModel)]="activeFieldConfig.match_prev">
+                                        <label class="form-check-label">equal</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                      <input type="radio" class="form-check-input" name="field_extract_compare_pre" [value]="'ne'" [(ngModel)]="activeFieldConfig.match_prev">
+                                      <label class="form-check-label">no equal</label>
+                                  </div>
+                                    <div class="form-check form-check-inline">
+                                        <input type="radio" class="form-check-input" name="field_extract_compare_pre" [value]="'contain'" [(ngModel)]="activeFieldConfig.match_prev">
+                                        <label class="form-check-label">contain</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input type="radio" class="form-check-input" name="field_extract_compare_pre" [value]="'start'" [(ngModel)]="activeFieldConfig.match_prev">
+                                        <label class="form-check-label"> start with</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input type="radio" class="form-check-input" name="field_extract_compare_pre" [value]="'end'" [(ngModel)]="activeFieldConfig.match_prev">
+                                        <label class="form-check-label">end with</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input type="radio" class="form-check-input" name="field_extract_compare_pre" [value]="'gte'" [(ngModel)]="activeFieldConfig.match_prev">
+                                        <label class="form-check-label">>=</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input type="radio" class="form-check-input" name="field_extract_compare_pre" [value]="'lte'" [(ngModel)]="activeFieldConfig.match_prev">
+                                        <label class="form-check-label"><=</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input type="radio" class="form-check-input" name="field_extract_compare_pre" [value]="'none'" [(ngModel)]="activeFieldConfig.match_prev">
+                                        <label class="form-check-label">none</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-1">
+                                <label>Pattern selector</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control form-control-lg form-control-solid" [(ngModel)]="activeFieldConfig.pattern_prev"  spellcheck="false">
+                                </div>
+                            </div>
+                            <div class="mb-1">
+                                <label>Value to compare</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control form-control-lg form-control-solid" [(ngModel)]="activeFieldConfig.value_prev"  spellcheck="false">
+                                    <div class="input-group-append">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-1">
+                              <div class="form-check">
+                                  <label class="form-check-label" style="color: black; font-weight: 500;">
+                                  <input type="checkbox" class="form-check-input" [(ngModel)]="activeFieldConfig.isSibling">
+                                  <span></span>Is sibling(if not, just next ones)</label>
+                              </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-1">
+                        <label>Pattern selector (generally is one tag, relative tag)</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control form-control-lg form-control-solid" [(ngModel)]="activeFieldConfig.pattern"  spellcheck="false">
+                            <div class="input-group-append">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-1" *ngIf="activeField.type==='url'">
+                        <label>Base URL</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control form-control-lg form-control-solid" [(ngModel)]="activeFieldConfig.baseUrl"  spellcheck="false">
+                        </div>
+                    </div>
+                    <div class="border mt-8 p-3 position-relative mb-1">
+                        <div class="form-check form-check-inline" style="position: absolute;
+                        top: -0.8rem;
+                        left: 0.8rem;
+                        background: white;">
+                            <input type="checkbox" class="form-check-input" [(ngModel)]="activeFieldConfig.bySub">
+                            <label class="form-check-label">Extract by sub content</label>
+                        </div>
+                        <div *ngIf="activeFieldConfig.bySub">
+                            <div class="mb-1">
+                                <label>Start mark</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control form-control-lg form-control-solid" [(ngModel)]="activeFieldConfig.startOfSub"  spellcheck="false">
+                                </div>
+                            </div>
+                            <div class="mb-1">
+                                <label>End mark</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control form-control-lg form-control-solid" [(ngModel)]="activeFieldConfig.endOfSub"  spellcheck="false">
+                                    <div class="input-group-append">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </ng-container>
+                <ng-container *ngIf="activeFieldConfig.from === 'formula'">
+                    <div class="mb-1">
+                        <label>Formula</label>
+                        <div class="alert alert-custom alert-default py-0" role="alert" *ngIf="activeField.suggestion">
+                            <div class="alert-icon text-warning">
+                                <i class="flaticon-information"></i>
+                            </div>
+                            <div class="alert-text" [innerHTML]="activeField.suggestion"></div>
+                        </div>
+                        <input type="text" class="form-control form-control-lg form-control-solid formula" [(ngModel)]="activeFieldConfig.formula"  spellcheck="false">
+                    </div>
+                </ng-container>
+                <ng-container *ngIf="activeFieldConfig.from === 'combine'">
+                    <div class="mb-1">
+                        <label>Combine pattern</label>
+                        <div class="alert alert-custom alert-default py-0" role="alert">
+                            <div class="alert-icon text-warning">
+                                <i class="flaticon-information"></i>
+                            </div>
+                            <div class="alert-text">{{'{field1} {field2}...'}}</div>
+                        </div>
+                        <input type="text" class="form-control form-control-lg form-control-solid formula" [(ngModel)]="activeFieldConfig.combine"  spellcheck="false">
+                    </div>
+                </ng-container>
+                <div class="mb-1 pt-4" *ngIf="getAvailableCopyStatuses() as availableStatuses">
+                    <div class="frame border p-1 pt-3 mb-4" *ngIf="availableStatuses.length">
+                        <label class="title">Copy from (status)</label>
+                        <div class="d-flex flex-wrap">
+                            <button *ngFor="let st of availableStatuses" class="btn btn-sm me-2 mb-2 text-uppercase rounded-0" type="button" (click)="onCopyFrom(st)" [disabled]="loading$ | async">
+                                {{st.title}}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-1 pt-4" *ngIf="getAvailableCopyTypologies() as availableTypologies">
+                    <div class="frame border p-1 pt-3 mb-4" *ngIf="availableTypologies.length">
+                        <label class="title">Copy from (typology)</label>
+                        <div class="d-flex flex-wrap">
+                            <button *ngFor="let tp of availableTypologies" class="btn btn-sm me-2 mb-2 text-uppercase rounded-0" type="button" (click)="onCopyFrom(tp, 'typology')" [disabled]="loading$ | async">
+                                {{tp.title}}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="alert alert-custom alert-default" role="alert" *ngIf="activeField.type == 'number'">
+                  <div class="alert-icon text-warning">
+                      <i class="flaticon-information"></i>
+                  </div>
+                  <div class="alert-text">
+                    If content involves 'k/m' at last, will be considered as 1000/1000000 unit, e.g 1.1k is 1100
+                  </div>
+                </div>
+                <div class="alert alert-custom alert-default" role="alert" *ngIf="activeField.type == 'date'">
+                  <div class="alert-icon text-warning">
+                      <i class="flaticon-information"></i>
+                  </div>
+                  <div class="alert-text">
+                    If content involved these pattern, will be considered like this:
+                    T1 → 31 March, T2 → 30 June, T3 → 30 September, T4 → 31 December
+                    Q1 → 30 April, Q2 → 31 August, Q3 → 31 December
+                  </div>
+                </div>
+                <button class="btn btn-primary btn-sm mb-2" type="button" (click)="onExtract()" [disabled]="loading$ | async">
+                    Extract
+                </button>
+                <div class="mb-1">
+                    <div class="example">
+                        <div class="example-code">
+                            <div class="example-highlight position-relative">
+                                <ng-container *ngIf="activeFieldConfig.result!=null">
+                                    <pre class="language-html mb-0" style="white-space: pre-line; word-break: break-all;" *ngIf="activeField.type === 'number'">
+                                      {{ addCommas(activeFieldConfig.result)}}
+                                      <span (click)="onClickCopy(addCommas(activeFieldConfig.result))"
+                                      class="cursor-pointer position-absolute top-0 start-0 w-20px h-20px text-center rounded-pill bg-transparent"><i class="text-white fa fa-copy"></i></span>
+                                    </pre>
+                                    <pre class="language-html mb-0" style="white-space: pre-line; word-break: break-all;" *ngIf="activeField.type === 'date'">
+                                      {{ getDateTimeFromDate(activeFieldConfig.result)}}
+                                      <span (click)="onClickCopy(getDateTimeFromDate(activeFieldConfig.result))"
+                                      class="cursor-pointer position-absolute top-0 start-0 w-20px h-20px text-center rounded-pill bg-transparent"><i class="text-white fa fa-copy"></i></span>
+                                    </pre>
+                                    <pre class="language-html mb-0" style="white-space: pre-line; word-break: break-all;" *ngIf="activeField.key === 'pictures'">
+                                      {{ activeFieldConfig.result}}
+                                      <span (click)="onClickCopy(activeFieldConfig.result)"
+                                      class="cursor-pointer position-absolute top-0 start-0 w-20px h-20px text-center rounded-pill bg-transparent"><i class="text-white fa fa-copy"></i></span>
+                                    </pre>
+                                    <pre class="language-html mb-0" style="white-space: pre-line; word-break: break-all;" *ngIf="activeField.key !== 'pictures' && !(activeField.type === 'date' || activeField.type === 'number')">
+                                      {{activeFieldConfig.baseUrl || ''}}{{ activeFieldConfig.result}}
+                                      <span (click)="onClickCopy((activeFieldConfig.baseUrl || '') + activeFieldConfig.result)"
+                                      class="cursor-pointer position-absolute top-0 start-0 w-20px h-20px text-center rounded-pill bg-transparent"><i class="text-white fa fa-copy"></i></span>
+                                    </pre>
+                                </ng-container>
+                                <pre *ngIf="activeFieldConfig.result==null" class="mb-0" style="white-space: pre-line; word-break: break-all;">
+                                    {{ 'Not extracted'}}
+                                </pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="frame border mt-8" *ngIf="activeFieldConfig.patternWithLanguage && activeFieldConfig.patternWithLanguage.length">
+                    <div  *ngFor="let lngPattern of activeFieldConfig.patternWithLanguage">
+                        <div class="mb-4">
+                            <label>Pattern selector ({{lngPattern.language}})</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control form-control-lg form-control-solid" [(ngModel)]="lngPattern.pattern"  spellcheck="false">
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <div class="example">
+                                <div class="example-code">
+                                    <div class="example-highlight position-relative">
+                                        <ng-container *ngIf="activeFieldConfig['result_'+lngPattern.language]!=null">
+                                          <pre class="language-html mb-0" style="white-space: pre-line; word-break: break-all;" *ngIf="activeField.type === 'number'">
+                                            {{ addCommas(activeFieldConfig['result_'+lngPattern.language])}}
+                                            <span (click)="onClickCopy(addCommas(activeFieldConfig['result_'+lngPattern.language]))"
+                                            class="cursor-pointer position-absolute top-0 start-0 w-20px h-20px text-center rounded-pill bg-transparent"><i class="text-white fa fa-copy"></i></span>
+                                          </pre>
+                                          <pre class="language-html mb-0" style="white-space: pre-line; word-break: break-all;" *ngIf="activeField.type === 'date'">
+                                              {{ getDateTimeFromDate(activeFieldConfig['result_'+lngPattern.language])}}
+                                              <span (click)="onClickCopy(getDateTimeFromDate(activeFieldConfig['result_'+lngPattern.language]))"
+                                              class="cursor-pointer position-absolute top-0 start-0 w-20px h-20px text-center rounded-pill bg-transparent"><i class="text-white fa fa-copy"></i></span>
+                                          </pre>
+                                          <pre class="language-html mb-0" style="white-space: pre-line; word-break: break-all;" *ngIf="activeField.key === 'pictures'">
+                                              {{ activeFieldConfig['result_'+lngPattern.language]}}
+                                              <span (click)="onClickCopy(activeFieldConfig['result_'+lngPattern.language])"
+                                              class="cursor-pointer position-absolute top-0 start-0 w-20px h-20px text-center rounded-pill bg-transparent"><i class="text-white fa fa-copy"></i></span>
+                                          </pre>
+                                          <pre class="language-html mb-0" style="white-space: pre-line; word-break: break-all;" *ngIf="activeField.key !== 'pictures' && !(activeField.type === 'date' || activeField.type === 'number')">
+                                              {{activeFieldConfig.baseUrl || ''}}{{ activeFieldConfig['result_'+lngPattern.language]}}
+                                              <span (click)="onClickCopy((activeFieldConfig.baseUrl || '') + activeFieldConfig['result_'+lngPattern.language])"
+                                              class="cursor-pointer position-absolute top-0 start-0 w-20px h-20px text-center rounded-pill bg-transparent"><i class="text-white fa fa-copy"></i></span>
+                                          </pre>
+                                        </ng-container>
+                                        <pre *ngIf="activeFieldConfig['result_'+lngPattern.language]==null" class="mb-0" style="white-space: pre-line; word-break: break-all;">
+                                            {{ 'Not extracted'}}
+                                        </pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </ng-container>
+        </div>
+    </div>
+</div>

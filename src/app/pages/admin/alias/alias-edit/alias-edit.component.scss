@@ -1,0 +1,17 @@
+:host {
+    .tags{
+		&.editing{
+			.tag .action{
+				cursor: not-allowed;
+			}
+		}
+		.tag{
+			&.editing{
+				display: none;
+			}
+		}
+	}
+	.input-group-append .btn {
+        z-index: inherit !important;
+    }
+}

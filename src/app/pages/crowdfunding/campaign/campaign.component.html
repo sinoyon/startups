@@ -1,0 +1,735 @@
+<div id="campaign_crowdfunding">
+    <div class="overview bg-primary py-8 d-flex pb-20" *ngIf="campaign">
+        <div class="container">
+            <h1 class="d-flex position-relative mb-0">
+                <span class="text-white">{{'OTHERS.Aggregatore_Crowdfunding' | translate}}</span>
+                <div class="w-30px position-relative cursor-pointer"
+                [ngbTooltip]="(campaign.typology == 'company equity' ? titleTooltipTemplateForEquity : titleTooltipTemplateForLending)" placement="bottom-right">
+                    <div class="w-100 h-100 d-flex justify-content-center align-items-start">
+                        <i class="fa fa-question-circle fs-2"></i>
+                    </div>
+                </div>
+                <a routerLink="/crowdfunding" class="position-relative ms-5">
+                    <i class="fa fa-link f-16px"></i>
+                </a>
+            </h1>
+        </div>
+	</div>
+    <div class="bg-white mt-n10" *ngIf="campaign" style="border-top-left-radius: 2.5rem;">
+        <div class="container">
+            <div class="row pt-10">
+                <div class="col-xl-8">
+                    <div class="d-flex align-items-start flex-wrap">
+                        <div class="logo me-7">
+                            <div *ngIf="campaign.logoSM || campaign.logo" class="img" [ngStyle]="{ 'background-image': 'url(' + (campaign.logoSM || campaign.logo) + ')'}"></div>
+                        </div>
+                        <div class="pt-2">
+                            <div class="d-flex align-items-center mb-4 flex-wrap">
+                                <div class="text-primary fw-boldest fs-1">{{campaign.title}}</div>
+                                <div>
+                                    <a href="javascript:void(0)" (click)="showShare = !showShare">
+                                        <img src="assets/media/svg/share.png" alt="" style="width: 25px; margin-left: 10px;">
+                                    </a>
+                                </div>
+                                <div *ngIf="campaign.link" class="hvr-grow py-2 px-6 btn rounded-pill btn-warning ms-6 text-capitalize h-40px"
+                                    (click)="onClickExternalCampaign(campaign)">
+                                    <span class="fs-4 fw-bolder">{{campaign.actionText | translate}}</span>
+                                </div>
+                            </div>
+
+                            <div *ngIf="showShare" >
+                                <share-buttons theme="circles-dark"
+                                    [include]="['facebook', 'email', 'linkedin', 'whatsapp', 'telegram']"
+                                    [showIcon]="true"
+                                    [showText]="false"
+                                    url="{{shareUrl}}"
+                                    title = "{{campaign.title}}"
+                                    image = "{{campaign?.backgroundSM || campaign?.background  || '/assets/media/misc/bg-1.jpg'}}"
+                                    description="{{campaign.description}}"
+                                    class="pt-1">
+                                </share-buttons>
+                            </div>
+
+
+                            <div class="d-flex my-2 align-items-start flex-wrap">
+                                <div class="hvr-grow py-2 px-0 btn rounded-pill btn-transparent text-warning me-5 text-capitalize h-40px" (click)="onClickWalletCampaign(campaign)">
+                                    <span class="me-3 custom_svg_icon" [inlineSVG]="campaign.wallet? './assets/media/svg/wallet1.svg': './assets/media/svg/wallet.svg'"
+                                    ></span>
+                                    <span class="fs-4 fw-bolder po_3">{{(campaign.wallet ? 'OTHERS.REMOVE_WALLET' : 'OTHERS.ADD_PORTFOLIO') | translate}}</span>
+                                </div>
+
+                                <div class="hvr-grow py-2 px-0 btn rounded-pill btn-transparent text-warning me-2 text-capitalize h-40px" (click)="onClickFollowCampaign(null)">
+                                    <span [inlineSVG]="campaign.followed? './assets/media/svg/follow1.svg': './assets/media/svg/follow.svg'" class="me-2 custom_svg_icon_follow" ></span>
+                                    <span class="fs-4 fw-bolder po_3">{{( campaign.followed ? 'GENERAL.FOLLOWING' : 'GENERAL.FOLLOW') | translate}}</span>
+                                </div>
+                            </div>
+                            <div *ngIf="campaign.typology === 'company equity' || campaign.typology === 'company lending'"  class="d-flex flex-wrap">
+                                <span *ngFor="let tag of campaign.tags; index as i" class="text-nowrap mb-1">
+                                    <span class="text-primary fs-5">{{tag2category(tag)}}</span>
+                                    <span class="hvr-grow-shadow btn rounded-pill btn-icon w-44px h-44px mx-2"
+                                     [ngClass]="{'btn-warning': favoriteCategories.includes(tag._id), 'btn-primary': !favoriteCategories.includes(tag._id)}"
+                                     [ngbTooltip]="isMobile ? '' : 'OTHERS.FOLLOW_CATEGORY_FOR_NOTI' | translate"
+                                     (click)="onClickFollowCategory(tag._id)">
+                                        <i *ngIf="!favoriteCategories.includes(tag._id)" class="la la-plus f-20px"></i>
+                                        <i *ngIf="favoriteCategories.includes(tag._id)" class="la la-check f-20px"></i>
+                                    </span>
+                                </span>
+                            </div>
+                            <div *ngIf="campaign.typology === 'real estate equity' || campaign.typology === 'real estate lending'" class="d-flex flex-wrap">
+                                <span class="text-nowrap mb-1">
+                                    <span class="text-primary fs-5">{{campaign.subTitle}}</span>
+                                </span>
+                            </div>
+                            <div class="d-flex flex-wrap mt-3" *ngIf="campaign.socials?.length || campaign.webPage">
+                                <span *ngIf="campaign.webPage" class="hvr-grow-shadow btn rounded-pill btn-icon btn-dark w-44px h-44px me-4">
+                                    <a
+                                      (click)="common.openLinkWithNewTab(campaign.webPage)">
+                                      <i class="fa fa-link f-16px"></i>
+                                    </a>
+                                </span>
+                                <span *ngFor="let social of campaign.socials" class="hvr-grow-shadow btn rounded-pill btn-icon btn-dark w-44px h-44px me-4">
+                                    <a (click)="common.openLinkWithNewTab(social.link)">
+                                        <i class="{{social.icon}} text-white f-16px"></i>
+                                    </a>
+                                </span>
+                            </div>
+                            <div class="mt-3 mb-5">
+                                <a class="text-info fs-6 cursor-pointer" (click)="campaign.source ? showSourceDetail(campaign.source) : common.openLinkWithNewTab(campaign.source?.link)">{{campaign.source?.name}}</a>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-4 pt-10">
+                    <div class="d-flex ps-xl-0 ps-md-24">
+                        <div class="h-20px text-uppercase px-3 py-0 mb-5" [ngStyle]="{'background' : campaign.statusBgColor}">
+                            <span [ngStyle]="{'color' : campaign.statusFontColor}" class="fs-6 fw-bolder">{{campaign.statusHTML | translate}}</span>
+                        </div>
+                    </div>
+                    <div class="ps-xl-0 ps-md-20 mb-16" style="max-width: 510px;" *ngIf="campaign.status==='1_ongoing'">
+                        <div class="d-flex justify-content-center h-55px" *ngIf="campaign.typology === 'company equity'">
+                            <div class="w-50 d-flex justify-content-center align-items-baseline fs-4 text-nowrap"
+                            [ngStyle]="{opacity: campaign.investorCount!=null ? 1 : 0}">
+                                <span class="fs-2hx fw-bolder pe-1">{{campaign.investorCount || 0}}</span>
+                                <span>{{'OTHERS.INVESTORS' | translate}}</span>
+                            </div>
+                            <div class="w-50 d-flex justify-content-center align-items-baseline fs-4 text-nowrap"
+                            *ngIf="campaign.leftDays > 0">
+                                <span class="fs-2hx fw-bolder pe-1">{{campaign.leftDays || 0}}</span>
+                                <span>{{'OTHERS.DAYS_FINISH' | translate}}</span>
+                            </div>
+                            <div class="w-50 d-flex justify-content-center align-items-center text-nowrap" *ngIf="campaign.leftDays <= 0">
+                                <span class="fs-1">{{ 'In chiusura'}}</span>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-center h-55px align-items-center"  *ngIf="campaign.typology === 'real estate equity' || campaign.typology === 'real estate lending' || campaign.typology === 'company lending' || campaign.typology === 'minibond'">
+                            <div class="w-50 d-flex flex-column align-items-center">
+                                <div class="d-flex justify-content-center align-items-baseline fs-4 text-nowrap"
+                                *ngIf="campaign.roiAnnual!=null">
+                                    <span class="me-1">{{'OTHERS.ROI_YEARLY' | translate}}:</span>
+                                    <span class="fw-bolder pe-1 fs-2">{{campaign.roiAnnual || 0}}</span>
+                                    <span>%</span>
+                                </div>
+                                <div class="d-flex justify-content-center align-items-baseline fs-4 text-nowrap"
+                                *ngIf="campaign.roiAnnual==null">
+                                    <span>N/D</span>
+                                </div>
+                                <div class="d-flex justify-content-center align-items-baseline fs-4 text-nowrap"
+                                *ngIf="campaign.holdingTime!=null">
+                                    <span class="me-1">{{'OTHERS.DURATION' | translate}}:</span>
+                                    <span class="fw-bolder pe-1 fs-2">{{campaign.holdingTime || 0}}</span>
+                                    <span>{{'OTHERS.MONTHS' | translate}}</span>
+                                </div>
+                                <div class="d-flex justify-content-center align-items-baseline fs-4 text-nowrap"
+                                *ngIf="campaign.holdingTime==null">
+                                    <span>N/D</span>
+                                </div>
+                            </div>
+                            <div class="w-50 d-flex justify-content-center align-items-baseline fs-4 text-nowrap"
+                            *ngIf="campaign.leftDays > 0">
+                                <span class="fs-2hx fw-bolder pe-1">{{campaign.leftDays || 0}}</span>
+                                <span>{{'OTHERS.DAYS_FINISH' | translate}}</span>
+                            </div>
+                            <div class="w-50 d-flex justify-content-center align-items-center text-nowrap" *ngIf="campaign.leftDays <= 0">
+                                <span class="fs-1">{{ 'In chiusura'}}</span>
+                            </div>
+                        </div>
+                        <div class="progress-bar mt-5 mb-6 h-5px rounded-xl" *ngIf="campaign.raisedPercent!=null" [ngbTooltip]="('OTHERS.Capital_raised' | translate) + ': ' + campaign.raised"
+                        [ngClass]="{'bg-secondary': campaign.raisedPercent < 100, 'bg-light-success': campaign.raisedPercent >= 100}">
+                            <div class="progress bg-success"  *ngIf="campaign.raisedPercent >= 100" [ngStyle]="{'width': (campaign.raisedPercentByMaximumGoal) + '%' }"></div>
+                            <div class="progress bg-warning" *ngIf="campaign.raisedPercent < 100" [ngStyle]="{'width': (campaign.raisedPercent ) + '%' }"></div>
+                        </div>
+                        <div class="d-flex justify-content-between" *ngIf="campaign.raisedPercent!=null">
+                            <div class="h-20px fs-4 fw-bolder"
+                            [ngClass]="{'text-warning': campaign.raisedPercent < 100, 'text-success': campaign.raisedPercent >= 100}">
+                                <span>{{campaign.raisedPercent}}%</span>
+                            </div>
+                            <div class="h-20px fs-4"  *ngIf="campaign.raisedPercent< 100">
+                                <span class="me-1">{{ 'OTHERS.OBJECT_MIN' | translate}}</span>
+                                <span class="fw-boldest">{{campaign.minimumGoal}}</span>
+                                <span class="ms-1 fw-bolder fs-5">€</span>
+                            </div>
+                            <div class="h-20px fs-4" *ngIf="campaign.raisedPercent >= 100">
+                                <span class="me-1">{{ 'OTHERS.OBJECT_MAX' | translate}}</span>
+                                <ng-container *ngIf="campaign.maximumGoal">
+                                    <span class="fw-boldest">{{campaign.maximumGoal}}</span>
+                                    <span class="ms-1 fw-bolder fs-5">€</span>
+                                </ng-container>
+                                <ng-container *ngIf="!campaign.maximumGoal">
+                                    <span class="fs-5 fw-bolder ms-1 ">N/D</span>
+                                </ng-container>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ps-xl-0 ps-md-24 mb-16" *ngIf="campaign.status==='2_comingsoon'">
+                        <div class="d-flex justify-content-center h-55px align-items-center"  *ngIf="campaign.typology === 'real estate equity' || campaign.typology === 'real estate lending' || campaign.typology === 'company lending' || campaign.typology === 'minibond'">
+                            <div class="w-50 d-flex flex-column align-items-center" *ngIf="campaign.roiAnnual!=null || campaign.holdingTime!=null">
+                                <div class="d-flex justify-content-center align-items-baseline fs-4 text-nowrap"
+                                *ngIf="campaign.roiAnnual!=null">
+                                    <span class="me-1">{{'OTHERS.ROI_YEARLY' | translate}}:</span>
+                                    <span class="fw-bolder pe-1 fs-2">{{campaign.roiAnnual || 0}}</span>
+                                    <span>%</span>
+                                </div>
+                                <div class="d-flex justify-content-center align-items-baseline fs-4 text-nowrap"
+                                *ngIf="campaign.roiAnnual==null">
+                                    <span>N/D</span>
+                                </div>
+                                <div class="d-flex justify-content-center align-items-baseline fs-4 text-nowrap"
+                                *ngIf="campaign.holdingTime!=null">
+                                    <span class="me-1">{{'OTHERS.DURATION' | translate}}:</span>
+                                    <span class="fw-bolder pe-1 fs-2">{{campaign.holdingTime || 0}}</span>
+                                    <span>{{'OTHERS.MONTHS' | translate}}</span>
+                                </div>
+                                <div class="d-flex justify-content-center align-items-baseline fs-4 text-nowrap"
+                                *ngIf="campaign.holdingTime==null">
+                                    <span>N/D</span>
+                                </div>
+                            </div>
+                            <div class="w-50 d-flex justify-content-around align-items-center" *ngIf="campaign.roiAnnual==null && campaign.holdingTime==null">
+                            </div>
+                            <div class="w-50 d-flex align-items-center justify-content-around" *ngIf="campaign.startDate">
+                                <div *ngIf="campaign.startDateRemainDays != 0 || campaign.startDateRemainHours != 0" class="d-flex justify-content-center align-items-center fs-4 text-nowrap h-60px w-65px" style="background: #EFF3F8;">
+                                    <span class="fw-bolder pe-1 fs-1">{{campaign.startDateRemainDays}}</span>
+                                    <span class="mt-2">g</span>
+                                </div>
+                                <div *ngIf="campaign.startDateRemainDays != 0 || campaign.startDateRemainHours != 0" class="d-flex justify-content-center align-items-center fs-4 text-nowrap h-60px w-65px" style="background: #EFF3F8;">
+                                    <span class="fw-bolder pe-1 fs-1">{{campaign.startDateRemainHours}}</span>
+                                    <span class="mt-2">h</span>
+                                </div>
+                                <span class="fs-1" *ngIf="campaign.startDateRemainDays == 0 && campaign.startDateRemainHours == 0">{{ 'Iniziando'}}</span>
+                            </div>
+                            <div class="w-50 d-flex justify-content-around align-items-center" *ngIf="campaign.startDate==null">
+                            </div>
+                        </div>
+                        <div class="progress-bar mt-5 mb-6 h-5px rounded-xl bg-secondary" *ngIf="campaign.minimumGoal!=null">
+                        </div>
+                        <div class="d-flex justify-content-between" *ngIf="campaign.minimumGoal!=null">
+                            <div class="h-20px fs-4 fw-bolder text-warning"
+                            >
+                                <span>{{0}}%</span>
+                            </div>
+                            <div class="h-20px fs-4">
+                                <span class="me-1">{{ 'OTHERS.OBJECT_MIN' | translate}}</span>
+                                <span class="fw-boldest">{{campaign.minimumGoal}}</span>
+                                <span class="ms-1 fw-bolder fs-5">€</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ps-xl-0 ps-md-24 mb-16" style="max-width: 510px;" *ngIf="campaign.status==='3_funded'">
+                        <div class="d-flex justify-content-center h-55px">
+                            <div class="w-50 d-flex justify-content-center align-items-baseline fs-4 text-nowrap"
+                            >
+                                <ng-container *ngIf="campaign.investorCount">
+                                    <span class="fs-2hx fw-bolder pe-1">{{campaign.investorCount || 0}}</span>
+                                    <span>{{'OTHERS.INVESTORS' | translate}}</span>
+                                </ng-container>
+                                <ng-container *ngIf="!campaign.investorCount">
+                                    <span>{{'OTHERS.INVESTORS' | translate}}: </span>
+                                    <span class="fs-3 fw-bolder ps-1" style="line-height: 50px;">N/D</span>
+                                </ng-container>
+                            </div>
+                            <div class="w-50 d-flex justify-content-center align-items-baseline fs-4 text-nowrap"
+                            >
+                                <ng-container *ngIf="campaign.raised">
+                                    <span class="fs-2hx fw-bolder">{{campaign.raised}}</span>
+                                    <span class="ms-1 fw-bolder fs-5">€</span>
+                                </ng-container>
+                                <ng-container *ngIf="!campaign.raised">
+                                    <span>{{'OTHERS.Capital_raised' | translate}}: </span>
+                                    <span class="fs-3 fw-bolder ps-1" style="line-height: 50px;">N/D</span>
+                                </ng-container>
+                            </div>
+                        </div>
+                        <div class="progress-bar mt-5 mb-6 h-5px rounded-xl" *ngIf="campaign.raisedPercent!=null" [ngbTooltip]="('OTHERS.Capital_raised' | translate) + ': ' + campaign.raised"
+                        [ngClass]="{'bg-secondary': campaign.raisedPercent < 100, 'bg-light-success': campaign.raisedPercent >= 100}">
+                            <div class="progress bg-success"  *ngIf="campaign.raisedPercent >= 100" [ngStyle]="{'width': (campaign.raisedPercentByMaximumGoal) + '%' }"></div>
+                            <div class="progress bg-warning" *ngIf="campaign.raisedPercent < 100" [ngStyle]="{'width': (campaign.raisedPercent ) + '%' }"></div>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <div class="d-flex flex-column fs-4">
+                                <ng-container *ngIf="campaign.minimumGoal">
+                                    <span class="me-1">{{ 'OTHERS.OBJECT_MIN' | translate}}:</span>
+                                    <span>
+                                        <span class="fw-boldest ms-1">{{campaign.minimumGoal}}</span>
+                                        <span class="ms-1 fw-bolder fs-5">€</span>
+                                    </span>
+                                </ng-container>
+                                <ng-container *ngIf="!campaign.minimumGoal">
+                                    <span class="me-1">{{ 'OTHERS.OBJECT_MIN' | translate}}:</span>
+                                    <span class="fs-2" style="line-height: 50px;">N/D</span>
+                                </ng-container>
+                            </div>
+                            <div class="d-flex flex-column fs-4 align-items-end">
+                                <ng-container *ngIf="campaign.maximumGoal">
+                                    <span class="me-1">{{ 'OTHERS.OBJECT_MAX' | translate}}:</span>
+                                    <span>
+                                        <span class="fw-boldest">{{campaign.maximumGoal}}</span>
+                                        <span class="ms-1 fw-bolder fs-5">€</span>
+                                    </span>
+                                </ng-container>
+                                <ng-container *ngIf="!campaign.maximumGoal">
+                                    <span class="me-1">{{ 'OTHERS.OBJECT_MAX' | translate}}:</span>
+                                    <span class="fs-5 fw-bolder ms-1 ">N/D</span>
+                                </ng-container>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-12 mb-16">
+                    <div class="d-flex align-items-end flex-wrap ps-md-24 justify-content-between" style="max-width: 920px;">
+                        <div style="width: 360px; margin-bottom: 20px;" *ngIf="(campaign.typology === 'company equity' || campaign.typology === 'company lending') && campaign.equity!=null">
+                            <div class="d-flex justify-content-between align-items-end">
+                                <span class="text-dark-primary fs-6 fw-bolder">{{'OTHERS.EQUITY_MIN' | translate}}
+                                </span>
+                                <span class="text-dark fs-6">{{ campaign.equity}}%</span>
+                            </div>
+                            <div class="progress-bar mt-5 mb-6 h-5px bg-secondary rounded-3" [ngbTooltip]="'OTHERS.percentage_equity_tooltip' | translate">
+                                <div class="progress bg-light-info h-100" [ngStyle]="{'width': (campaign.equity > 100 ? 100 : campaign.equity ) + '%' }"></div>
+                            </div>
+                        </div>
+                        <div style="width: 360px; margin-bottom: 20px;" *ngIf="(campaign.typology === 'company equity' || campaign.typology === 'company lending') && campaign.equity==null && campaign.equityMax!=null">
+                            <div class="d-flex justify-content-between align-items-end">
+                                <span class="text-dark-primary fs-6 fw-bolder">{{'OTHERS.EQUITY_MAX' | translate}}</span>
+                                <span class="text-dark fs-6">{{ campaign.equityMax}}%</span>
+                            </div>
+                            <div class="progress-bar mt-5 mb-6 h-5px bg-secondary rounded-xl" [ngbTooltip]="'OTHERS.percentage_equity_tooltip' | translate">
+                                <div class="progress bg-light-info h-100" [ngStyle]="{'width': (campaign.equity > 100 ? 100 : campaign.equity ) + '%' }"></div>
+                            </div>
+                        </div>
+                        <div style="width: 360px; margin-bottom: 20px;" *ngIf="(campaign.typology === 'real estate equity' || campaign.typology === 'company lending' || campaign.typology === 'real estate lending') && campaign.roiAnnual!=null">
+                            <div class="d-flex justify-content-between align-items-end">
+                                <span class="text-dark-primary fs-6 fw-bolder">{{'OTHERS.ROI_YEARLY' | translate}}
+                                    <span class="info position-relative ms-2 cursor-pointer d-inline-block h-25px"
+                                    [ngbTooltip]="roiAnnualTooltipTemplate"><!-- triggers="click" -->
+                                        <span [inlineSVG]="'./assets/media/svg/bulb.svg'"
+                                        class="svg-icon">
+                                        </span>
+                                    </span>
+                                </span>
+                                <span class="text-dark fs-6">{{ campaign.roiAnnual}}%</span>
+                            </div>
+                            <div class="progress-bar mt-5 mb-6 h-5px bg-secondary rounded-xl" [ngbTooltip]="'OTHERS.rang_between2_tootltip' | translate">
+                                <div class="progress bg-light-info h-100" [ngStyle]="{'width': (campaign.roiAnnual > 20 ? 100 : (campaign.roiAnnual < 2 ? 0: campaign.roiAnnual) ) + '%' }"></div>
+                            </div>
+                        </div>
+                        <div style="width: 360px; margin-bottom: 20px;" *ngIf="(campaign.typology === 'real estate equity' ||  campaign.typology === 'company lending' || campaign.typology === 'real estate lending') && campaign.holdingTime!=null">
+                            <div class="d-flex justify-content-between align-items-end">
+                                <span class="text-dark-primary fs-6 fw-bolder">{{'OTHERS.DURATION' | translate}} {{'OTHERS.loan' | translate}}
+                                    <span class="info position-relative ms-2 cursor-pointer d-inline-block h-25px"
+                                    [ngbTooltip]="holdingTimeTooltipTemplate">
+                                        <span [inlineSVG]="'./assets/media/svg/bulb.svg'"
+                                        class="svg-icon">
+                                        </span>
+                                    </span>
+                                </span>
+                                <span class="text-dark fs-6">{{ campaign.holdingTime }} {{'OTHERS.MONTHS' | translate}}</span>
+                            </div>
+                            <div class="progress-bar mt-5 mb-6 h-5px bg-secondary rounded-3"
+                            [ngbTooltip]="'OTHERS.rang_between6_tootltip' | translate">
+                                <div class="progress bg-light-info h-100" [ngStyle]="{'width': (campaign.holdingTime> 60 ? 100 : (campaign.holdingTime < 6 ? 0: campaign.holdingTime / 0.6) ) + '%' }"></div>
+                            </div>
+                        </div>
+                        <div style="width: 360px; margin-bottom: 20px;" *ngIf="campaign.minimumInvestment!=null">
+                            <div class="d-flex justify-content-between align-items-end">
+                                <span class="text-dark-primary fs-6 fw-bolder">{{'GENERAL.MINIMUM_INVESTMENT'| translate}}
+                                    <span class="position-relative ms-2 cursor-pointer d-inline-block h-25px"
+                                    [ngbTooltip]="minimumInvestmentTooltipTemplate">
+                                        <span [inlineSVG]="'./assets/media/svg/bulb.svg'"
+                                        class="svg-icon">
+                                        </span>
+                                    </span>
+                                </span>
+                                <span class="text-dark fs-6">{{campaign.minimumInvestment}} €</span>
+                            </div>
+                            <div class="progress-bar mt-5 mb-6 h-5px bg-secondary rounded-xl" [ngbTooltip]="'OTHERS.rang_between0_tootltip' | translate">
+                                <div class="progress bg-light-info h-100" [ngStyle]="{'width': (campaign.minimumInvestment > 2000 ? 100 : campaign.minimumInvestment / 20 ) + '%' }"></div>
+                            </div>
+                        </div>
+                        <div style="width: 360px; margin-bottom: 20px;" *ngIf="campaign.preMoneyEvaluation!=null">
+                            <div class="d-flex justify-content-between align-items-end">
+                                <span class="text-dark-primary fs-6 fw-bolder">{{'GENERAL.PRE_MONEY_EVALUATION' | translate}}
+                                    <span class="info position-relative ms-2 cursor-pointer d-inline-block h-25px"
+                                    [ngbTooltip]="preMoneyEvaluationTooltipTemplate">
+                                        <span [inlineSVG]="'./assets/media/svg/bulb.svg'"
+                                        class="svg-icon">
+                                        </span>
+                                    </span>
+                                </span>
+                                <span class="text-dark fs-6">{{campaign.preMoneyEvaluation}} €</span>
+                            </div>
+                            <div class="progress-bar mt-5 mb-6 h-5px bg-secondary rounded-3" [ngbTooltip]="'OTHERS.rang_between_milion_tootltip' | translate">
+                                <div class="progress bg-light-info h-100" [ngStyle]="{'width': (campaign.preMoneyEvaluation > 20000000 ? 100 : campaign.preMoneyEvaluation / 200000 ) + '%' }"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="map_view" *ngIf="campaign && (campaign.lat!=null && campaign.lng!=null)" class="position-relative" >
+        <app-crowdfunding-map #map [fitBounds]="false"
+			[campaigns]="[]"
+			[wallets]="[]"
+			[user]="user"
+			[locale]="locale"
+		></app-crowdfunding-map>
+        <div class="position-absolute top-0 end-0">
+            <div class="pe-10 pt-10">
+                <a routerLink="/crowdfunding"
+                    [queryParams]="{ typology: campaign.typology === 'company equity' || campaign.typology === 'real estate equity' ? 'equity': ( campaign.typology === 'minibond' ? 'minibond' : 'lending'),
+                    view: 'map', country: (campaign.country || 'italy')}"
+                    class="py-2 px-6 btn btn-sm rounded-pill btn-warning z-index-1 cursor-pointer">
+                    <span class="fs-5 fw-bolder">{{ 'OTHERS.SEE_ALL_INVEST' | translate}}</span>
+                </a>
+            </div>
+        </div>
+    </div>
+    <div *ngIf="campaign" class="position-relative bg-white cover-bg">
+        <div class="container pb-20 position-relative">
+            <div class="row pt-20">
+                <div class="col-xl-8">
+                    <div class="cover-image mb-12" id="main_campaign_video">
+                        <div class="wrap">
+                            <div class="img" [ngStyle]="{ 'background-image': 'url(' + (campaign?.backgroundSM || campaign?.background  || '/assets/media/misc/bg-1.jpg') + ')'}"></div>
+                            <div class="video-overlay z-index-1" *ngIf="campaign.videoUrl">
+                                <a class="btn-play align-self-center stretched-link" (click)="onClickMainVideo()"><i class="far fa-play-circle text-warning"></i></a>
+                            </div>
+                            <div id="video-container">
+                                <div class="frame-container">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex flex-wrap justify-content-between">
+                        <div *ngIf="campaign.startDate" class="_width_100">
+                            <div class="px-6 badge rounded-0 badge-success text-uppercase mb-4">{{'GENERAL.START_DATE' | translate}}:</div>
+                            <div class="d-flex">
+                                <div class="w-60px h-60px p-3 badge rounded-0 badge-secondary fs-2hx me-3 each_item">{{ campaign.startDateDay}}</div>
+                                <div class="w-60px h-60px p-3 badge rounded-0 badge-secondary fs-2hx me-3 each_item">{{ campaign.startDateMonth}}</div>
+                                <div class="w-105px h-60px p-3 badge rounded-0 badge-secondary fs-2hx each_item">{{ campaign.startDateYear}}</div>
+                            </div>
+                        </div>
+                        <div *ngIf="campaign.endDate && campaign.status!=='2_comingsoon'" class="_mobile _width_100">
+                            <div class="px-6 badge rounded-0 badge-danger text-uppercase mb-4">{{'GENERAL.END_DATE' | translate}}:</div>
+                            <div class="d-flex">
+                                <div class="w-60px h-60px p-3 badge rounded-0 badge-secondary fs-2hx me-3 each_item">{{ campaign.endDateDay}}</div>
+                                <div class="w-60px h-60px p-3 badge rounded-0 badge-secondary fs-2hx me-3 each_item">{{ campaign.endDateMonth}}</div>
+                                <div class="w-100px h-60px p-3 badge rounded-0 badge-secondary fs-2hx each_item">{{ campaign.endDateYear}}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-4 d-flex flex-column ps-xl-12 pt-12">
+                    <ng-container *ngIf="campaign.description">
+                        <div class="fs-1 fw-bolder mb-5">{{'CAMPAIGNS.LIST.DESCRIPTION' | translate}}</div>
+                        <div class="fs-4" *ngIf="campaign.description.length > 600">
+                            {{campaign.description.substr(0,600)}}...
+                        </div>
+                        <div class="fs-4" *ngIf="campaign.description.length <= 600">
+                            {{campaign.description}}
+                        </div>
+                    </ng-container>
+                    <ng-container *ngIf="campaign.company">
+                        <div class="d-flex mb-4" *ngIf="campaign.company.name">
+                            <div class="fs-6 fw-boldest w-130px">{{'GENERAL.NAME' | translate}}:</div>
+                            <div class="fs-6 flex-root">{{campaign.company.name}}</div>
+                        </div>
+                    </ng-container>
+                    <ng-container>
+                        <div class="d-flex mb-4" *ngIf="campaign.typology">
+                            <div class="fs-6 fw-boldest w-130px">{{'OTHERS.Crowdfunding' | translate}}:</div>
+                            <div class="fs-6 flex-root">
+                                <span class="text-capitalize">{{ campaign.crowdfundingTypology}}</span>
+                                <span class="position-relative ms-3 cursor-pointer d-inline-block h-25px" [ngbTooltip]="campaign.crowdfundingTypologyTooltip">
+                                    <span [inlineSVG]="'./assets/media/svg/bulb.svg'" class="svg-icon">
+                                    </span>
+                                </span>
+                            </div>
+                        </div>
+                    </ng-container>
+                    
+
+                    <ng-container *ngIf="!campaign.company">
+                        <br><br>
+                        <div class="d-flex mb-8 width_100">
+                            <div class="w-100px text-center me-7">
+                                <img src="assets/media/news.png" alt="" style="width: 55%;">
+                            </div>
+                            <div class="text-center width_100">
+                                <div class="fs-6 fw-boldest text-center">{{'OTHERS.SOMETHING_RELATED_CAMPAIGN' | translate}}</div>
+                                <a href="mailto:redazione@startupswallet.com?subject=news {{campaign.title}}&body=" class="py-2 px-6 btn btn-sm rounded-pill btn-warning z-index-1 width_100 mt-3">
+                                    <span class="fs-5 fw-bolder text-uppercase">{{'OTHERS.REPORT_NEWS' | translate}}</span>
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="d-flex mb-8 width_100">
+                            <div class="w-100px text-center me-7">
+                                <img src="assets/media/question.png" alt="" class="width_100">
+                            </div>
+                            <div class="text-center width_100">
+                                <div class="fs-6 fw-boldest text-center">{{'OTHERS.ASK_QUESTION' | translate}}</div>
+                                <a href="mailto:redazione@startupswallet.com?subject=question {{campaign.title}}&body=" class="py-2 px-6 btn btn-sm rounded-pill btn-warning z-index-1 width_100 mt-3">
+                                    <span class="fs-5 fw-bolder text-uppercase">{{'OTHERS.ASK_EXPERT' | translate}}</span>
+                                </a>
+                            </div>
+                        </div>
+                        <br><br>
+                    </ng-container>
+
+
+                    <ng-container *ngIf="campaign.company">
+                        <div class="d-flex mb-4" *ngIf="campaign.company.type">
+                            <div class="fs-6 fw-boldest w-130px">{{'GENERAL.COMPANY_TYPE' | translate}}:</div>
+                            <div class="fs-6 flex-root">{{campaign.company.type ? campaign.company.type.names[0].value : 'startup'}}</div>
+                        </div>
+                        <div class="d-flex mb-4" *ngIf="campaign.company.fiscalCode && campaign.company.fiscalCode.length < 13">
+                            <div class="fs-6 fw-boldest w-130px">{{'OTHERS.postalcode' | translate}}:</div>
+                            <div class="fs-6 flex-root">{{campaign.company.fiscalCode}}</div>
+                        </div>
+                        <div class="d-flex mb-4" *ngIf="campaign.company.physicalLocation">
+                            <div class="fs-6 fw-boldest w-130px">{{'GENERAL.LOCATION'| translate}}:</div>
+                            <div class="fs-6 flex-root">{{campaign.company.physicalLocation}}
+                                <span class="info position-relative ms-2 cursor-pointer d-inline-block h-25px"
+                                [closeDelay]="1000"
+                                [ngbTooltip]="physicalLocationTooltipTemplate"
+                                >
+                                    <span [inlineSVG]="'./assets/media/svg/bulb.svg'" class="svg-icon">
+                                    </span>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="d-flex mb-4" *ngIf="campaign.company.foundedDate">
+                            <div class="fs-6 fw-boldest w-130px">{{'GENERAL.FOUND_DATE' | translate}}:</div>
+                            <div class="fs-6 flex-root">{{campaign.company.foundedDate}}</div>
+                        </div>
+                        <div class="d-flex mb-4" *ngIf="campaign.company.originalTags && campaign.company.originalTags.length">
+                            <div class="fs-6 fw-boldest w-130px">{{'OTHERS.tag_original' | translate}}:</div>
+                            <div class="fs-6 flex-root">
+                                <span *ngFor="let otag of campaign.company.originalTags" class="mb-1 me-1 label label-inline label-light-primary">
+                                    {{otag}}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="d-flex mb-4" *ngIf="campaign.country">
+                            <div class="fs-6 fw-boldest w-130px">{{'OTHERS.country' | translate}}:</div>
+                            <div class="fs-6 flex-root text-capitalize">{{campaign.country}}
+                                <img *ngIf="campaign.flagImage" class="w-20px h-20px ms-2" [src]="campaign.flagImage"></div>
+                        </div>
+                        <div class="d-flex mb-4" *ngIf="campaign.company.campaigns.length> 0">
+                            <div class="fs-6 fw-boldest w-130px">{{'GENERAL.INVOLVED_OTHER_CAMPAIGNS' | translate}}</div>
+                            <div class="d-flex flex-column align-items-start flex-root">
+                                <a class="px-3 py-1 mb-3" [routerLink]="cc.link" [ngStyle]="{'background' : cc.statusBgColor}" *ngFor="let cc of campaign.company.campaigns">
+                                    <span [ngStyle]="{'color' : cc.statusFontColor}">{{cc.name}}</span>
+                                </a>
+                            </div>
+                        </div>
+
+                        <br><br>
+                        <div class="d-flex mb-8 width_100">
+                            <div class="w-100px text-center me-7">
+                                <img src="assets/media/news.png" alt="" style="width: 55%;">
+                            </div>
+                            <div class="text-center width_100">
+                                <div class="fs-6 fw-boldest text-center">{{'OTHERS.SOMETHING_RELATED_CAMPAIGN' | translate}}</div>
+                                <a href="mailto:redazione@startupswallet.com?subject=news {{campaign.title}}&body=" class="py-2 px-6 btn btn-sm rounded-pill btn-warning z-index-1 width_100 mt-3">
+                                    <span class="fs-5 fw-bolder text-uppercase">{{'OTHERS.REPORT_NEWS' | translate}}</span>
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="d-flex mb-8 width_100">
+                            <div class="w-100px text-center me-7">
+                                <img src="assets/media/question.png" alt="" class="width_100">
+                            </div>
+                            <div class="text-center width_100">
+                                <div class="fs-6 fw-boldest text-center">{{'OTHERS.ASK_QUESTION' | translate}}</div>
+                                <a href="mailto:redazione@startupswallet.com?subject=question {{campaign.title}}&body=" class="py-2 px-6 btn btn-sm rounded-pill btn-warning z-index-1 width_100 mt-3">
+                                    <span class="fs-5 fw-bolder text-uppercase">{{'OTHERS.ASK_EXPERT' | translate}}</span>
+                                </a>
+                            </div>
+                        </div>
+                        <br><br>
+
+                        <div class="flex-root"></div>
+                        <a *ngIf="campaign.company.article" style="max-width: 340px;" class="cursor-pointer">
+                            <div class="cover-image">
+                                <div class="wrap position-relative" style="padding-bottom: 30.25%;">
+                                    <div class="img" [ngStyle]="{ 'background-image': 'url(' + (campaign.company.articleImageUrl || 'https://image.shutterstock.com/image-photo/abstract-defocused-blurred-background-empty-260nw-476822953.jpg') + ')'}"></div>
+                                    <div class="w-30px h-30px position-absolute ms-5 mt-5 bg-primary rounded-xl d-flex justify-content-center align-items-center">
+                                        <svg width="17" height="17" viewBox="0 0 29 23" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M0 14.7236C0.124682 14.0477 0.544069 13.5215 0.906781 12.9675C2.21028 10.9622 3.51945 8.95694 4.81728 6.9461C5.17999 6.38107 5.66172 5.96561 6.2908 5.71079C7.1239 5.37288 7.96267 5.03497 8.77878 4.65275C9.63455 4.2539 10.479 4.1265 11.3688 4.56412C11.4424 4.46994 11.4991 4.39239 11.5615 4.3093C12.4682 3.03521 13.3807 1.76667 14.2875 0.498124C14.7012 -0.077984 15.1319 -0.149997 15.727 0.254386C16.5601 0.824954 17.3989 1.39552 18.232 1.96609C18.7874 2.34832 18.8667 2.78594 18.4757 3.33435C17.8183 4.25944 17.1552 5.179 16.4978 6.09856C16.4354 6.18719 16.3731 6.28136 16.2994 6.38661C16.6678 6.56388 17.0078 6.73006 17.3535 6.89625C18.8951 7.633 20.4309 8.37529 21.9781 9.10097C22.1708 9.1896 22.4088 9.23945 22.6242 9.24499C24.3981 9.25607 26.172 9.25053 27.9459 9.25053C28.6883 9.25053 29 9.55521 29 10.2753C29 13.4661 28.9943 16.6568 29.0057 19.8476C29.0057 20.3406 28.8186 20.6619 28.3596 20.8779C27.3225 21.3654 26.3023 21.8806 25.2709 22.3791C24.5058 22.7503 23.905 22.3847 23.8994 21.5482C23.8994 20.95 23.8994 20.3517 23.8994 19.7146C20.4706 21.238 17.0532 21.2712 13.6017 19.7423C13.6131 20.8447 13.2277 21.731 12.2075 22.2462C11.1931 22.7503 10.2353 22.5841 9.35685 21.9194C7.97401 22.983 6.22845 22.5896 5.40102 21.2602C4.40922 21.7864 3.41743 22.3182 2.41431 22.8334C2.22161 22.9331 1.98358 23.0106 1.77389 22.994C1.26949 22.9608 0.963455 22.5287 1.03146 22.0025C1.12214 21.3433 1.22982 20.6896 1.33184 20.0359C1.39984 19.5983 1.47919 19.1607 1.53019 18.7231C1.56987 18.3741 1.67188 18.0583 1.90424 17.7869C1.96658 17.7093 2.01759 17.6207 2.09126 17.5155C1.36584 17.3493 0.787766 17.0058 0.419386 16.3965C0.232363 16.0918 0.136017 15.7317 0 15.3883C0 15.1667 0 14.9451 0 14.7236ZM11.8732 12.5576C12.5022 12.5964 13.0577 12.5022 13.6074 12.325C14.3555 12.0868 14.9846 11.6602 15.5626 11.145C15.948 10.8016 16.4524 10.8459 16.7755 11.2004C17.0928 11.555 17.0702 12.048 16.6791 12.3804C16.3334 12.6795 15.9764 12.9731 15.591 13.2168C14.4802 13.9259 13.2447 14.2361 11.9185 14.2305C10.2466 14.225 8.58042 14.225 6.90854 14.2305C5.69005 14.2361 4.89095 15.1889 5.15165 16.2968C5.32734 17.0335 5.99609 17.5432 6.84053 17.5487C8.37639 17.5542 9.91792 17.5875 11.4538 17.5376C12.4569 17.5044 13.3467 17.6983 14.2308 18.1691C15.489 18.8394 16.8661 19.1496 18.3 19.205C20.2042 19.277 21.9781 18.8117 23.6613 17.9752C23.837 17.8866 23.8994 17.7924 23.8994 17.6041C23.8937 15.4714 23.8937 13.3442 23.8937 11.2115C23.8937 11.1173 23.8937 11.0176 23.8937 10.9068C23.3383 10.9068 22.8282 10.929 22.3238 10.9013C22.0405 10.8847 21.7401 10.8348 21.4851 10.713C19.5071 9.78232 17.5406 8.83507 15.5683 7.89336C15.4833 7.85458 15.3983 7.8158 15.2963 7.77149C14.1571 9.36132 13.0293 10.9456 11.8732 12.5576ZM10.343 6.00439C10.3316 5.97669 10.3203 5.94899 10.309 5.92129C10.1503 5.95453 9.98026 5.96561 9.83858 6.02654C8.83545 6.44755 7.82666 6.86855 6.83487 7.30617C6.64784 7.38926 6.46082 7.53883 6.35314 7.71055C4.83995 10.015 3.33809 12.325 1.84757 14.6405C1.74555 14.8011 1.70588 15.0504 1.73422 15.2443C1.78523 15.6376 2.14227 15.8924 2.56166 15.8924C3.02638 15.8924 3.37776 15.6597 3.46844 15.2554C3.70647 14.2139 4.30154 13.4384 5.27067 12.9398C5.39535 12.8734 5.5087 12.757 5.59371 12.6462C6.44948 11.4663 7.29392 10.2753 8.14403 9.08989C8.86946 8.05954 9.60622 7.03473 10.343 6.00439ZM25.6052 20.3572C26.1096 20.1135 26.58 19.8698 27.0618 19.6537C27.2488 19.5706 27.2998 19.4654 27.2941 19.277C27.2885 16.5848 27.2885 13.8982 27.2885 11.206C27.2885 11.1173 27.2828 11.0287 27.2771 10.9345C26.7104 10.9345 26.1606 10.9345 25.5996 10.9345C25.6052 14.0754 25.6052 17.1942 25.6052 20.3572ZM7.71331 12.5742C8.36506 12.5742 8.9488 12.5687 9.53254 12.5798C9.72523 12.5853 9.83291 12.5188 9.94626 12.3637C11.4935 10.1978 13.0463 8.03184 14.5935 5.8659C14.6389 5.79943 14.6785 5.73295 14.7295 5.6554C14.2591 5.33411 13.8057 5.0239 13.3467 4.70814C11.4708 7.32833 9.61188 9.92081 7.71331 12.5742ZM2.95271 20.673C3.83682 20.1578 4.85695 19.9085 5.21399 18.9059C4.79461 18.5514 4.38089 18.1913 3.95017 17.8312C3.84815 17.9752 3.72347 18.1359 3.61012 18.3076C3.47411 18.507 3.28708 18.6954 3.23608 18.9114C3.11139 19.4709 3.04905 20.047 2.95271 20.673ZM15.7157 4.29822C16.05 3.8329 16.3617 3.38974 16.6904 2.9355C16.2087 2.60867 15.761 2.304 15.2963 1.98825C14.9619 2.45357 14.6502 2.89673 14.3271 3.34543C14.7919 3.66672 15.2339 3.97139 15.7157 4.29822ZM10.1956 19.2272C10.1956 19.4875 10.1956 19.7202 10.1956 19.9473C10.1956 20.0027 10.1956 20.0581 10.2013 20.1135C10.241 20.5234 10.564 20.8392 10.9664 20.8669C11.3971 20.9001 11.7938 20.6508 11.8618 20.2354C11.9128 19.9085 11.8732 19.5651 11.8732 19.2272C11.3121 19.2272 10.768 19.2272 10.1956 19.2272ZM8.48974 19.2161C8.12703 19.2161 7.79832 19.2383 7.46961 19.2106C7.18624 19.1829 6.98222 19.2715 6.89154 19.5263C6.8292 19.7091 6.79519 19.9141 6.80653 20.108C6.82353 20.54 7.18057 20.8669 7.61696 20.8779C8.07035 20.889 8.45007 20.5788 8.48407 20.1412C8.50674 19.8421 8.48974 19.5485 8.48974 19.2161Z" fill="white"/>
+                                        </svg>
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="background: #EFF3F8;" class="p-3">
+                                <div class="fs-6 mb-2" *ngIf="campaign.company.articleDate">
+                                    {{date2string(campaign.company.articleDate)}}
+                                </div>
+                                <div class="fs-6 fw-bolder mb-2" *ngIf="campaign.company.articleTitle">
+                                    {{campaign.company.articleTitle}}
+                                </div>
+                                <div class="overflow-hidden">
+                                    <div style="height: 4.14rem;" *ngIf="campaign.company.articleDescription" #articleDescriptionWrapper>
+                                        <div class="spacer"></div>
+                                        <a class="read-article text-warning fw-bolder cursor-pointer" (click)="common.openLinkWithNewTab(campaign.company.article)">
+                                            <span class="text-dark pe-3">{{articleDescriptionContentWrapper.offsetHeight <= articleDescriptionWrapper.offsetHeight? '': '...'}}</span>
+                                            {{'GENERAL.KEEP_READING' | translate}}
+                                        </a>
+                                        <span class="word-break-all" #articleDescriptionContentWrapper>{{campaign.company.articleDescription}}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </ng-container>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="position-relative bg-white cover-bg" *ngIf="advs.campaigns.length + advs.sources.length > 0">
+        <div class="text-center">{{'Sponsored' | translate}}</div>
+        <div class="container">
+            <div class="row justify-content-center">
+                <ng-container *ngIf="advs.campaigns.length">
+                    <div class="col-xl-4 col-md-6 mb-12" *ngFor="let adv of advs.campaigns">
+                        <app-campaign-card
+                            [data]="adv"
+                            [type]="'sm'"
+                            (videoClick)="onClickVideo($event)"
+                            (followClick)="onClickFollowCampaign($event)"
+                            (walletClick)="onClickWalletCampaign($event)"
+                            (detailClick)="onClickDetailCampaign($event)"
+                            (externalClick)="onClickExternalCampaign($event)"
+                            (expandClick)="onExpandCard($event)"
+                            [expanded]="expandedAdv"
+                        ></app-campaign-card>
+                    </div>
+                </ng-container>
+                <ng-container *ngIf="advs.sources.length">
+                    <div class="col-xl-12 mb-12" *ngFor="let adv of advs.sources">
+                        <app-campaign-card
+                            [data]="adv"
+                            [type]="'lg'"
+                            (videoClick)="onClickVideo($event)"
+                            (followClick)="onClickFollowCampaign($event)"
+                            (walletClick)="onClickWalletCampaign($event)"
+                            (detailClick)="onClickDetailCampaign($event)"
+                            (externalClick)="onClickExternalCampaign($event)"
+                        ></app-campaign-card>
+                    </div>
+                </ng-container>
+            </div>
+        </div>
+    </div>
+    <div class="position-relative bg-white cover-bg pb-10 pt-1" [hidden]="sameCategoryCampaignQuery.campaigns.length == 0">
+        <div class="text-center position-relative fs-2 fw-bolder mt-10 mb-10">{{'OTHERS.YOU_INTERESTED' | translate}}</div>
+        <div class="position-relative container">
+			<app-card-slider #sameCategoryCampaignsSlider
+            (videoClick)="onClickVideo($event)"
+			(followClick)="onClickFollowCampaign($event)"
+			(walletClick)="onClickWalletCampaign($event)"
+			(detailClick)="onClickDetailCampaign($event)"
+			(externalClick)="onClickExternalCampaign($event)"
+            ></app-card-slider>
+		</div>
+    </div>
+    <div class="d-flex justify-content-center pt-10">
+        <a routerLink="/crowdfunding" class="hvr-grow py-2 px-6 btn rounded-pill btn-warning text-capitalize h-40px">
+            <span class="fs-4 fw-bolder">{{ 'GENERAL.ALL_STARTUPS' | translate}}</span>
+        </a>
+    </div>
+
+    <div class="container mt-10">
+        <div class="d-flex justify-content-center pt-3 other_cats">
+            <div *ngFor="let item of categories" class="cat_div ms-3 me-3 mb-5 cursor-pointer" (click)="showCategory(item)">
+              <img [src]="item.pic" alt="">
+              <p>{{item.label}}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="video_view">
+        <app-video-component
+        (close)="onCloseVideo()"
+        [campaigns]="isClickedAdvVideo ? advs.campaigns : sameCategoryCampaignQuery.campaigns"
+        [totalCount]="sameCategoryCampaignQuery.totalCount"
+        (followClick)="onClickFollowCampaign($event)"
+        (walletClick)="onClickWalletCampaign($event)"
+        (detailClick)="onClickDetailCampaign($event)"
+        (externalClick)="onClickExternalCampaign($event)"
+        #video
+        ></app-video-component>
+    </div>
+</div>
+
+<ng-template #titleTooltipTemplateForEquity>
+    <h2 class="fs-6 fw-normal text-left"
+    >{{'OTHERS.detail_equity_tooltip1' | translate}}:
+        <span *ngFor="let source of sources; let i = index;">
+            <a (click)="common.openLinkWithNewTab(source.link)" class="fw-bolder">{{source.name}}</a>{{i < sources.length - 1 ? ',' : '.'}}
+        </span>
+    </h2>
+</ng-template>
+<ng-template #titleTooltipTemplateForLending>
+    <h2 class="fw-6 text-left fw-normal"
+    >{{'OTHERS.detail_lending_tooltip1' | translate}}
+        <a (click)="common.openLinkWithNewTab('https://www.startupswallet.com/news/it/crowdfunding/lending-crowdfunding/')" class="fw-bolder">lending crowdfunding</a>, {{'OTHERS.detail_lending_tooltip2' | translate}}:
+
+        <span *ngFor="let source of sources; let i = index;">
+            <a (click)="common.openLinkWithNewTab(source.link)" class="fw-bolder">{{source.name}}</a>{{i < sources.length - 1 ? ',' : '.'}}
+        </span>
+    </h2>
+</ng-template>
+
+<ng-template #roiAnnualTooltipTemplate>
+    <h2 class="fs-7 fw-normal">
+        {{'OTHERS.front_detail' | translate}} <a (click)="common.openLinkWithNewTab('http://startupswallet.com')">Startups Wallet</a>
+        {{'OTHERS.detail_AnnualTooltip' | translate}}
+    </h2>
+</ng-template>
+<ng-template #holdingTimeTooltipTemplate>
+    <h2 class="fs-7 fw-normal">
+        {{'OTHERS.front_detail' | translate}} <a (click)="common.openLinkWithNewTab('http://startupswallet.com')">Startups Wallet</a>
+        {{'OTHERS.detail_holding' | translate}}
+    </h2>
+</ng-template>
+<ng-template #minimumInvestmentTooltipTemplate>
+    <h2 class="fs-7 fw-normal">
+        {{'OTHERS.front_detail' | translate}} <a (click)="common.openLinkWithNewTab('http://startupswallet.com')">Startups Wallet</a>
+         {{'OTHERS.detail_minimum' | translate}}
+    </h2>
+</ng-template>
+<ng-template #preMoneyEvaluationTooltipTemplate>
+    <h2 class="fs-7 fw-normal">
+        {{'OTHERS.front_detail' | translate}} <a (click)="common.openLinkWithNewTab('http://startupswallet.com')">Startups Wallet</a>
+        {{'OTHERS.detail_preMoney' | translate}}
+    </h2>
+</ng-template>
+<ng-template #physicalLocationTooltipTemplate>
+    <h2 class="fs-7 fw-normal">
+        {{'OTHERS.front_detail' | translate}} <a (click)="common.openLinkWithNewTab('http://startupswallet.com')">Startups Wallet</a>
+        {{'OTHERS.detail_physical1' | translate}}
+        <a (click)="common.openLinkWithNewTab('https://www.startupswallet.com/crowdfunding?typology=equity&view=map')">{{'OTHERS.detail_physical2' | translate}}</a>
+    </h2>
+</ng-template>

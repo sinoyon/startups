@@ -1,0 +1,57 @@
+:host {
+	border-radius: 4px;
+    background-color: #f2f3f7;
+    margin: 10px;
+	.quick-search__category:first-child {
+		margin-top: 0;
+	}
+	.quick-search__item{
+		cursor: pointer;
+		margin-bottom: 0 !important;
+		padding: 1rem;
+		&:hover{
+			background: #eef6ff
+		}
+	}
+	.quick-search__category {
+		margin: 0;
+		padding: 0.25rem 0 0.75rem 1.5rem;
+		background: #e2e2e2;
+		color: #7d7a7a;
+		font-weight: bold;
+	}
+	.dropdown-menu {
+		padding: 1.5rem 0 !important;
+		width: 100% !important;
+	}
+	.load-more{
+		width: 100%;
+		display: flex;
+		justify-content: flex-end;
+		button{
+			border: none;
+			background: transparent;
+			text-transform: uppercase;
+			font-weight: bold;
+			color: #262626;
+		}
+	}
+	.search-tabs{
+		.item{
+			cursor: pointer;
+			.label{
+				font-size: 1.1rem;
+				font-weight: bold;
+				text-transform: capitalize;
+				white-space: nowrap;
+				color: #8c8b8b;
+			}
+			&.active{
+				.label{
+					color: #262626;
+				}
+				border-bottom: 2px solid #262626;
+			}
+		}
+	}
+}

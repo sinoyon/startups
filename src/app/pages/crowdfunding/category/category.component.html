@@ -1,0 +1,140 @@
+<div class="category_container">
+  <div class="overview bg-primary py-8 d-flex pb-20" *ngIf="category">
+    <div class="container">
+      <h1 class="d-flex position-relative mb-0">
+        <span class="text-white">{{'OTHERS.Aggregatore_Crowdfunding' | translate}}</span>
+        <span class="position-relative ms-2 cursor-pointer" [ngbTooltip]="titleTooltipTemplate" triggers="click hover" placement="bottom-center" [closeDelay]="1000">
+          <i class="fa fa-question-circle fs-2"></i>
+        </span>
+        <a routerLink="/crowdfunding" class="position-relative ms-5">
+          <i class="fa fa-link f-16px"></i>
+        </a>
+      </h1>
+    </div>
+  </div>
+
+  <div class="bg-white mt-n10" style="border-top-left-radius: 2.5rem;">
+    <div class="container">
+      <div class="pt-10 pb-10">
+        <div>
+          <div class="row" *ngIf="category">
+            <div class="col-xl-2 col-md-4 mb-12">
+              <div class="logo me-7">
+                <img [src]="category.pic" alt="" class="img">
+              </div>
+            </div>
+  
+            <div class="col-xl-6 col-md-8 mb-12">
+              <div class="pt-2">
+                <div class="text-primary fw-boldest fs-1">
+                  {{category.label}}
+                  <span class="hvr-grow-shadow btn rounded-pill btn-icon w-44px h-44px mx-2"
+                    [ngClass]="{'btn-warning': favoriteCategories.includes(category._id), 'btn-primary': !favoriteCategories.includes(category._id)}"
+                    [ngbTooltip]="'OTHERS.FOLLOW_CATEGORY_FOR_NOTI' | translate"
+                    (click)="onClickFollowCategory(category._id)">
+                      <i *ngIf="!favoriteCategories.includes(category._id)" class="la la-plus f-20px"></i>
+                      <i *ngIf="favoriteCategories.includes(category._id)" class="la la-check f-20px"></i>
+                  </span>
+                </div>
+                <a class="pt-4 cursor-pointer" (click)="common.openLinkWithNewTab(category.link)">{{category.link}}</a>
+                <div class="pt-4">
+                  <span class="fs-5" [innerHtml]="category.description"></span>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-xl-4 col-md-12 mb-12" *ngIf="category.articleImageUrl && category.articleTitle" >
+              <div class="article_div cursor-pointer">
+                <div class="img_div">
+                  <img src="{{category.articleImageUrl}}" alt="">
+                </div>
+
+                <div class="desc_div">
+                  <p class="mt-2 mb-0 fs-3 text-primary">{{category.articleDate}}</p>
+                  <h3 class="mt-2 fs-2 text-primary fw-bolder">{{category.articleTitle}}</h3>
+                  <div class="description text-primary overflow-hidden" #descWrapper>
+                    <div class="spacer"></div>
+                    <span
+                    [ngbTooltip]="category.articleDescription"
+                    triggers="click"
+                    placement="top-right"
+                    class="read-more fs-5 ps-2 text-warning fw-bolder text-lowercase" [hidden]="descContentWrapper.offsetHeight <= descWrapper.offsetHeight"
+                      >{{ 'GENERAL.READ_MORE'| translate }}</span>
+                    <span class="description-wrapper fs-6 mb-0" #descContentWrapper>
+                      {{category.articleDescription}}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+  
+          <br>
+  
+          <div class="row pt-10 d-flex flex-wrap">
+            <ng-container *ngIf="campaigns.length">
+              <div class="col-xl-4 col-md-6 mb-12" *ngFor="let campaign of campaigns">
+                <app-campaign-card
+                  [data]="campaign"
+                  [type]="'md'"
+                  (videoClick)="onClickVideo($event)"
+                  (followClick)="onClickFollowCampaign($event)"
+                  (walletClick)="onClickWalletCampaign($event)"
+                  (detailClick)="onClickDetailCampaign($event)"
+                  (externalClick)="onClickExternalCampaign($event)"
+                  (expandClick)="onExpandCard($event)"
+                  [expanded]="expanded">
+                </app-campaign-card>
+              </div>
+  
+              <div class="py-4 d-flex justify-content-center" *ngIf="campaigns.length && totalCampaigns > 9 && loadMore">
+                <div (click)="onClickLoadMore()" class="btn btn-warning hvr-grow-shadow"><span>{{ 'GENERAL.SHOW_MORE_RESULT' | translate}}</span></div>
+              </div>
+            </ng-container>
+  
+            <div class="modal" id="video_view">
+              <app-video-component
+                (close)="onCloseVideo()"
+                [campaigns]="campaigns"
+                [totalCount]="totalCampaigns"
+                (followClick)="onClickFollowCampaign($event)"
+                (walletClick)="onClickWalletCampaign($event)"
+                (detailClick)="onClickDetailCampaign($event)"
+                (externalClick)="onClickExternalCampaign($event)"
+                #video>
+              </app-video-component>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="d-flex justify-content-center pt-3 other_cats">
+        <div *ngFor="let item of categories" class="cat_div ms-3 me-3 mb-5 cursor-pointer" (click)="showCategory(item)">
+          <img [src]="item.pic" alt="">
+          <p>{{item.label}}</p>
+        </div>
+      </div>
+  
+      <div class="d-flex justify-content-center pt-10">
+        <a routerLink="/crowdfunding" class="hvr-grow py-2 px-6 btn rounded-pill btn-warning text-capitalize h-40px">
+          <span class="fs-4 fw-bolder">{{ 'GENERAL.ALL_STARTUPS' | translate}}</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <ng-template #titleTooltipTemplate>
+    <h2 class="fs-7 fw-normal">
+      {{'OTHERS.homepage_tooltip1' | translate}}
+      <a (click)="common.openLinkWithNewTab('https://www.startupswallet.com/news/it/crowdfunding/equity-crowdfunding/crowdfunding-immobiliare-un-fenomeno-in-crescita-con-grandi-potenzialita-di-ritorno/')">{{'OTHERS.immobiliari' | translate}}</a>
+      {{'OTHERS.homepage_tooltip2' | translate}}
+      <a (click)="common.openLinkWithNewTab('https://www.startupswallet.com/news/it/crowdfunding/lending-crowdfunding-guadagnare-aiutando-le-aziende/')">lending</a>
+      ,
+      <a (click)="common.openLinkWithNewTab('https://www.startupswallet.com/news/it/crowdfunding/minibond/')">minibond</a>
+        {{'OTHERS.AND' | translate}}
+      <a (click)="common.openLinkWithNewTab('https://www.startupswallet.com/news/it/crowdfunding/equity-crowdfunding/')">equity</a>
+      {{'OTHERS.homepage_tooltip3' | translate}}
+      <a (click)="common.openLinkWithNewTab('https://www.startupswallet.com/news/it/crowdfunding/piattaforme-equity-crowdfunding/')">{{'OTHERS.homepage_tooltip4' | translate}}</a>
+    </h2>
+  </ng-template>
+</div>

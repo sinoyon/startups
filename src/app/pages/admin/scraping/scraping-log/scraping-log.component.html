@@ -1,0 +1,58 @@
+<div class="card card-custom overlay" [ngClass]="{'overlay-block': loading$ | async}">
+	<ng-container *ngIf="loading$ | async">
+		<div class="overlay-layer bg-transparent" style="z-index: 1;">
+		  <div class="spinner spinner-center spinner-primary"></div>
+		</div>
+	</ng-container>
+	<div class="card-header flex-start">
+		<div class="d-flex align-items-center"><div class="btn btn-primary" (click)="onClickBackup()">Backup daemons</div></div>
+		<div class="card-toolbar" *ngIf="progress">
+			<div class="d-flex justify-content-center align-items-center">
+				<div *ngIf="progress.startedTime!=0 && progress.count > 0">
+					<div>{{ progress.source }} {{ progress.sourceCount}}</div>
+					<div class="progress-bar bg-secondary rounded-xl h-5px w-250px me-5">
+						<div class="progress bg-success" [ngStyle]="{'width': ((progress.current + 1) / progress.count * 100) + '%' }"></div>
+					</div>
+				</div>
+				<div class="btn btn-icon btn-elevate" *ngIf="progress.startedTime==0" (click)="onClickScraping(true)"><i class="fa fa-play"></i></div>
+				<div class="btn btn-icon btn-elevate" *ngIf="progress.startedTime!=0" (click)="onClickScraping(false)"><i class="fa fa-pause"></i></div>
+			</div>
+		</div>
+	</div>
+	<div class="card-body">
+		<div class="d-flex flex-wrap">
+			<div class="mx-3 form-control p-0 form-control-solid d-flex align-items-center" style="width: inherit;">
+				<ng-multiselect-dropdown
+					style="width: 100%;"
+					[(ngModel)]="selectedCountries"
+					[ngModelOptions]="{standalone: true}"
+					[settings]="multiSelectSettings"
+					[data]="countries"
+					[placeholder]="'Select countries'"
+					(onSelect)="selectCountries($event)"
+					(onDeSelect)="selectCountries($event)"
+					(onSelectAll)="selectCountries($event)"
+					(onDeSelectAll)="selectCountries($event)"
+				>
+				</ng-multiselect-dropdown>
+			</div>
+		</div>
+		<div>
+			<lp-table
+				[cacheBlockSize]="10"
+				[paginationPageSize]="'10'"
+				[hidden]="isEmptyTable"
+				[hasPadding]="false"
+				[showSelectAllCheckbox]="true"
+				[suppressRowClickSelection]="true"
+				[showDeleteColumn]="true"
+				[showCheckbox]="true"
+				(action)="onAction($event)"
+				(paginationChanged)="onPaginationChanged($event)"
+				[columnDefs]="columnDefs"
+				#tableCtrl
+			></lp-table>
+		</div>
+		<div class="d-flex justify-content-center align-items-center h-200px" *ngIf="isEmptyTable">{{'GENERAL.NO_RECORD_FOUND' | translate}}</div>
+	</div>
+</div>

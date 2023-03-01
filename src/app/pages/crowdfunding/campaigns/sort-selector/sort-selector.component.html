@@ -1,0 +1,28 @@
+<div class="position-relative">
+	<div class="bg-white cursor-pointer d-flex py-2 px-2 rounded-1 align-items-center" (click)="toggleOpen($event);">
+		<div class="text-nowrap d-sm-block d-none">
+			<span class="fs-7 text-uppercase me-2 fw-bold">{{'GENERAL.ORDER_BY' | translate}}</span>
+			<span class="fs-4 text-primary me-3 fw-bolder">{{(selectedOption?.label) | translate}}</span>
+			<i class="fa fs-4 lh-0 text-primary" [ngClass]="{'fa-angle-down': !opened, 'fa-angle-up': opened}"></i>
+		</div>
+		<div class="d-blcok d-sm-none">
+			<span [inlineSVG]="'./assets/media/svg/sort.svg'">
+			</span>
+		</div>
+	</div>
+	<div class="position-absolute z-index-2 bg-white min-w-100 rounded-1 end-0" [ngClass]="{'d-block': opened, 'd-none': !opened}">
+		<div>
+			<ng-container *ngFor="let item of options; index as i">
+				<ng-container [ngTemplateOutlet]="itemTemplate" [ngTemplateOutletContext]="{item: item, index: i}"></ng-container>
+			</ng-container>
+		</div>
+	</div>
+</div>
+<ng-template #itemTemplate let-item="item" let-index="index" let-type="type">
+	<div class="py-2 px-4 fs-4 text-nowrap cursor-pointer bg-hover-light-primary" *ngIf="!item.hidden && item!=selectedOption"
+		(click)="optionSelect(item, $event)">
+		<span>
+			{{item.label | translate}}
+		</span>
+	</div>
+</ng-template>

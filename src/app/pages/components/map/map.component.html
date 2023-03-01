@@ -1,0 +1,84 @@
+<ng-container *ngIf="campaigns.length">
+  <div class="position-absolute z-index-1"  *ngIf="markersOfMap.pages.length && markersOfMap.activeIndex == -1">
+    <div class="bg-white position-relative overflow-hidden w-100 h-100">
+      <div class="position-absolute w-50px h-50px d-flex cursor-pointer justify-content-end top-0 end-0"
+      (click)="onClickCloseMarkerSelection(false)"
+      style="background: #FFF; z-index: 2; border-bottom-left-radius: 100%; box-shadow: 0 0 16px 0 rgb(33 33 33 / 15%);">
+        <div class="btn-close me-3 mt-3"></div>
+      </div>
+      <ng-container *ngFor="let item of markersOfMap.campaigns; index as i">
+        <app-campaign-card (click)="onClickMapListItem(i)" *ngIf="i >= markersOfMap.activePage * markersOfMap.pageSize && i < (markersOfMap.activePage + 1) * markersOfMap.pageSize"
+          [data]="item"
+          [type]="'xs'"
+        ></app-campaign-card>
+      </ng-container>
+      <div class="d-flex flex-wrap py-2 justify-content-center">
+        <a (click)="onClickPrevOfMarkers()" class="btn btn-icon btn-sm btn-light me-2 my-1" *ngIf="markersOfMap.startPage > 0">
+          <i class="ki ki-bold-arrow-back icon-xs"></i>
+        </a>
+        <ng-container *ngFor="let page of markersOfMap.pages">
+          <a (click)="onClickPageOfMarkers(page)"
+          *ngIf="page>=markersOfMap.startPage && page < markersOfMap.countPage + markersOfMap.startPage"
+          [ngClass]="{'btn-hover-primary active': page == markersOfMap.activePage}"
+          class="btn btn-icon btn-sm border-0 btn-light me-2 my-1">{{page + 1}}</a>
+        </ng-container>
+        <a (click)="onClickNextOfMarkers()" class="btn btn-icon btn-sm btn-light me-2 my-1" *ngIf="markersOfMap.startPage + markersOfMap.countPage < markersOfMap.totalPage">
+          <i class="ki ki-bold-arrow-next icon-xs"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+  <div class="position-absolute z-index-2"  *ngIf="markersOfMap.activeIndex >= 0">
+    <div class="position-relative bg-white  w-100 h-100">
+      <div class="position-absolute w-50px h-50px d-flex cursor-pointer justify-content-end  top-0 end-0"
+      (click)="onClickCloseMarkerSelection(true)"
+      style="background: #FFF; z-index: 1; border-bottom-left-radius: 100%; box-shadow: 0 0 16px 0 rgb(33 33 33 / 15%);">
+        <div class="btn-close me-3 mt-3"></div>
+      </div>
+      <div class="selected-marker">
+        <app-campaign-card [data]="markersOfMap.campaigns[markersOfMap.activeIndex]"
+        (videoClick)="videoClickEvent.emit($event)" (followClick)="followClickEvent.emit($event)" (walletClick)="walletClickEvent.emit($event)" (detailClick)="detailClickEvent.emit($event)" (externalClick)="externalClickEvent.emit($event)"
+        ></app-campaign-card>
+      </div>
+    </div>
+  </div>
+</ng-container>
+<div class="flex-root">
+  <agm-map [disableDefaultUI]="true" [fitBounds]="fitBounds" [scrollwheel]="false" [latitude]="location.lat" [longitude]="location.lng" [maxZoom]="12"
+  (mapClick)="onMapClick($event)">
+    <agm-marker *ngFor="let marker of location.markers; index as i" #markerW
+     [iconUrl]="{
+      scaledSize: scaleSize,
+      url: marker.count > 1 ? './assets/media/misc/map-marker-active.png' : marker.icon}"
+     [latitude]="marker.lat"
+     [label]="{text: marker.count + '', color:  marker.count > 1 ? 'white': 'transparent'}"
+     [zIndex]="hoverMarkerInfoWindow == infoMarker ? location.markers.length + 2 : (selectedMarkerInfoWindow == infoMarker ? location.markers.length + 1 : i)"
+     [longitude]="marker.lng"
+     [agmFitBounds]="fitBounds"
+     (mouseOver)="onMouseOver(marker, infoMarker)"
+     (mouseOut)="onMouseOut(marker, infoMarker)"
+     (markerClick)="onClickMarker(marker, infoMarker)">
+      <agm-info-window [disableAutoPan]="false" #infoMarker (infoWindowClose)="onCloseInfoWindow(infoMarker)" [isOpen]="activeMarker==marker">
+        <div class="btn-close float-end" aria-label="Close" (click)="clear()"
+        ></div>
+        <app-campaign-card [data]="marker" [type]="'xxs'" *ngIf="marker.count==1"></app-campaign-card>
+        <div *ngIf="marker.count>1">
+          <div class="d-flex flex-column align-items-start min-w-100px mw-200px ps-3 pt-3">
+            <div class="fw-boldest fs-5 overflow-hidden w-100 d-flex cursor-default" >
+              <span class="cursor-default">
+                {{'OTHERS.CLICK_PIN_VIEW' | translate}}
+              </span>
+            </div>
+            <div class="fs-5 cursor-default">
+              <span >
+                {{ marker.fullAddress}}
+              </span>
+            </div>
+          </div>
+        </div>
+      </agm-info-window>
+    </agm-marker>
+    <agm-zoom-control></agm-zoom-control>
+  </agm-map>
+</div>
+

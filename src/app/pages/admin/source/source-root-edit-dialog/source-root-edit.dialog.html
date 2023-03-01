@@ -1,0 +1,79 @@
+<div class="overlay">
+    <ng-container *ngIf="loading$ | async">
+		<div class="overlay-layer bg-transparent" style="z-index: 1;">
+		  <div class="spinner spinner-center spinner-primary"></div>
+		</div>
+    </ng-container>
+    <div class="modal-body">
+        <div>
+          <div class="form-group row">
+            <div class="col-lg-6">
+              <label>Description</label>
+              <div class="input-group">
+                <textarea class="form-control form-control-solid" rows="9" [(ngModel)]="source.description"></textarea>
+              </div>
+            </div>
+            <div class="col-lg-6">
+              <label>Note</label>
+              <div style="display: flex;" class="overlay">
+                <editor
+                  style="flex: 1;"
+                  [(ngModel)]="source.note"
+                  #textEditor
+                  plugins="print lists"
+                  [init]="{
+                    branding: false,
+                    menubar: false,
+                    height: 190
+                    }"
+                  toolbar="undo redo | formatselect | fontsizeselect |' +
+                  ' bold italic underline forecolor backcolor | alignleft aligncenter ' +
+                  ' alignright alignjustify | bullist numlist outdent indent |' +
+                  ' removeformat"
+                  apiKey="vjnhpihfm7y5gjs7b4fsyv9e6jb6a0gttrmdpw7bl6jacczj"
+                ></editor>
+              </div>
+            </div>
+          </div>
+          <div class="form-group row">
+            <div class="col-lg-6 d-flex flex-column">
+              <label class="me-2">Logo</label>
+              <div>
+                <div class="symbol h-100px w-100 border">
+                  <div class="symbol-label h-100 w-100 bg-transparent" style="background-size: contain" [ngStyle]="{ 'background-image': 'url(' + source.logo + ')'}"></div>
+                  <label
+                    class="d-flex justify-content-center align-items-center position-absolute translate-middle top-0 start-100 rounded-circle h-25px w-25px bg-white bg-hover-secondary">
+                    <i class="fa fa-pen"></i>
+                    <input class="d-none" type="file" onclick="this.value = null" accept=".png, .jpg, .jpeg" (change)="logoInputChanged($event)">
+                  </label>
+                </div>
+              </div>
+            </div>
+            <div class="col-lg-6 d-flex flex-column">
+              <label class="me-2">Background</label>
+              <div>
+                <div class="symbol h-200px w-100 border">
+                  <div class="symbol-label h-100 w-100 bg-transparent" style="background-size: contain"  [ngStyle]="{ 'background-image': 'url(' + source.background + ')'}"></div>
+                  <label
+                    class="d-flex justify-content-center align-items-center position-absolute translate-middle top-0 start-100 rounded-circle h-25px w-25px bg-white bg-hover-secondary">
+                    <i class="fa fa-pen"></i>
+                    <input class="d-none" type="file" onclick="this.value = null" accept=".png, .jpg, .jpeg" (change)="backgroundInputChanged($event)">
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <div>
+          <button type="button" class="btn btn-light btn-elevate me-1" (click)="modal.dismiss()">
+          {{ 'GENERAL.CANCEL' | translate}}
+          </button>&nbsp;
+          <button type="button" class="btn btn-primary btn-elevate" (click)="onYesClick()"
+          [disabled]="(loading$ | async)">
+          {{ 'GENERAL.SAVE' | translate}}
+          </button>
+        </div>
+    </div>
+</div>

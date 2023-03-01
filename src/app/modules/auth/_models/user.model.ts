@@ -1,0 +1,41 @@
+import { AuthModel } from './auth.model';
+export class UserModel extends AuthModel {
+  _id: number;
+  id: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  pic: string;
+  roles: any[];
+  permissions: any[];
+  notification: any;
+  notificationApp: any;
+  hasRole: boolean;
+  isAdmin: boolean;
+  isGuest: boolean;
+  password: string;
+  emailConfirmed: boolean;
+  followedCampaignsCount: number;
+  followedCategoriesCount: number;
+  connectedCount: number;
+  countries: string[];
+  platform: string;
+  newsletter: boolean;
+  linkedin: boolean;
+  linkedInProfileUrl: string;
+  jobTitle: string;
+  city: string;
+  actualCompany: string;
+  country: string;
+  setUser(user: any) {
+    this.id = user.id;
+    this.firstName = user.firstName || '';
+    this.lastName = user.lastName || '';
+    this.email = user.email || '';
+    this.pic = user.pic || './assets/media/users/default.jpg';
+    this.roles = user.roles || [];
+    this.password = user.password;
+    this.newsletter = user.newsletter || false;
+    this.country = user.country || 'italy';
+  };
+}

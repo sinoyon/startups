@@ -1,0 +1,142 @@
+<div id="crowdfunding_list" class="position-relative" #wrapper><!-- [perfectScrollbar]="{wheelPropagation: true}" -->
+	<div class="h-50px d-flex z-index-1 mb-4" id="list_header" style="min-width: 100%;">
+		<ng-container *ngFor="let field of fields[typology]">
+			<ng-container *ngIf="field!=='action'">
+				<div
+				style="background: #B8D9FF"
+				class="text-dark fw-bold fs-6 d-flex align-items-center p-4"
+				[ngStyle]="{'min-width': columns[field].width + 'px', width: columns[field].width + 'px'}"
+				>
+				{{ columns[field].label | translate }}
+				</div>
+			</ng-container>
+			<ng-container *ngIf="field==='action'">
+				<div
+				style="background: #B8D9FF"
+				class="flex-root"
+				>
+				</div>
+				<div
+				style="background: #B8D9FF"
+				class="text-dark fw-bold fs-6 d-flex align-items-center p-4"
+				[ngStyle]="{'min-width': columns[field].width + 'px', width: columns[field].width + 'px'}"
+				>
+				</div>
+			</ng-container>
+		</ng-container>
+
+	</div>
+	<div class="d-flex position-relative bg-white mb-4 cursor-pointer" *ngFor="let campaign of campaigns"
+  [ngClass]="{'cursor-pointer': campaign.link}"
+  (click)="onClick($event, campaign, '.action, .read-more')"
+  (contextmenu)="onDblClick($event, campaign, '.action, .read-more')">
+		<ng-container *ngFor="let field of fields[typology]">
+			<ng-container *ngIf="field !== 'action'">
+				<div class="text-dark fs-6 d-flex align-items-start p-4"
+				[ngStyle]="{'min-width': columns[field].width + 'px', width: columns[field].width + 'px', 'background': advIds.includes(campaign._id) ? '#FCF0C0': '#FFF'}">
+					<ng-container>
+						<ng-container [ngSwitch]="field">
+							<ng-container *ngSwitchCase="'name'">
+								<div class="symbol symbol-25px symbol-light me-2 cursor-pointer">
+									<div class="symbol-label rounded-pill"[ngStyle]="{ 'background-image': 'url(' + (campaign.logoSM || campaign.logo) + ')'}"></div>
+								</div>
+								<span class="cursor-pointer">{{ campaign[field]}}</span>
+							</ng-container>
+							<ng-container *ngSwitchCase="'description'">
+								<div class="d-flex overflow-hidden" *ngIf="campaign[field]" #descriptionWrapper
+								[ngStyle]="{'max-height': campaign.isFullDisplay? 'inherit': '60px'}">
+									<ng-container>
+										<span #descriptionContentWrapper style="height: fit-content;">{{ campaign.description }}</span>
+										<span (click)="campaign.isFullDisplay = !campaign.isFullDisplay" *ngIf="campaign.isFullDisplay || descriptionContentWrapper.offsetHeight > descriptionWrapper.offsetHeight"
+											class=" cursor-pointer w-20px h-20px d-flex justify-content-center align-items-center read-more">
+											<i class="fa fs-3" [ngClass]="{'fa-angle-down': !campaign.isFullDisplay, 'fa-angle-up': campaign.isFullDisplay}"></i>
+										</span>
+									</ng-container>
+								</div>
+							</ng-container>
+							<ng-container *ngSwitchCase="'duration'">
+								<div class="d-flex flex-column align-items-center">
+									<span class="d-block">{{ campaign.startDate_ || 'N/D'}}</span>
+									<span>-</span>
+									<span class="d-block">{{ campaign.endDate_ || 'N/D'}}</span>
+								</div>
+							</ng-container>
+							<ng-container *ngSwitchCase="'goal'" >
+								<div class="d-flex flex-column align-items-center">
+									<span class="d-block">{{ campaign.minimumGoal ? '€' + campaign.minimumGoal: 'N/D'}}</span>
+									<span>-</span>
+									<span class="d-block">{{ campaign.maximumGoal ? '€' + campaign.maximumGoal: 'N/D' }}</span>
+								</div>
+							</ng-container>
+							<ng-container *ngSwitchCase="'source'">
+								<span class="text-capitalize">{{ campaign.source?.name}}</span>
+							</ng-container>
+							<ng-container *ngSwitchCase="'categories'">
+								<div class="d-flex overflow-hidden" #categoryWrapper
+								[ngStyle]="{'max-height': campaign.isFullDisplay? 'inherit': '60px'}">
+									<ng-container>
+										<div class="d-flex flex-column align-items-start" #categoryContentWrapper style="height: fit-content;">
+											<div class="badge badge-warning me-1 mb-1 text-white text-wrap" *ngFor="let tag of campaign.categories">{{tag}}</div>
+										</div>
+										<div (click)="campaign.isFullDisplay = !campaign.isFullDisplay" *ngIf="campaign.isFullDisplay || categoryContentWrapper.offsetHeight > categoryWrapper.offsetHeight"
+											class=" cursor-pointer w-20px h-20px d-flex justify-content-center align-items-center read-more">
+											<i class="fa fs-3" [ngClass]="{'fa-angle-down': !campaign.isFullDisplay, 'fa-angle-up': campaign.isFullDisplay}"></i>
+										</div>
+									</ng-container>
+								</div>
+							</ng-container>
+							<ng-container *ngSwitchCase="'status'">
+								<div class="h-20px text-uppercase px-3 py-0" [ngStyle]="{'background' : campaign?.statusBgColor}">
+									<span [ngStyle]="{'color' : campaign?.statusFontColor}" class="fs-7 fw-bolder text-nowrap">{{campaign?.statusHTML | translate}}</span>
+								</div>
+							</ng-container>
+							<ng-container *ngSwitchDefault>
+								<ng-container *ngIf="campaign[field]">
+									<span>{{ columns[field].preUnit }}</span>
+									<span>{{ campaign[field]}}</span>
+									<span>{{ columns[field].unit }}</span>
+								</ng-container>
+								<ng-container *ngIf="!campaign[field]">N/D</ng-container>
+							</ng-container>
+						</ng-container>
+					</ng-container>
+				</div>
+			</ng-container>
+			<ng-container *ngIf="field === 'action'" >
+				<div class="flex-root"
+					[ngStyle]="{'background': advIds.includes(campaign._id) ? '#FCF0C0': '#FFF'}">
+				</div>
+				<div
+					class="text-dark fs-6 h-100 d-flex align-items-start p-4 border-start position-absolute action"
+					[ngStyle]="{'min-width': columns[field].width + 'px', width: columns[field].width + 'px',
+					'background': advIds.includes(campaign._id) ? '#FCF0C0': '#FFF',
+					'left': (wrapper.offsetWidth + scrollLeft > row[typology].width && scrollLeft > 0 ?
+					row[typology].width - columns.action.width : wrapper.offsetWidth + scrollLeft - columns.action.width) + 'px' }">
+					<div *ngIf="walletable"
+						class="p-0 me-2 btn btn-transparent" (click)="walletClickEvent.emit(campaign)"
+						[ngbTooltip]="isMobile ? '' : (campaign.wallet ? 'OTHERS.REMOVE_WALLET' : 'OTHERS.ADD_PORTFOLIO') | translate">
+						<span class="custom_svg_icon" [inlineSVG]="campaign.wallet? './assets/media/svg/wallet1.svg': './assets/media/svg/wallet.svg'"
+						></span>
+					</div>
+					<div *ngIf="followable"
+						class="btn p-0 btn-transparent" (click)="followClickEvent.emit(campaign)"
+						[ngbTooltip]="isMobile ? '' : (campaign.followed ? 'GENERAL.FOLLOWING' : 'GENERAL.FOLLOW') | translate">
+						<span class="custom_svg_icon_follow" [inlineSVG]="campaign.followed? './assets/media/svg/follow1.svg': './assets/media/svg/follow.svg'"
+						></span>
+					</div>
+					<div *ngIf="editable"
+						class="p-0 me-2 btn btn-transparent" (click)="editClickEvent.emit(campaign)"
+						>
+						<span><i class="la la-pen fs-1" style="font-size: 24px !important;"></i></span>
+					</div>
+					<div *ngIf="deletable"
+						class="btn p-0 btn-transparent" (click)="deleteClickEvent.emit(campaign)"
+						>
+						<span><i class="la la-trash fs-1" style="font-size: 24px !important;"></i></span>
+					</div>
+				</div>
+			</ng-container>
+		</ng-container>
+	</div>
+</div>
+

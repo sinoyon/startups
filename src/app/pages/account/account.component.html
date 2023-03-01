@@ -1,0 +1,52 @@
+<div class="d-flex flex-row mx-lg-n9 mx-n4" style="min-height: calc(100%);">
+  <div class="flex-row-auto d-md-block d-none w-250">
+    <div class="h-100 bg-white" *ngIf="user$ | async as user">
+      <div class="h-100 d-flex flex-column">
+        <div class="d-flex align-items-center p-7">
+          <div class="symbol symbol-40px symbol-fixed position-relative me-5">
+            <div class="symbol-label bg-transparent rounded-pill" [style.backgroundImage]="'url('+ (user.pic || './assets/media/users/default.jpg') +')'"></div>
+            <label
+              class="d-flex justify-content-center align-items-center position-absolute translate-middle top-0 start-100 rounded-circle h-25px w-25px bg-white bg-hover-secondary">
+              <i class="fa fa-pen"></i>
+              <input class="d-none" type="file" onclick="this.value = null" accept=".png, .jpg, .jpeg" (change)="picInputChanged($event)">
+            </label>
+          </div>
+          <div>
+            <a class="fw-bolder fs-4 text-dark text-hover-primary cursor-pointer">
+              {{user.firstName}} {{user.lastName}}
+            </a>
+            <div class="text-muted">
+              {{'USER.PROFILE.PERSONAL.member_of' | translate}} {{date2string(user.createdAt)}}
+            </div>
+          </div>
+        </div>
+        <div class="px-7 pb-7">
+          <a class="d-flex align-items-center text-gray-400 text-hover-primary cursor-pointer">
+            <span class="svg-icon svg-icon-4 me-1" [inlineSVG]="'./assets/media/svg/email.svg'"></span>
+            {{user.email}}
+          </a>
+        </div>
+        <ul class="nav d-flex flex-root flex-column">
+          <li class="nav-item" *ngFor="let item of menuList">
+            <a class="nav-link p-6" [routerLink]="item.path" routerLinkActive="active"  [ngbTooltip]="item.tooltip">
+              <span class="nav-icon me-2 primary-svg" [inlineSVG]="item.svg" [setSVGAttributes]="{width: 20, height: 20}">
+              </span>
+              <span class="nav-text fs-6 fw-bold">
+                {{ item.label | translate}}
+              </span>
+            </a>
+          </li>
+          <div class="flex-root"></div>
+          <div class="p-6">
+            <span class="cursor-pointer fs-6 fw-bolder" (click)="logout()">
+              {{ 'GENERAL.LOGOUT' | translate}}
+            </span>
+          </div>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="flex-row-fluid">
+    <router-outlet></router-outlet>
+  </div>
+</div>

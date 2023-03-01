@@ -1,0 +1,361 @@
+/* You can add global styles to this file, and also import other style files */
+@import url("https://fonts.googleapis.com/css?family=Raleway:300,400,500,600,700|Roboto:300,400,500,600,700");
+@import "./assets/sass/style";
+
+// Replace above style with this SCSS file to enable dark mode styles
+//@import "./assets/sass/style.dark";
+
+@import "~ag-grid-community/dist/styles/ag-grid.css";
+@import "~ag-grid-community/dist/styles/ag-theme-material.css";
+
+@import '~perfect-scrollbar/css/perfect-scrollbar.css';
+@import "~ngx-bootstrap/datepicker/bs-datepicker.css";
+
+@import '~ngx-owl-carousel-o/lib/styles/scss/owl.carousel';
+@import '~ngx-owl-carousel-o/lib/styles/scss/owl.theme.default';
+
+@import "~@ng-select/ng-select/themes/default.theme.css";
+// ... or 
+// @import "~@ng-select/ng-select/themes/material.theme.css";
+
+.word-break-all {
+    word-break: break-all !important;
+}
+.word-break-word {
+    word-break: break-word !important;
+}
+.word-keep-all {
+    word-break: keep-all !important;
+}
+.text-overflow-ellipsis {
+    text-overflow: ellipsis;
+}
+
+* {
+  outline: none !important;
+}
+
+.hvr-grow-shadow {
+    display: inline-block;
+    vertical-align: middle;
+    -webkit-transform: perspective(1px) translateZ(0);
+    transform: perspective(1px) translateZ(0);
+    box-shadow: 0 0 1px rgba(0, 0, 0, 0);
+    -webkit-transition-duration: 0.3s;
+    transition-duration: 0.3s;
+    -webkit-transition-property: box-shadow, transform;
+    transition-property: box-shadow, transform;
+  }
+  .hvr-grow-shadow:hover,
+  .hvr-grow-shadow:focus,
+  .hvr-grow-shadow:active {
+    box-shadow: 0 10px 10px -10px rgba(0, 0, 0, 0.5);
+    -webkit-transform: scale(1.1);
+    transform: scale(1.1);
+  }
+  .hvr-grow {
+    display: inline-block;
+    vertical-align: middle;
+    -webkit-transform: perspective(1px) translateZ(0);
+    transform: perspective(1px) translateZ(0);
+    box-shadow: 0 0 1px rgba(0, 0, 0, 0);
+    -webkit-transition-duration: 0.3s;
+    transition-duration: 0.3s;
+    -webkit-transition-property: box-shadow, transform;
+    transition-property: box-shadow, transform;
+  }
+  .hvr-grow:hover,
+  .hvr-grow:focus,
+  .hvr-grow:active {
+    -webkit-transform: scale(1.1);
+    transform: scale(1.1);
+  }
+  .hvr-shadow {
+    display: inline-block;
+    vertical-align: middle;
+    -webkit-transform: perspective(1px) translateZ(0);
+    transform: perspective(1px) translateZ(0);
+    box-shadow: 0 0 1px rgba(0, 0, 0, 0);
+    -webkit-transition-duration: 0.3s;
+    transition-duration: 0.3s;
+    -webkit-transition-property: box-shadow;
+    transition-property: box-shadow;
+  }
+  .hvr-shadow:hover,
+  .hvr-shadow:focus,
+  .hvr-shadow:active {
+    box-shadow: 0 10px 10px -10px rgba(0, 0, 0, 0.5);
+  }
+
+  .ngb-toasts{
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    margin: 0.5em;
+    z-index: 1200;
+    .toast{
+      max-width: 350px;
+      width: inherit;
+    }
+  }
+
+  .tooltip{
+    z-index: 900;
+  }
+
+  button.calendar, button.calendar:active {
+    width: 2.75rem;
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACIAAAAcCAYAAAAEN20fAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAOxAAADsQBlSsOGwAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAEUSURBVEiJ7ZQxToVAEIY/YCHGxN6XGOIpnpaEsBSeQC9ArZbm9TZ6ADyBNzAhQGGl8Riv4BLAWAgmkpBYkH1b8FWT2WK/zJ8ZJ4qiI6XUI3ANnGKWBnht2/ZBDRK3hgVGNsCd7/ui+JkEIrKtqurLpEWaphd933+IyI3LEIdpCYCiKD6HcuOa/nwOa0ScJEnk0BJg0UTUWJRl6RxCYEzEmomsIlPU3IPW+grIAbquy+q6fluy/28RIBeRMwDXdXMgXLj/B2uimRXpui4D9sBeRLKl+1N+L+t6RwbWrZliTTTr1oxYtzVWiTQAcRxvTX+eJMnlUDaO1vpZRO5NS0x48sIwfPc87xg4B04MCzQi8hIEwe4bl1DnFMCN2zsAAAAASUVORK5CYII=') !important;
+    background-repeat: no-repeat;
+    background-size: 23px;
+    background-position: center;
+  }
+
+  .example .example-code {
+    padding: 0;
+    position: relative;
+    background: #1e1e3f;
+  }
+  .example .example-code .example-copy {
+    position: absolute;
+    top: 0.25rem;
+    right: 0.75rem;
+  }
+  .example .example-copy {
+    height: 34px;
+    width: 34px;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    margin-left: 0.25rem;
+    -webkit-transition: all 0.15s ease;
+    transition: all 0.15s ease;
+    cursor: pointer;
+    font-size: 1.15rem;
+  }
+  .example .example-code .example-highlight {
+    padding: 1.75rem 1.5rem;
+  }
+  .example .example-code pre[class*=language-] {
+    margin: 0;
+    overflow: auto;
+    padding: 0;
+    border-radius: 0.42rem;
+    font-size: 1rem;
+    font-family: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  }
+  .example .example-copy:after {
+    font-family: 'Line Awesome Free';
+    font-weight: 400;
+    font-style: normal;
+    font-weight: normal;
+    font-variant: normal;
+    line-height: 1;
+    text-decoration: inherit;
+    text-rendering: optimizeLegibility;
+    text-transform: none;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+    font-smoothing: antialiased;
+    content: "\f06e";
+  }
+  .white-svg {
+    svg path {
+      fill: #FFF !important;
+    }
+  }
+  .primary-svg {
+    svg path {
+      fill: #003F87 !important;
+    }
+  }
+
+  .multiselect-dropdown{
+    min-width: 200px;
+    outline: none !important;
+  .dropdown-btn{
+    outline: none;
+    border: none !important;
+    border-radius: 2px !important;
+    .selected-item{
+      border-color: #f9f9fc  !important;
+      color: black !important;
+      background: #f9f9fc  !important;
+      border-radius: 0 !important;
+      &:hover{
+      box-shadow: none !important;
+      }
+    }
+    >span:last-child {
+      span:first-child{
+        padding-right: 20px !important;
+      }
+      .dropdown-multiselect__caret:before {
+        border-top: 6px solid #adadad !important;
+        border-left: 6px solid transparent !important;
+        border-right: 6px solid transparent !important;
+      }
+    }
+  }
+  .dropdown-list{
+    border: 1px solid #ebedf2 !important;
+    box-shadow: none !important;
+    border-radius: 3px !important;
+    z-index: 200 !important;
+
+    .item1{
+      li:first-of-type{
+      border-bottom: 1px solid #ebedf2 !important;
+      }
+      .filter-textbox{
+      border-bottom: 1px solid #ebedf2 !important;
+      }
+    }
+
+    .multiselect-item-checkbox > input:checked + div:before {
+      -webkit-animation: .2s ease-in borderscale;
+      animation: .2s ease-in borderscale;
+      background: #003F87  !important;
+    }
+    .multiselect-item-checkbox > div:before {
+      box-sizing: content-box;
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 0;
+      width: 18px !important;
+      height: 18px !important;
+      margin-top: -9px;
+      border: none !important;
+      text-align: center;
+      transition: .4s;
+      border-radius: 2px !important;
+      background: #f1f4fe;
+    }
+  }
+}
+#kt_wrapper{
+  transition: none !important;
+}
+.drawer {
+  z-index: 1200;
+}
+
+
+//// 
+
+::-ms-reveal, ::-ms-clear {
+	display: none;
+}
+
+input[type=password]::-webkit-contacts-auto-fill-button,
+input[type=password]::-webkit-credentials-auto-fill-button {
+	visibility: hidden;
+	display: none !important;
+	pointer-events: none;
+	height: 0;
+	width: 0;
+	margin: 0;
+}
+
+
+@mixin svg-icon-size-follow($size, $important: false) {
+  svg {
+      height: $size * 1.48 valueif($important, !important, null);
+      width: $size * 1.48 valueif($important, !important, null);
+  }
+}
+
+
+.custom_svg_icon {
+  line-height: 1;
+  
+  @include svg-icon-size(get($font-sizes, 5));
+
+  // Theme colors
+  @each $name, $color in $theme-text-colors {
+      &.svg-icon-#{$name} {
+          @include svg-icon-color($color);
+      }
+  }
+
+  // Responsive icon sizes
+  @each $breakpoint in map-keys($grid-breakpoints) {
+      @include media-breakpoint-up($breakpoint) {
+          $infix: breakpoint-infix($breakpoint, $grid-breakpoints);
+
+          // Sizes
+          @each $name, $value in $font-sizes {
+              &.svg-icon#{$infix}-#{$name} {
+                  @include svg-icon-size($value, true);
+              }
+          }
+      }
+  }
+}
+
+.custom_svg_icon_follow {
+  line-height: 1;
+  position: relative;
+  top: 0px;
+  
+  @include svg-icon-size-follow(get($font-sizes, 5));
+
+  // Theme colors
+  @each $name, $color in $theme-text-colors {
+      &.svg-icon-#{$name} {
+          @include svg-icon-color($color);
+      }
+  }
+
+  // Responsive icon sizes
+  @each $breakpoint in map-keys($grid-breakpoints) {
+      @include media-breakpoint-up($breakpoint) {
+          $infix: breakpoint-infix($breakpoint, $grid-breakpoints);
+
+          // Sizes
+          @each $name, $value in $font-sizes {
+              &.svg-icon#{$infix}-#{$name} {
+                  @include svg-icon-size-follow($value, true);
+              }
+          }
+      }
+  }
+}
+
+@media (max-width: 400.98px) {
+  .modal-dialog {
+    // width: 92%;
+  }
+}
+
+body {
+  width: 100%;
+  overflow-x: hidden;
+}
+
+.svg-icon-1 {
+  width: 20px;
+  height: 20px;
+
+  svg {
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.space_between {
+  justify-content: space-between;
+}
+.align_center {
+  align-items: center;
+}
+.card {
+  box-shadow: 0 0 16px 0 rgb(33 33 33 / 7%);
+}

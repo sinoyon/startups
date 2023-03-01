@@ -1,0 +1,13 @@
+@import "../../../../assets/sass/init";
+:host {
+  ::ng-deep .tooltip-inner{
+    max-width: 280px !important;
+  }
+  .symbol {
+    z-index: 0;
+  }
+
+  #crowdfunding_list {
+    overflow: scroll;
+  }
+}

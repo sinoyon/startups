@@ -1,0 +1,76 @@
+<div class="p-6 bg-white overflow-hidden d-flex flex-column" id="crowdfunding_filter">
+	<div class="fs-3 text-primary fw-bolder">{{'OTHERS.ADD_FILTER' | translate}}</div>
+	<div class="d-flex justify-content-end py-2">
+		<span class="cursor-pointer" (click)="clear()">{{'OTHERS.UNCHECK_ALL' | translate}}</span>
+	</div>
+	<div class="d-flex flex-wrap justify-content-between">
+		<ng-container *ngFor="let scope of scopes">
+			<ng-container *ngIf="scope.typology == typology">
+				<ng-container *ngFor="let item of scope.items">
+          <div class="py-2 w-100" *ngIf="item.scopeType === 'checkbox'">
+						<ng-container [ngTemplateOutlet]="scopeTemplate" [ngTemplateOutletContext]="{scopeType: item.scopeType, opened: openedScope == item.type, type: item.type, label: item.label}"></ng-container>
+					</div>
+          <div class="py-2 w-100 w-sm-225px" *ngIf="item.scopeType !== 'checkbox'">
+						<ng-container [ngTemplateOutlet]="scopeTemplate" [ngTemplateOutletContext]="{scopeType: item.scopeType, opened: openedScope == item.type, type: item.type, label: item.label}"></ng-container>
+					</div>
+				</ng-container>
+			</ng-container>
+		</ng-container>
+	</div>
+	<div class="flex-root"></div>
+	<div class="d-flex justify-content-end align-items-center">
+		<div class="text-warning fw-bold"></div>
+		<div class="btn btn-secondary text-uppercase btn-sm me-3" (click)="modal.dismiss()">{{'GENERAL.CANCEL' | translate}}</div>
+		<div class="btn btn-warning text-uppercase btn-sm" (click)="modal.close(options)">{{'OTHERS.UPDATE' | translate}}</div>
+	</div>
+</div>
+<ng-template #scopeTemplate let-type="type" let-opened="opened" let-label="label" let-scopeType="scopeType">
+	<div class="d-flex flex-wrap text-primary" *ngIf="scopeType==='checkbox'">
+		<ng-container *ngFor="let option of options; index as i">
+			<ng-container *ngIf="option.type == type">
+				<div class="form-check form-check-sm form-check-custom me-2 mb-1">
+					<input class="form-check-input" type="checkbox" [(ngModel)]="option.selected" (change)="optionSelect(option, $event)" id="check_option_{{type}}_{{i}}">
+					<label class="form-check-label" for="check_option_{{type}}_{{i}}">
+						{{option.label | translate}}
+					</label>
+				</div>
+			</ng-container>
+		</ng-container>
+	</div>
+	<div class="position-relative"   [attr.data-opended]="opened? true: false"  *ngIf="scopeType==='selectbox'">
+		<div class="text-dark cursor-pointer d-flex py-2 px-4 rounded-1 align-items-center justify-content-between border" (click)="toggleOpen(type)">
+			<div class="me-1 overflow-hidden text-nowrap scope-toggle text-truncate" [attr.data-text]="label | translate">
+				<ng-container *ngFor="let option of options">
+					<ng-container *ngIf="option.type == type && option.selected">{{option.label | translate}} </ng-container>
+				</ng-container>
+			</div>
+			<i class="fa fs-4 lh-0 text-dark" [ngClass]="{'fa-angle-down': !opened, 'fa-angle-up': opened}"></i>
+		</div>
+		<div class="position-absolute z-index-2 bg-white w-100 pb-2" [ngClass]="{'d-block': opened, 'd-none': !opened}" style="filter: drop-shadow(0px 4px 9px #D8D8D8);">
+			<div class="d-flex justify-content-end py-2 px-4 text-primary">
+				<span class="cursor-pointer" (click)="clear(type)">{{'OTHERS.DESELECT' | translate}}</span>
+			</div>
+			<div class="position-relative" [perfectScrollbar]="{wheelPropagation: false}" [ngStyle]="{'max-height': '200px'}">
+				<ng-container *ngFor="let option of options; index as i">
+					<ng-container *ngIf="option.type == type">
+						<div class="text-primary d-flex py-2 px-4 mt-2 mx-2 rounded-1 align-items-center justify-content-between"
+						style="background: #F9FBFD">
+							<div class="form-check form-check-sm form-check-custom">
+								<input class="form-check-input" type="checkbox" [(ngModel)]="option.selected" (change)="optionSelect(option, $event)" id="check_option_{{type}}_{{i}}">
+								<label class="form-check-label" for="check_option_{{type}}_{{i}}">
+									{{option.label | translate}}
+								</label>
+							</div>
+							<div class="cursor-pointer" *ngIf="option.favorite">
+								<span [inlineSVG]="'./assets/media/svg/star.svg'"></span>
+							</div>
+						</div>
+					</ng-container>
+				</ng-container>
+			</div>
+			<div class="d-flex justify-content-end py-2 px-4  text-primary">
+				<span class="cursor-pointer" (click)="select(type)">{{'OTHERS.SELECT_ALL' | translate}}</span>
+			</div>
+		</div>
+	</div>
+</ng-template>

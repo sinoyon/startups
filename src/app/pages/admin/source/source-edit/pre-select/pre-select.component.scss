@@ -1,0 +1,25 @@
+:host{
+    .pre-select-component{
+        &.border{
+            padding: 1.4em;
+            border-top-color: transparent !important;
+        }
+        position: relative;
+        
+        .form-group{
+            margin-bottom: 1rem;
+        }
+        .title {
+            position: absolute;
+            top: -0.8rem;
+            left: 0.8rem;
+            background: white;
+            padding: 0 3px;
+            font-size: 1rem;
+            font-weight: 400;
+        }
+        .kt-section{
+            margin-bottom: 0;
+        }
+    }
+}

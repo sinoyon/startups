@@ -1,0 +1,31 @@
+<span class="ae-font ae-picker" [ngClass]="{'ae-expanded':isOpen}">
+  <button [tabIndex]="-1" #labelButton tabindex="0" type="button" role="button" class="ae-picker-label" (click)="toggleOpen($event);"
+  [ngClass]="{'default': defaultUI, 'form-control form-control-lg form-control-solid': !defaultUI}">{{label | translate}}
+    <svg viewBox="0 0 18 18">
+     <!-- <use x="0" y="0" xlink:href="../assets/icons.svg#hom"></use>-->
+      <polygon class="ae-stroke" points="7 11 9 13 11 11 7 11"></polygon>
+      <polygon class="ae-stroke" points="7 7 9 5 11 7 7 7"></polygon>
+    </svg>
+  </button>
+  <span class="ae-picker-options" >
+    <div class="input-group search-input"
+      *ngIf="showSearch"
+       [ngClass]="{'spinner spinner-sm spinner-primary spinner-right': loading$ | async}">
+      <div class="input-group-prepend">
+        <span class="input-group-text">
+          <i class="la la-search"></i>
+        </span>
+      </div>
+      <input #searchInput (keyup)="onSearch($event)" type="text" class="form-control" placeholder="{{'GENERAL.SEARCH' | translate}}..." />
+    </div>
+    <div [perfectScrollbar]="{wheelPropagation: false}" [ngStyle]="{'max-height': maxHeight, 'position': 'relative'}">
+      <button tabindex="-1" type="button" role="button" class="ae-picker-item"
+      *ngFor="let item of options; let i = index"
+      [ngClass]="{'selected': item.value === value, 'focused': i === optionId}"
+      (click)="optionSelect(item, $event)">
+      {{item.label | translate}}
+      </button>
+      <span class="dropdown-item" *ngIf="!options.length">{{'GENERAL.NO_ITEM_SELECT' | translate}}</span>
+    </div>
+  </span>
+</span>

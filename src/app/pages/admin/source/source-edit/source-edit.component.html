@@ -1,0 +1,207 @@
+<div class="card card-custom gutter-b overlay" [ngClass]="{'overlay-block': loading$ | async}">
+	<ng-container *ngIf="loading$ | async">
+		<div class="overlay-layer bg-transparent" style="z-index: 1;">
+		  <div class="spinner spinner-center spinner-primary spinner-lg"></div>
+		</div>
+	</ng-container>
+
+	<div class="mt-5 mb-1 ms-5" *ngIf="source">
+		<a target="_blank" [href]="'/crowdfunding/source/' + source.name" class="hvr-grow-shadow btn btn-primary rounded-pill btn-icon w-44px h-44px mx-2 cursor-pointer">
+			<i class="fa fa-link f-16px"></i>
+		</a>
+	</div>
+	
+	<div class="card-header align-items-end">
+		<ul class="nav nav-dark nav-bold nav-tabs nav-tabs-line" style="margin-bottom: -1px" role="tablist">
+			<li class="nav-item" *ngFor="let tab of tabs">
+				<a *ngIf="tab.key === 'main'"
+				  (click)="onClickTab(tab)"
+				  class="nav-link cursor-pointer"
+				  [ngClass]="{'active': tab==activeTab }"
+				  role="tab"
+				>
+				{{tab.title}}
+				</a>
+				<a *ngIf="tab.key !== 'main'"
+				  class="nav-link cursor-pointer d-flex align-items-center"
+				  [ngClass]="{'active': tab==activeTab }"
+				  role="tab"
+				>
+					<span class="cursor-pointer me-2" (click)="onClickTab(tab)">{{tab.title}}</span>
+				 	<div (click)="onClickRemove(tab)" class="cursor-pointer bg-hover-light-primary w-20px h-20px d-flex align-items-center justify-content-center me-2"><i class="la la-trash"></i></div>
+           <div (click)="onClickDuplicate(tab)" class="cursor-pointer bg-hover-light-primary w-20px h-20px d-flex align-items-center justify-content-center"><i class="la la-copy"></i></div>
+				</a>
+			</li>
+			<li class="nav-item">
+				<a
+				  (click)="onClickAdd()"
+				  class="nav-link cursor-pointer"
+				  role="tab"
+				>
+				<span class="" [inlineSVG]="'./assets/media/svg/plus.svg'"></span>
+				</a>
+			</li>
+		</ul>
+	</div>
+	<div class="card-body pt-2">
+		<div *ngIf="source">
+			<div class="row">
+				<div class="col-12">
+					<div class="row" *ngIf="activeTab?.key==='main'">
+						<div class="col-md-4">
+							<div class="mb-1">
+								<label>Name</label>
+								<div class="input-group">
+									<input type="text" class="form-control form-control-lg form-control-solid" [(ngModel)]="source.name" spellcheck="false">
+								</div>
+							</div>
+							<div class="mb-1">
+								<label>Link</label>
+								<div class="input-group v-middle">
+									<input type="text" class="form-control form-control-lg form-control-solid" [(ngModel)]="source.link" spellcheck="false">
+								</div>
+							</div>
+							<div class="mb-1">
+								<label>Dx days</label>
+								<div class="input-group">
+									<input type="number" class="form-control form-control-lg form-control-solid" [(ngModel)]="source.dxDay" spellcheck="false">
+								</div>
+							</div>
+
+							<div class="mb-1">
+								<label>Fiscal Code</label>
+								<div class="input-group v-middle">
+									<input type="text" class="form-control form-control-lg form-control-solid" [(ngModel)]="source.fiscalCode" spellcheck="false">
+								</div>
+							</div>
+							<div class="mb-1">
+								<label>Address</label>
+								<div class="input-group v-middle">
+									<input type="text" class="form-control form-control-lg form-control-solid" [(ngModel)]="source.address" spellcheck="false" autocapitalize="words" >
+								</div>
+							</div>
+							<div class="mb-1">
+								<label>Country</label>
+								<div class="input-group v-middle">
+									<ae-select [options]="countries" style="flex: 1;" #countrySelector></ae-select>
+								</div>
+							</div>
+							<!-- <div class="mb-1">
+								<label>Web Page</label>
+								<div class="input-group v-middle">
+									<input type="text" class="form-control form-control-lg form-control-solid" [(ngModel)]="source.webpageUrl" spellcheck="false">
+								</div>
+							</div> -->
+							<div class="mb-1">
+								<label>Email</label>
+								<div class="input-group v-middle">
+									<input type="email" class="form-control form-control-lg form-control-solid" [(ngModel)]="source.email" spellcheck="false">
+								</div>
+							</div>
+							<div class="mb-1">
+								<label>Blog Section</label>
+								<div class="input-group v-middle">
+									<input type="text" class="form-control form-control-lg form-control-solid" [(ngModel)]="source.blogSection" spellcheck="false">
+								</div>
+							</div>
+						</div>
+
+						<div class="col-md-4">
+							<div class="mb-1">
+								<label>Description</label>
+								<div class="input-group">
+								  <textarea class="form-control form-control-solid" rows="9" [(ngModel)]="source.description"></textarea>
+								</div>
+							</div>
+							<br>
+							<div class="mb-1">
+								<div class="form-group">
+									<label>Socials</label>
+									<div class="input-group">
+										<input type="text" class="form-control form-control-lg form-control-solid" [(ngModel)]="currentSocial" spellcheck="false" [ngModelOptions]="{standalone: true}">
+										<div class="input-group-append">
+											<button class="btn btn-primary" *ngIf="currentSocialIndex==-1" type="button" (click)="onAddSocial()" [disabled]="!currentSocial || currentSocial.trim() === ''">
+												Add
+											</button>
+											<button class="btn btn-primary"  *ngIf="currentSocialIndex>=0" type="button" (click)="onUpdateSocial()" [disabled]="!currentSocial || currentSocial.trim() === ''">
+												Update
+											</button>
+											<button class="btn btn-secondary" *ngIf="currentSocialIndex>=0" type="button" (click)="onCancelSocial()" [disabled]="!currentSocial || currentSocial.trim() === ''">
+												Cancel
+											</button>
+										</div>
+									</div>
+								</div>
+
+								<div class="form-group">
+									<label>&nbsp;</label>
+									<div class="tags" [ngClass]="{'editing': currentSocialIndex>=0}">
+										<div class="tag badge badge-secondary label-lg me-2 pe-1 mb-2" *ngFor="let social of source.socials; index as i" [ngClass]="{'editing': i == currentSocialIndex}">
+											{{social}}&nbsp;
+											<span class="badge badge-secondary px-2 cursor-pointer bg-hover-white" (click)="onEditSocial(social, i)"><i class="la la-pen"></i></span>
+											<span class="badge badge-secondary px-2 cursor-pointer bg-hover-white" (click)="onDeleteSocial(social, i)"><i class="la la-trash"></i></span>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="col-md-4">
+							<div class="mb-1">
+							  <label class="me-2">Logo</label>
+							  <div>
+								<div class="symbol h-100px w-100 border">
+								  <div class="symbol-label h-100 w-100 bg-transparent" style="background-size: contain" [ngStyle]="{ 'background-image': 'url(' + source.logo + ')'}"></div>
+								  <label
+									class="d-flex justify-content-center align-items-center position-absolute translate-middle top-0 start-100 rounded-circle h-25px w-25px bg-white bg-hover-secondary">
+									<i class="fa fa-pen"></i>
+									<input class="d-none" type="file" onclick="this.value = null" accept=".png, .jpg, .jpeg, .webp" (change)="logoInputChanged($event)">
+								  </label>
+								</div>
+							  </div>
+							</div>
+
+							<div class="mb-1">
+							  <label class="me-2">Small Logo</label>
+							  <div>
+								<div class="symbol h-100px w-100 border">
+								  <div class="symbol-label h-100 w-100 bg-transparent" style="background-size: contain" [ngStyle]="{ 'background-image': 'url(' + source.smallLogo + ')'}"></div>
+								  <label
+									class="d-flex justify-content-center align-items-center position-absolute translate-middle top-0 start-100 rounded-circle h-25px w-25px bg-white bg-hover-secondary">
+									<i class="fa fa-pen"></i>
+									<input class="d-none" type="file" onclick="this.value = null" accept=".png, .jpg, .jpeg, .webp" (change)="smallLogoInputChanged($event)">
+								  </label>
+								</div>
+							  </div>
+							</div>
+
+							<div class="mb-1">
+							  <label class="me-2">Background</label>
+							  <div>
+								<div class="symbol h-200px w-100 border">
+								  <div class="symbol-label h-100 w-100 bg-transparent" style="background-size: contain"  [ngStyle]="{ 'background-image': 'url(' + source.background + ')'}"></div>
+								  <label
+									class="d-flex justify-content-center align-items-center position-absolute translate-middle top-0 start-100 rounded-circle h-25px w-25px bg-white bg-hover-secondary">
+									<i class="fa fa-pen"></i>
+									<input class="d-none" type="file" onclick="this.value = null" accept=".png, .jpg, .jpeg, .webp" (change)="backgroundInputChanged($event)">
+								  </label>
+								</div>
+							  </div>
+							</div>
+						</div>
+					</div>
+					<div class="" *ngIf="activeTab?.key!=='main' && activeConfig">
+						<app-config-component [config]="activeConfig" [loader]="loadingSubject" #configCtrl></app-config-component>
+					</div>
+				</div>
+			</div>
+			<div class="float-end mt-7">
+				<a class="btn btn-default fw-bold me-2" routerLink="/admin/sources">Close</a>
+				<button type="submit" class="btn btn-primary fw-bold me-2" (click)="save()"
+				>Save</button>
+			</div>
+		</div>
+	</div>
+
+	<br>
+	
+</div>

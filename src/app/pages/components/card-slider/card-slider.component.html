@@ -1,0 +1,34 @@
+<div class="slider-pointer" [hidden]="slideData.length==0">
+	<div class="pointer prev-pointer" *ngIf="prevSlides > 0">
+	</div>
+	<ng-container *ngFor="let i of [0,1,2]">
+		<div class="pointer" *ngIf="i < length && slideData[prevSlides  + i]">
+			{{ slideData[prevSlides  + i]?.index + 1}}
+		</div>
+	</ng-container>
+	<div class="pointer next-pointer" *ngIf="nextSlides > 0">
+	</div>
+</div>
+<div
+	#slider class="slider"
+	[ngClass]="{'spinner spinner-lg spinner-primary spinner-center': loading$| async}">
+	<div class="slider-wrapper" #wrapper>
+		<div class="items" #slideItems>
+			<ng-container *ngFor="let item of slideData; index as i">
+				<div class="slide" [ngStyle]="{ 'width': slideSize + 'px'}" [attr.indexofdata]="item._id">
+					<app-campaign-card [data]="item" [type]="type"
+					(videoClick)="videoClickEvent.emit($event)"
+					(followClick)="followClickEvent.emit($event)"
+					(walletClick)="walletClickEvent.emit($event)"
+					(detailClick)="detailClickEvent.emit($event)"
+					(externalClick)="externalClickEvent.emit($event)"
+          (expandClick)="onExpandCard($event)"
+          [expanded]="expanded"
+					></app-campaign-card>
+				</div>
+			</ng-container>
+		</div>
+	</div>
+	<a id="prev_slide" #prevBtn class="control prev hvr-grow-shadow" [hidden]="prevSlides == 0"><i class="fa fa-angle-left"></i></a>
+	<a id="next_slide" #nextBtn class="control next hvr-grow-shadow" [hidden]="nextSlides == 0"><i class="fa fa-angle-right"></i></a>
+</div>

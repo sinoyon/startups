@@ -1,0 +1,31 @@
+<div class="p-8" *ngIf="modalData as data">
+    <div class="position-relative"  [perfectScrollbar]="{wheelPropagation: true}" style="max-height: 80vh;">
+        <div class="text-primary pb-8" *ngIf="data.text">
+            <span><i class="fa fa-info-circle text-warning fs-2 me-2"></i></span>
+            <span class="fs-3 fw-bolder">{{data.text | translate}}</span>
+        </div>
+        <div class="text-primary pb-8" *ngIf="data.description">
+            <span class="fs-6">{{data.description | translate}}</span>
+        </div>
+        <ng-container *ngIf="data.key_values && data.key_values.length">
+            <p *ngFor="let item of data.key_values">
+              <span class="fw-boldest" *ngIf="item.key && item.key!== ''">{{ item.key }}: </span>
+              <span>{{ item.value }}</span>
+            </p>
+        </ng-container>
+    </div>
+    <div class="d-flex justify-content-end align-items-center">
+        <div class="flex-root" *ngIf="data.withNotify">
+            <div class="form-check form-check-sm form-check-custom">
+                <input type="checkbox" class="form-check-input" [(ngModel)]="data.notify" id="check_notify">
+                <label class="form-check-label" for="check_notify">{{modalData.notifyLabel || 'Notify'}}</label>
+            </div>
+        </div>
+        <div class="btn btn-transparent fs-5 me-2 text-uppercase" (click)="modal.close(false)">
+            {{ (modalData.cancel || 'Indietro') | translate}}
+        </div>
+        <div class="btn btn-warning fs-5 text-uppercase" (click)="modal.close(data)">
+            {{ (modalData.yes || 'Prosegui') | translate}}
+        </div>
+    </div>
+</div>

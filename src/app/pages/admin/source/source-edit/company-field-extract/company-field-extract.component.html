@@ -1,0 +1,234 @@
+<div class="row" *ngIf="config">
+    <div class="col-md-8">
+        <div class="company-field-extract-component border">
+            <label class="title" style="font-weight: 700;">Field extract</label>
+            <div class="row" style="flex-wrap: nowrap;">
+                <div class="col-md-6" style="max-width: 300px;">
+                    <ul class="nav pe-4 nav-pills flex-column flex-nowrap" role="tablist"
+                        [perfectScrollbar]="{wheelPropagation: false}" [ngStyle]="{ 'max-height': '500px', 'position': 'relative'}">
+                        <ng-container>
+                            <li *ngFor="let item of fields" class="nav-item">
+                                <a class="nav-link cursor-pointer d-flex"
+                                [ngClass]="{'active':activeField?.key==item.key, 'disabled': item.disabled}" data-toggle="tab" (click)="onClickField(item)" [hidden]="item.hidden">
+                                    <span class="nav-icon"><i class="fa fa-code"></i></span>
+                                    <span class="flex-root nav-text text-capitalize">{{item.title}}</span>
+                                    <span class="text-center w-20px h-20px bg-success rounded-pill" *ngIf="getFieldStatus(item)"><i class="text-white fa fa-check"></i></span>
+                                </a>
+                            </li>
+                        </ng-container>
+                    </ul>
+                </div>
+                <div class="col-md-6" style="max-width: calc(100% - 300px); flex: 1;"> 
+                    <ng-container *ngIf="getConfig() as activeFieldConfig">
+                        <div class="form-group">
+                            <label>Extract from</label>
+                            <div>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" class="form-check-input" name="company_field_extract_from" [value]="'main'" [(ngModel)]="activeFieldConfig.from">
+                                    <label class="form-check-label">main page</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" class="form-check-input" name="company_field_extract_from" [value]="'detail'" [(ngModel)]="activeFieldConfig.from">
+                                    <label class="form-check-label">detail page</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group" *ngIf="activeField.type==='number'">
+                            <label>Number decimal format</label>
+                            <div class="radio-inline">
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" class="form-check-input" name="company_field_extract_ndf" [value]="null" [(ngModel)]="activeFieldConfig.numberDecimalPoint">
+                                    <label class="form-check-label">none</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" class="form-check-input" name="company_field_extract_ndf" [value]="','" [(ngModel)]="activeFieldConfig.numberDecimalPoint">
+                                    <label class="form-check-label">comma</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" class="form-check-input" name="company_field_extract_ndf" [value]="'.'" [(ngModel)]="activeFieldConfig.numberDecimalPoint">
+                                    <label class="form-check-label">point</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Pattern type</label>
+                            <div class="radio-inline">
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" class="form-check-input" name="company_field_extract_ptype" [value]="'text'"  [(ngModel)]="activeFieldConfig.type">
+                                    <label class="form-check-label">text</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" class="form-check-input" name="company_field_extract_ptype" [value]="'textWithChildren'" [(ngModel)]="activeFieldConfig.type">
+                                    <label class="form-check-label">text with children</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" class="form-check-input" name="company_field_extract_ptype" [value]="'src'" [(ngModel)]="activeFieldConfig.type">
+                                    <label class="form-check-label">src</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" class="form-check-input" name="company_field_extract_ptype" [value]="'title'" [(ngModel)]="activeFieldConfig.type">
+                                    <label class="form-check-label">title</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" class="form-check-input" name="company_field_extract_ptype" [value]="'href'" [(ngModel)]="activeFieldConfig.type">
+                                    <label class="form-check-label">href</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" class="form-check-input" name="company_field_extract_ptype" [value]="'backgroundImage'" [(ngModel)]="activeFieldConfig.type">
+                                    <label class="form-check-label">background image</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" class="form-check-input" name="company_field_extract_ptype" [value]="'backgroundStyle'" [(ngModel)]="activeFieldConfig.type">
+                                    <label class="form-check-label">background style</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Pattern selector</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control form-control-lg form-control-solid" [(ngModel)]="activeFieldConfig.pattern"  spellcheck="false">
+                                <div class="input-group-append">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group" *ngIf="activeField.type==='url'">
+                            <label>Base URL</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" [(ngModel)]="activeFieldConfig.baseUrl"  spellcheck="false">
+                            </div>
+                        </div>
+                        <button class="btn btn-primary btn-sm mb-4" type="button" (click)="onExtract()" [disabled]="loading$ | async"
+                            >
+                            Extract
+                        </button>
+                        <div class="form-group">
+                            <div class="example">
+                                <div class="example-code">
+                                    <div class="example-highlight">
+                                        <pre class="language-html">
+                                            {{ activeFieldConfig.result || 'Not extracted'}}
+                                        </pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </ng-container>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="company-field-extract-component border" *ngIf="config.campaigns as campaignConfig">
+            <label class="title" style="font-weight: 700;">Campaigns extract</label>
+            <div class="form-group">
+                <label>Extract from</label>
+                <div class="radio-inline">
+                    <div class="form-check form-check-inline">
+                        <input type="radio" class="form-check-input" name="campaign_pattern_extract_from" [value]="'main'" [(ngModel)]="campaignConfig.from">
+                        <label class="form-check-label">main page</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input type="radio" class="form-check-input" name="campaign_pattern_extract_from" [value]="'detail'" [(ngModel)]="campaignConfig.from">
+                        <label class="form-check-label">detail page</label>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group" *ngIf="campaignConfig.type">
+                <label>Pattern type</label>
+                <div class="radio-inline">
+                    <div class="form-check form-check-inline">
+                        <input type="radio" class="form-check-input" name="campaign_pattern_extract_ptype" [value]="'text'" [(ngModel)]="campaignConfig.type">
+                        <label class="form-check-label">text</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input type="radio" class="form-check-input" name="campaign_pattern_extract_ptype" [value]="'textWithChildren'" [(ngModel)]="campaignConfig.type">
+                        <label class="form-check-label">text with children</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input type="radio" class="form-check-input" name="campaign_pattern_extract_ptype" [value]="'src'" [(ngModel)]="campaignConfig.type">
+                        <label class="form-check-label">src</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input type="radio" class="form-check-input" name="campaign_pattern_extract_ptype" [value]="'title'" [(ngModel)]="campaignConfig.type">
+                        <label class="form-check-label">title</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input type="radio" class="form-check-input" name="campaign_pattern_extract_ptype" [value]="'href'" [(ngModel)]="campaignConfig.type">
+                        <label class="form-check-label">href</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input type="radio" class="form-check-input" name="campaign_pattern_extract_ptype" [value]="'backgroundImage'" [(ngModel)]="campaignConfig.type">
+                        <label class="form-check-label">background image</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input type="radio" class="form-check-input" name="campaign_pattern_extract_ptype" [value]="'backgroundStyle'" [(ngModel)]="campaignConfig.type">
+                        <label class="form-check-label">background style</label>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Pattern selector</label>
+                <div class="input-group">
+                    <input type="text" class="form-control form-control-lg form-control-solid" [(ngModel)]="campaignConfig.pattern"  spellcheck="false">
+                    <div class="input-group-append">
+                    </div>
+                </div>
+            </div>
+            <div class="form-group" *ngIf="type==='url'">
+                <label>Base URL</label>
+                <div class="input-group">
+                    <input type="text" class="form-control form-control-lg form-control-solid" [(ngModel)]="campaignConfig.baseUrl"  spellcheck="false">
+                </div>
+            </div>
+            <button class="btn btn-primary btn-sm mb-4" type="button" (click)="onExtractCampaign()" [disabled]="loading$ | async">
+                Extract
+            </button>
+            <div class="form-group">
+                <div class="example">
+                    <p>
+                        Detail Page: {{ campaignConfig.detailUrl}}
+                    </p>
+                    <div class="example-code">
+                        <div class="example-highlight">
+                            <pre class="language-html">
+                                {{ campaignConfig.detailContent }}
+                            </pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group" *ngIf="parent && parent.selectedCampaignStatuses && parent.statuses" [ngClass]="{ 'no-selected' : parent.selectedCampaignStatuses.length == 0 }">
+                <label>Involved Campaign Status:</label>
+                <ng-multiselect-dropdown
+                    style="min-width: 200px"
+                    [settings]="multiSelectSettings"
+                    [data]="parent.statuses"
+                    [placeholder]="'Select campaign status'"
+                    [(ngModel)]="parent.selectedCampaignStatuses"
+                    (onSelect)="onSelectCampaignStatus($event)"
+                    (onDeSelect)="onSelectCampaignStatus($event)"
+                    (onSelectAll)="onSelectCampaignStatus($event)"
+                    [ngModelOptions]="{standalone: true}"
+                >
+                </ng-multiselect-dropdown>
+            </div>
+            <div class="form-group" *ngIf="parent && parent.selectedCampaignTypologies && parent.typologies" [ngClass]="{ 'no-selected' : parent.selectedCampaignTypologies.length == 0 }">
+                <label>Involved Campaign Typologies:</label>
+                <ng-multiselect-dropdown
+                    style="min-width: 200px"
+                    [(ngModel)]="parent.selectedCampaignTypologies"
+                    [ngModelOptions]="{standalone: true}"
+                    [settings]="multiSelectSettings"
+                    [data]="parent.typologies"
+                    [placeholder]="'Select campaign typologies'"
+                    (onSelect)="onSelectCampaignTypology($event)"
+                    (onDeSelect)="onSelectCampaignTypology($event)"
+                    (onSelectAll)="onSelectCampaignTypology($event)"
+                >
+                </ng-multiselect-dropdown>
+            </div>
+        </div>
+    </div>
+</div>

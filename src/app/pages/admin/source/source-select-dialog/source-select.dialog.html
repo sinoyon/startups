@@ -1,0 +1,34 @@
+<div class="overlay">
+    <ng-container *ngIf="loading$ | async">
+		<div class="overlay-layer bg-transparent" style="z-index: 1;">
+		  <div class="spinner spinner-center spinner-primary"></div>
+		</div>
+    </ng-container>
+    <div class="modal-body">
+        <div>
+			<lp-table
+				[hidden]="isEmptyTable"
+				[hasPadding]="false"
+				[showSelectAllCheckbox]="true"
+				[suppressRowClickSelection]="true"
+				[showDeleteColumn]="false"
+				(action)="onAction($event)"
+				(paginationChanged)="onPaginationChanged($event)"
+				[columnDefs]="columnDefs"
+				#tableCtrl
+			></lp-table>
+		</div>
+		<div class="d-flex justify-content-center align-items-center h-200px" *ngIf="isEmptyTable">{{'GENERAL.NO_RECORD_FOUND' | translate}}</div>
+    </div>
+    <div class="modal-footer">
+        <div>
+            <button type="button" class="btn btn-light btn-elevate me-1" (click)="modal.dismiss()">
+            {{ 'GENERAL.CANCEL' | translate}}
+            </button>&nbsp;
+            <button type="button" class="btn btn-primary btn-elevate" (click)="onYesClick()"
+            [disabled]="(loading$ | async) || tableCtrl.originSelectedRowIds.length < min">
+            {{ 'GENERAL.SAVE' | translate}}
+            </button>
+        </div>
+    </div>
+</div>

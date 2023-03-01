@@ -1,0 +1,76 @@
+:host {
+  height: 100%;
+  margin: 0;
+
+  .flex-root {
+    height: 100%;
+  }
+
+  .sticky-button:hover {
+    animation: shake 0.82s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+    transform: translate3d(0, 0, 0);
+    backface-visibility: hidden;
+    perspective: 1000px;
+  }
+
+  @keyframes shake {
+    10%,
+    90% {
+      transform: translate3d(-1px, 0, 0);
+    }
+
+    20%,
+    80% {
+      transform: translate3d(2px, 0, 0);
+    }
+
+    30%,
+    50%,
+    70% {
+      transform: translate3d(-4px, 0, 0);
+    }
+
+    40%,
+    60% {
+      transform: translate3d(4px, 0, 0);
+    }
+  }
+
+  .sticky-button {
+    width: 60px;
+    height: 60px;
+    cursor: pointer;
+    border-radius: 50%;
+    position: fixed;
+    background: #001a38;
+    right: 10px;
+    bottom: 10px;
+    z-index: 50;
+    box-shadow: 0px 0px 50px 0px rgba(82, 63, 105, 0.15);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    i {
+      font-size: 30px;
+      color: white;
+    }
+  }
+
+  #kt_content {
+    background: white;
+  }
+}
+
+
+// @media (max-width: 767.98px) {
+//   .sticky-button {
+//     right: 15px !important;
+//   }
+// }
+
+.page-loaded {
+  app-layout {
+    opacity: 1;
+    transition: opacity 1s ease-in-out;
+  }
+}
